@@ -66,6 +66,38 @@ export const en: Dict = {
       title: 'Image watermark',
       desc: 'Apply text watermark over images',
     },
+    imgcrop: {
+      title: 'Crop image',
+      desc: 'Crop area by coordinates or anchor',
+    },
+    imgtransform: {
+      title: 'Rotate/flip image',
+      desc: 'Rotate 90/180/270° or mirror horizontal/vertical',
+    },
+    imgfilters: {
+      title: 'Image filters',
+      desc: 'Grayscale, invert, blur, sharpen, sepia, contrast, brightness',
+    },
+    imgicon: {
+      title: 'Favicon icon',
+      desc: 'Generate multi-resolution .ico from image',
+    },
+    gifextract: {
+      title: 'Extract GIF frames',
+      desc: 'Save each GIF frame as PNG',
+    },
+    gifbuild: {
+      title: 'Build GIF',
+      desc: 'Build animated GIF from PNGs',
+    },
+    imgwmpos: {
+      title: 'Image watermark',
+      desc: 'Overlay logo in 5 positions with scale',
+    },
+    imgpalette: {
+      title: 'Color palette',
+      desc: 'List dominant colors in hexadecimal',
+    },
     tabular: {
       title: 'Table convert',
       desc: 'Convert between CSV and XLSX',
@@ -236,6 +268,15 @@ export const en: Dict = {
       keepaspect: { label: 'Keep aspect ratio' },
       opacity: { label: 'Opacity' },
       qrsize: { label: 'Size (px)' },
+      x: { label: 'Start X' },
+      y: { label: 'Start Y' },
+      anchor: { label: 'Anchor' },
+      transform: { label: 'Operation' },
+      filter: { label: 'Filter' },
+      wmimage: { label: 'Watermark image' },
+      position: { label: 'Position' },
+      wmscale: { label: 'Scale %' },
+      margin: { label: 'Margin (px)' },
     },
     data: {
       format: { label: 'Output format' },
@@ -273,6 +314,9 @@ export const en: Dict = {
       quality: { label: 'JPG quality' },
       pages: { label: 'Pages (e.g. 1-3,5)' },
     },
+    gif: {
+      delay: { label: 'Delay (ms)' },
+    },
   },
   job: {
     title: 'Jobs',
@@ -301,13 +345,13 @@ export const en: Dict = {
     copyPath: 'Copy path',
     outputDir: 'Output folder',
     clear: 'Clear',
-    preview: {
-      title: 'Preview',
-      rows: 'rows',
-      cols: 'columns',
-    },
     remove: 'remove',
     pages: 'pages',
+  },
+  preview: {
+    title: 'Preview',
+    rows: 'rows',
+    cols: 'columns',
   },
   search: {
     title: 'Search',

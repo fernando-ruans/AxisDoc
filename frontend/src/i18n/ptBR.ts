@@ -64,6 +64,38 @@ export const ptBR = {
       title: 'Marca d\'água em imagens',
       desc: 'Aplica marca d\'água de texto sobre imagens',
     },
+    imgcrop: {
+      title: 'Recortar imagem',
+      desc: 'Recorta área por coordenadas ou âncora',
+    },
+    imgtransform: {
+      title: 'Girar/inverter imagem',
+      desc: 'Gira 90/180/270° ou espelha horizontal/vertical',
+    },
+    imgfilters: {
+      title: 'Filtros de imagem',
+      desc: 'P&B, inverter, blur, nitidez, sépia, contraste, brilho',
+    },
+    imgicon: {
+      title: 'Ícone favicon',
+      desc: 'Gera .ico multi-resolução a partir de imagem',
+    },
+    gifextract: {
+      title: 'Extrair frames de GIF',
+      desc: 'Salva cada quadro do GIF como PNG',
+    },
+    gifbuild: {
+      title: 'Montar GIF',
+      desc: 'Monta GIF animado a partir de PNGs',
+    },
+    imgwmpos: {
+      title: 'Marca d\'água com imagem',
+      desc: 'Sobrepõe logo em 5 posições com escala',
+    },
+    imgpalette: {
+      title: 'Paleta de cores',
+      desc: 'Lista as cores dominantes em hexadecimal',
+    },
     tabular: {
       title: 'Converter tabela',
       desc: 'Converte entre CSV e XLSX',
@@ -234,6 +266,15 @@ export const ptBR = {
       keepaspect: { label: 'Manter proporção' },
       opacity: { label: 'Opacidade' },
       qrsize: { label: 'Tamanho (px)' },
+      x: { label: 'X inicial' },
+      y: { label: 'Y inicial' },
+      anchor: { label: 'Âncora' },
+      transform: { label: 'Operação' },
+      filter: { label: 'Filtro' },
+      wmimage: { label: 'Imagem da marca' },
+      position: { label: 'Posição' },
+      wmscale: { label: 'Escala %' },
+      margin: { label: 'Margem (px)' },
     },
     data: {
       format: { label: 'Formato de saída' },
@@ -271,6 +312,9 @@ export const ptBR = {
       quality: { label: 'Qualidade JPG' },
       pages: { label: 'Páginas (ex.: 1-3,5)' },
     },
+    gif: {
+      delay: { label: 'Intervalo (ms)' },
+    },
   },
   job: {
     title: 'Jobs',
@@ -299,13 +343,13 @@ export const ptBR = {
     copyPath: 'Copiar caminho',
     outputDir: 'Pasta de destino',
     clear: 'Limpar',
-    preview: {
+    remove: 'remover',
+    pages: 'páginas',
+  },
+  preview: {
     title: 'Pré-visualização',
     rows: 'linhas',
     cols: 'colunas',
-  },
-    remove: 'remover',
-    pages: 'páginas',
   },
   search: {
     title: 'Busca',

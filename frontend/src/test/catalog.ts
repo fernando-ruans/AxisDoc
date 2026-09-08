@@ -197,6 +197,70 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     ],
   },
   {
+    id: 'img.crop', category: 'image', titleKey: 'tool.imgcrop.title',
+    descKey: 'tool.imgcrop.desc', icon: 'crop', stepNames: ['step.img2.crop'],
+    params: [
+      param('x', 'param.img.x.label', 'number', { default: 0, min: 0 }),
+      param('y', 'param.img.y.label', 'number', { default: 0, min: 0 }),
+      param('width', 'param.img.width.label', 'number', { default: 100, min: 1 }),
+      param('height', 'param.img.height.label', 'number', { default: 100, min: 1 }),
+      param('anchor', 'param.img.anchor.label', 'select', { options: ['topLeft', 'center', 'topRight', 'bottomLeft', 'bottomRight'], default: 'topLeft' }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'img.transform', category: 'image', titleKey: 'tool.imgtransform.title',
+    descKey: 'tool.imgtransform.desc', icon: 'flip-horizontal', stepNames: ['step.img2.transform'],
+    params: [
+      param('op', 'param.img.transform.label', 'select', { options: ['rotate90', 'rotate180', 'rotate270', 'flipH', 'flipV'], default: 'rotate90' }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'img.filters', category: 'image', titleKey: 'tool.imgfilters.title',
+    descKey: 'tool.imgfilters.desc', icon: 'wand', stepNames: ['step.img2.filters'],
+    params: [
+      param('filter', 'param.img.filter.label', 'select', { options: ['grayscale', 'invert', 'blur', 'sharpen', 'sepia', 'contrast', 'brightness'], default: 'grayscale' }),
+      param('strength', 'param.img.opacity.label', 'number', { default: 5, min: 0, max: 10 }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'img.icon', category: 'image', titleKey: 'tool.imgicon.title',
+    descKey: 'tool.imgicon.desc', icon: 'shapes', stepNames: ['step.img2.icon'],
+    params: [
+      param('outputPath', 'param.outputPath.label', 'output', { default: 'icon.ico' }),
+    ],
+  },
+  {
+    id: 'img.gifextract', category: 'image', titleKey: 'tool.gifextract.title',
+    descKey: 'tool.gifextract.desc', icon: 'film', stepNames: ['step.img2.gifextract'],
+    params: [outputDir()],
+  },
+  {
+    id: 'img.gifbuild', category: 'image', titleKey: 'tool.gifbuild.title',
+    descKey: 'tool.gifbuild.desc', icon: 'film', stepNames: ['step.img2.gifbuild'],
+    params: [
+      param('delay', 'param.gif.delay.label', 'number', { default: 100, min: 20, max: 5000 }),
+      param('outputPath', 'param.outputPath.label', 'output', { default: 'animacao.gif' }),
+    ],
+  },
+  {
+    id: 'img.watermarkpos', category: 'image', titleKey: 'tool.imgwmpos.title',
+    descKey: 'tool.imgwmpos.desc', icon: 'stamp', stepNames: ['step.img2.watermarkpos'],
+    params: [
+      param('image', 'param.img.wmimage.label', 'text', { required: true, default: '' }),
+      param('position', 'param.img.position.label', 'select', { options: ['topLeft', 'topRight', 'center', 'bottomLeft', 'bottomRight'], default: 'bottomRight' }),
+      param('scale', 'param.img.wmscale.label', 'number', { default: 20, min: 5, max: 90 }),
+      param('margin', 'param.img.margin.label', 'number', { default: 20, min: 0, max: 500 }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'img.palette', category: 'image', titleKey: 'tool.imgpalette.title',
+    descKey: 'tool.imgpalette.desc', icon: 'palette', stepNames: ['step.img2.palette'],
+  },
+  {
     id: 'data.tabular', category: 'data', titleKey: 'tool.tabular.title',
     descKey: 'tool.tabular.desc', icon: 'table-2', stepNames: ['step.data.tabular'],
     params: [
@@ -368,5 +432,6 @@ export const VALID_ICONS = [
   'scan-barcode', 'database', 'scan-text', 'image', 'file-output', 'file-x',
   'type', 'paperclip', 'info', 'lock', 'images', 'file-plus', 'layout-grid',
   'database-zap', 'file-spreadsheet', 'table', 'align-left', 'binary', 'clock',
-  'link', 'columns-3', 'code-2',
+  'link', 'columns-3', 'code-2', 'crop', 'flip-horizontal', 'wand', 'shapes',
+  'film', 'palette',
 ]

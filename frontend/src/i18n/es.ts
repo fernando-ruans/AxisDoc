@@ -66,6 +66,38 @@ export const es: Dict = {
       title: 'Marca de agua en imágenes',
       desc: 'Aplica marca de agua de texto sobre imágenes',
     },
+    imgcrop: {
+      title: 'Recortar imagen',
+      desc: 'Recorta área por coordenadas o ancla',
+    },
+    imgtransform: {
+      title: 'Rotar/voltear imagen',
+      desc: 'Rota 90/180/270° o espeja horizontal/vertical',
+    },
+    imgfilters: {
+      title: 'Filtros de imagen',
+      desc: 'B/N, invertir, blur, nitidez, sepia, contraste, brillo',
+    },
+    imgicon: {
+      title: 'Icono favicon',
+      desc: 'Genera .ico multi-resolución desde imagen',
+    },
+    gifextract: {
+      title: 'Extraer cuadros de GIF',
+      desc: 'Guarda cada cuadro del GIF como PNG',
+    },
+    gifbuild: {
+      title: 'Crear GIF',
+      desc: 'Crea GIF animado desde PNGs',
+    },
+    imgwmpos: {
+      title: 'Marca de agua con imagen',
+      desc: 'Superpone logo en 5 posiciones con escala',
+    },
+    imgpalette: {
+      title: 'Paleta de colores',
+      desc: 'Lista los colores dominantes en hexadecimal',
+    },
     tabular: {
       title: 'Convertir tabla',
       desc: 'Convierte entre CSV y XLSX',
@@ -236,6 +268,15 @@ export const es: Dict = {
       keepaspect: { label: 'Mantener proporción' },
       opacity: { label: 'Opacidad' },
       qrsize: { label: 'Tamaño (px)' },
+      x: { label: 'X inicial' },
+      y: { label: 'Y inicial' },
+      anchor: { label: 'Ancla' },
+      transform: { label: 'Operación' },
+      filter: { label: 'Filtro' },
+      wmimage: { label: 'Imagen de marca' },
+      position: { label: 'Posición' },
+      wmscale: { label: 'Escala %' },
+      margin: { label: 'Margen (px)' },
     },
     data: {
       format: { label: 'Formato de salida' },
@@ -273,6 +314,9 @@ export const es: Dict = {
       quality: { label: 'Calidad JPG' },
       pages: { label: 'Páginas (ej.: 1-3,5)' },
     },
+    gif: {
+      delay: { label: 'Intervalo (ms)' },
+    },
   },
   job: {
     title: 'Tareas',
@@ -301,13 +345,13 @@ export const es: Dict = {
     copyPath: 'Copiar ruta',
     outputDir: 'Carpeta de destino',
     clear: 'Limpiar',
-    preview: {
-      title: 'Vista previa',
-      rows: 'filas',
-      cols: 'columnas',
-    },
     remove: 'quitar',
     pages: 'páginas',
+  },
+  preview: {
+    title: 'Vista previa',
+    rows: 'filas',
+    cols: 'columnas',
   },
   search: {
     title: 'Búsqueda',

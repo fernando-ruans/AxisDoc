@@ -19,6 +19,7 @@ import (
 	"github.com/ferna/axisdoc/internal/tool/datafiles2"
 	"github.com/ferna/axisdoc/internal/tool/hashfile"
 	"github.com/ferna/axisdoc/internal/tool/imgtools"
+	"github.com/ferna/axisdoc/internal/tool/imgtools2"
 	"github.com/ferna/axisdoc/internal/tool/pdftools"
 	"github.com/ferna/axisdoc/internal/tool/pdftools2"
 	"github.com/ferna/axisdoc/internal/tool/texttools"
@@ -86,6 +87,14 @@ func NewRegistry() *tool.Registry {
 		imgtools.NewConvertImage(),
 		imgtools.NewResizeImage(),
 		imgtools.NewWatermarkImage(),
+		imgtools2.NewCrop(),
+		imgtools2.NewTransform(),
+		imgtools2.NewFilters(),
+		imgtools2.NewIconGen(),
+		imgtools2.NewGIFExtract(),
+		imgtools2.NewGIFBuild(),
+		imgtools2.NewWatermarkPos(),
+		imgtools2.NewPalette(),
 		datafiles.NewTabularConvert(),
 		datafiles.NewSpreadsheetCompare(),
 		datafiles.NewStructConvert(),
@@ -223,6 +232,14 @@ func runCLI() bool {
 		imgtools.NewConvertImage(),
 		imgtools.NewResizeImage(),
 		imgtools.NewWatermarkImage(),
+		imgtools2.NewCrop(),
+		imgtools2.NewTransform(),
+		imgtools2.NewFilters(),
+		imgtools2.NewIconGen(),
+		imgtools2.NewGIFExtract(),
+		imgtools2.NewGIFBuild(),
+		imgtools2.NewWatermarkPos(),
+		imgtools2.NewPalette(),
 		datafiles.NewTabularConvert(),
 		datafiles.NewSpreadsheetCompare(),
 		datafiles.NewStructConvert(),

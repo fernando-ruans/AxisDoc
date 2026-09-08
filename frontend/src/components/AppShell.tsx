@@ -8,6 +8,7 @@ import {
   Pencil, List, QrCode, ScanBarcode, Database, ScanText, FileImage,
   Search as SearchIcon, Workflow, FolderClock, DatabaseZap,
   FileSpreadsheet, Table, AlignLeft, Binary, Clock, Link, Columns3, Code,
+  Crop, FlipHorizontal, Wand2, Shapes, Film, Palette,
 } from 'lucide-react'
 import { useCatalog } from '../stores/catalog'
 import { useTheme } from '../stores/theme'
@@ -54,6 +55,12 @@ const ICONS: Record<string, IconComponent> = {
   link: Link,
   'columns-3': Columns3,
   'code-2': Code,
+  crop: Crop,
+  'flip-horizontal': FlipHorizontal,
+  wand: Wand2,
+  shapes: Shapes,
+  film: Film,
+  palette: Palette,
 }
 
 function iconFor(name: string): IconComponent {
