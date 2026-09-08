@@ -118,6 +118,54 @@ export const es: Dict = {
       title: 'PDF a imagen',
       desc: 'Convierte páginas del PDF en imágenes PNG/JPG',
     },
+    pdfextractimages: {
+      title: 'Extraer imágenes de PDF',
+      desc: 'Extrae todas las imágenes incrustadas del PDF',
+    },
+    pdfextractpages: {
+      title: 'Extraer páginas de PDF',
+      desc: 'Guarda páginas seleccionadas en un nuevo PDF',
+    },
+    pdfremovepages: {
+      title: 'Eliminar páginas de PDF',
+      desc: 'Elimina páginas seleccionadas del PDF',
+    },
+    pdfextractfonts: {
+      title: 'Extraer fuentes de PDF',
+      desc: 'Extrae las fuentes incrustadas en el PDF',
+    },
+    pdfextractattachments: {
+      title: 'Extraer adjuntos de PDF',
+      desc: 'Extrae archivos adjuntos al PDF',
+    },
+    pdfextractmetadata: {
+      title: 'Metadatos de PDF',
+      desc: 'Muestra los metadatos XMP del PDF',
+    },
+    pdfpermissions: {
+      title: 'Permisos de PDF',
+      desc: 'Lista los permisos de uso del PDF',
+    },
+    pdfdiff: {
+      title: 'Comparar PDF',
+      desc: 'Compara el texto de dos PDF',
+    },
+    pdfaddattachments: {
+      title: 'Adjuntar archivos a PDF',
+      desc: 'Adjunta archivos dentro del PDF',
+    },
+    pdffromimages: {
+      title: 'Imágenes a PDF',
+      desc: 'Une imágenes en un solo PDF',
+    },
+    pdfcreate: {
+      title: 'Crear PDF',
+      desc: 'Crea un PDF nuevo con título y texto',
+    },
+    pdfnup: {
+      title: 'N-up de PDF',
+      desc: 'Pone 2, 4 u 8 páginas por hoja',
+    },
   },
   step: {
     hashfile: { compute: 'Calculando hashes' },
@@ -133,6 +181,12 @@ export const es: Dict = {
       angle: { label: 'Ángulo' },
       text: { label: 'Texto' },
       fontsize: { label: 'Tamaño de fuente' },
+      pages: { label: 'Páginas (ej.: 1-3,5)' },
+      attachfiles: { label: 'Archivos (uno por línea)' },
+      doctitle: { label: 'Título' },
+      docbody: { label: 'Texto' },
+      blankpages: { label: 'Páginas en blanco extra' },
+      nup: { label: 'Páginas por hoja' },
     },
     img: {
       format: { label: 'Formato' },

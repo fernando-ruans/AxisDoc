@@ -101,8 +101,17 @@ export function AppShell(): React.JSX.Element {
     <div className="flex h-screen bg-bg text-text">
       <aside className="flex w-64 flex-col border-r border-border bg-surface" data-testid="sidebar">
         <div className="border-b border-border px-4 py-4">
-          <h1 className="text-lg font-bold tracking-tight">{t('app.name')}</h1>
-          <p className="text-xs text-text-muted">{t('app.tagline')}</p>
+          <div className="flex items-center gap-2.5">
+            <img
+              src="logo.png"
+              alt=""
+              className="h-9 w-9"
+              draggable={false}
+              data-testid="app-logo"
+            />
+            <h1 className="text-lg font-bold tracking-tight">{t('app.name')}</h1>
+          </div>
+          <p className="mt-1 text-xs text-text-muted">{t('app.tagline')}</p>
         </div>
 
         <button

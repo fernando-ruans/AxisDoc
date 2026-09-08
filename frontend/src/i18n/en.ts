@@ -118,6 +118,54 @@ export const en: Dict = {
       title: 'PDF to image',
       desc: 'Convert PDF pages to PNG/JPG images',
     },
+    pdfextractimages: {
+      title: 'Extract PDF images',
+      desc: 'Extract all embedded images from the PDF',
+    },
+    pdfextractpages: {
+      title: 'Extract PDF pages',
+      desc: 'Save selected pages to a new PDF',
+    },
+    pdfremovepages: {
+      title: 'Remove PDF pages',
+      desc: 'Remove selected pages from the PDF',
+    },
+    pdfextractfonts: {
+      title: 'Extract PDF fonts',
+      desc: 'Extract embedded fonts from the PDF',
+    },
+    pdfextractattachments: {
+      title: 'Extract PDF attachments',
+      desc: 'Extract files attached to the PDF',
+    },
+    pdfextractmetadata: {
+      title: 'PDF metadata',
+      desc: 'Show the PDF XMP metadata',
+    },
+    pdfpermissions: {
+      title: 'PDF permissions',
+      desc: 'List the PDF usage permissions',
+    },
+    pdfdiff: {
+      title: 'Compare PDFs',
+      desc: 'Compare the text of two PDFs',
+    },
+    pdfaddattachments: {
+      title: 'Attach files to PDF',
+      desc: 'Attach files inside the PDF',
+    },
+    pdffromimages: {
+      title: 'Images to PDF',
+      desc: 'Join images into a single PDF',
+    },
+    pdfcreate: {
+      title: 'Create PDF',
+      desc: 'Create a new PDF with title and text',
+    },
+    pdfnup: {
+      title: 'PDF N-up',
+      desc: 'Put 2, 4 or 8 pages per sheet',
+    },
   },
   step: {
     hashfile: { compute: 'Computing hashes' },
@@ -133,6 +181,12 @@ export const en: Dict = {
       angle: { label: 'Angle' },
       text: { label: 'Text' },
       fontsize: { label: 'Font size' },
+      pages: { label: 'Pages (e.g. 1-3,5)' },
+      attachfiles: { label: 'Files (one per line)' },
+      doctitle: { label: 'Title' },
+      docbody: { label: 'Text' },
+      blankpages: { label: 'Extra blank pages' },
+      nup: { label: 'Pages per sheet' },
     },
     img: {
       format: { label: 'Format' },

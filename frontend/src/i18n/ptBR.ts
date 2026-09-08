@@ -116,6 +116,54 @@ export const ptBR = {
       title: 'PDF para imagem',
       desc: 'Converte páginas do PDF em imagens PNG/JPG',
     },
+    pdfextractimages: {
+      title: 'Extrair imagens de PDF',
+      desc: 'Extrai todas as imagens embutidas do PDF',
+    },
+    pdfextractpages: {
+      title: 'Extrair páginas de PDF',
+      desc: 'Salva páginas selecionadas em um novo PDF',
+    },
+    pdfremovepages: {
+      title: 'Remover páginas de PDF',
+      desc: 'Remove páginas selecionadas do PDF',
+    },
+    pdfextractfonts: {
+      title: 'Extrair fontes de PDF',
+      desc: 'Extrai as fontes embutidas no PDF',
+    },
+    pdfextractattachments: {
+      title: 'Extrair anexos de PDF',
+      desc: 'Extrai arquivos anexados ao PDF',
+    },
+    pdfextractmetadata: {
+      title: 'Metadados de PDF',
+      desc: 'Mostra os metadados XMP do PDF',
+    },
+    pdfpermissions: {
+      title: 'Permissões de PDF',
+      desc: 'Lista as permissões de uso do PDF',
+    },
+    pdfdiff: {
+      title: 'Comparar PDFs',
+      desc: 'Compara o texto de dois PDFs',
+    },
+    pdfaddattachments: {
+      title: 'Anexar arquivos em PDF',
+      desc: 'Anexa arquivos dentro do PDF',
+    },
+    pdffromimages: {
+      title: 'Imagens para PDF',
+      desc: 'Junta imagens em um único PDF',
+    },
+    pdfcreate: {
+      title: 'Criar PDF',
+      desc: 'Cria um PDF novo com título e texto',
+    },
+    pdfnup: {
+      title: 'N-up de PDF',
+      desc: 'Coloca 2, 4 ou 8 páginas por folha',
+    },
   },
   step: {
     hashfile: { compute: 'Calculando hashes' },
@@ -131,6 +179,12 @@ export const ptBR = {
       angle: { label: 'Ângulo' },
       text: { label: 'Texto' },
       fontsize: { label: 'Tamanho da fonte' },
+      pages: { label: 'Páginas (ex.: 1-3,5)' },
+      attachfiles: { label: 'Arquivos (um por linha)' },
+      doctitle: { label: 'Título' },
+      docbody: { label: 'Texto' },
+      blankpages: { label: 'Páginas em branco extras' },
+      nup: { label: 'Páginas por folha' },
     },
     img: {
       format: { label: 'Formato' },

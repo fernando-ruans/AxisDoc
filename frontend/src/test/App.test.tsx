@@ -24,9 +24,10 @@ describe('AppShell', () => {
     setBackend(makeBackend())
   })
 
-  it('renderiza sidebar com o nome do app', async () => {
+  it('renderiza sidebar com logo e nome do app', async () => {
     render(<App />)
     expect(await screen.findByTestId('sidebar')).toBeInTheDocument()
+    expect(screen.getByTestId('app-logo')).toBeInTheDocument()
     expect(screen.getAllByText('AxisDoc').length).toBeGreaterThan(0)
   })
 

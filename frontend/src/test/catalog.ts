@@ -76,6 +76,89 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     descKey: 'tool.pdfextract.desc', icon: 'file-text', stepNames: ['step.pdf.extracttext'],
   },
   {
+    id: 'pdf.extractimages', category: 'pdf', titleKey: 'tool.pdfextractimages.title',
+    descKey: 'tool.pdfextractimages.desc', icon: 'image', stepNames: ['step.pdf.extractimages'],
+    params: [
+      param('pages', 'param.pdf.pages.label', 'text', { default: '' }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'pdf.extractpages', category: 'pdf', titleKey: 'tool.pdfextractpages.title',
+    descKey: 'tool.pdfextractpages.desc', icon: 'file-output', stepNames: ['step.pdf.extractpages'],
+    params: [
+      param('pages', 'param.pdf.pages.label', 'text', { required: true, default: '' }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'pdf.removepages', category: 'pdf', titleKey: 'tool.pdfremovepages.title',
+    descKey: 'tool.pdfremovepages.desc', icon: 'file-x', stepNames: ['step.pdf.removepages'],
+    params: [
+      param('pages', 'param.pdf.pages.label', 'text', { required: true, default: '' }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'pdf.extractfonts', category: 'pdf', titleKey: 'tool.pdfextractfonts.title',
+    descKey: 'tool.pdfextractfonts.desc', icon: 'type', stepNames: ['step.pdf.extractfonts'],
+    params: [
+      param('pages', 'param.pdf.pages.label', 'text', { default: '' }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'pdf.extractattachments', category: 'pdf', titleKey: 'tool.pdfextractattachments.title',
+    descKey: 'tool.pdfextractattachments.desc', icon: 'paperclip', stepNames: ['step.pdf.extractattachments'],
+    params: [outputDir()],
+  },
+  {
+    id: 'pdf.extractmetadata', category: 'pdf', titleKey: 'tool.pdfextractmetadata.title',
+    descKey: 'tool.pdfextractmetadata.desc', icon: 'info', stepNames: ['step.pdf.extractmetadata'],
+  },
+  {
+    id: 'pdf.permissions', category: 'pdf', titleKey: 'tool.pdfpermissions.title',
+    descKey: 'tool.pdfpermissions.desc', icon: 'lock', stepNames: ['step.pdf.permissions'],
+  },
+  {
+    id: 'pdf.diff', category: 'pdf', titleKey: 'tool.pdfdiff.title',
+    descKey: 'tool.pdfdiff.desc', icon: 'git-compare', stepNames: ['step.pdf.diff'],
+  },
+  {
+    id: 'pdf.addattachments', category: 'pdf', titleKey: 'tool.pdfaddattachments.title',
+    descKey: 'tool.pdfaddattachments.desc', icon: 'paperclip', stepNames: ['step.pdf.addattachments'],
+    params: [
+      param('files', 'param.pdf.attachfiles.label', 'text', { required: true, default: '' }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'pdf.fromimages', category: 'pdf', titleKey: 'tool.pdffromimages.title',
+    descKey: 'tool.pdffromimages.desc', icon: 'images', stepNames: ['step.pdf.fromimages'],
+    params: [
+      param('outputPath', 'param.outputPath.label', 'output', { default: 'imagens.pdf' }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'pdf.create', category: 'pdf', titleKey: 'tool.pdfcreate.title',
+    descKey: 'tool.pdfcreate.desc', icon: 'file-plus', stepNames: ['step.pdf.create'],
+    params: [
+      param('title', 'param.pdf.doctitle.label', 'text', { required: true, default: '' }),
+      param('body', 'param.pdf.docbody.label', 'text', { required: true, default: '' }),
+      param('pages', 'param.pdf.blankpages.label', 'number', { default: 0, min: 0, max: 50 }),
+      param('outputPath', 'param.outputPath.label', 'output', { default: 'novo.pdf' }),
+    ],
+  },
+  {
+    id: 'pdf.nup', category: 'pdf', titleKey: 'tool.pdfnup.title',
+    descKey: 'tool.pdfnup.desc', icon: 'layout-grid', stepNames: ['step.pdf.nup'],
+    params: [
+      param('n', 'param.pdf.nup.label', 'select', { options: ['2', '4', '8'], default: '2' }),
+      outputDir(),
+    ],
+  },
+  {
     id: 'pdf.toimage', category: 'pdf', titleKey: 'tool.pdf2img.title',
     descKey: 'tool.pdf2img.desc', icon: 'file-image', stepNames: [], frontendDriven: true,
     params: [
@@ -204,5 +287,6 @@ export const VALID_ICONS = [
   'fingerprint', 'file-info', 'file-plus-2', 'scissors', 'rotate-cw', 'stamp',
   'minimize-2', 'file-text', 'file-image', 'repeat', 'scaling', 'table-2',
   'git-compare', 'braces', 'code', 'file-json', 'pencil', 'list', 'qr-code',
-  'scan-barcode', 'database', 'scan-text',
+  'scan-barcode', 'database', 'scan-text', 'image', 'file-output', 'file-x',
+  'type', 'paperclip', 'info', 'lock', 'images', 'file-plus', 'layout-grid',
 ]

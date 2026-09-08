@@ -19,6 +19,7 @@ import (
 	"github.com/ferna/axisdoc/internal/tool/hashfile"
 	"github.com/ferna/axisdoc/internal/tool/imgtools"
 	"github.com/ferna/axisdoc/internal/tool/pdftools"
+	"github.com/ferna/axisdoc/internal/tool/pdftools2"
 	"github.com/ferna/axisdoc/internal/tool/texttools"
 	"github.com/ferna/axisdoc/internal/update"
 	wruntime "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -68,6 +69,18 @@ func NewRegistry() *tool.Registry {
 		pdftools.NewWatermarkPDF(),
 		pdftools.NewCompressPDF(),
 		pdftools.NewExtractTextPDF(),
+		pdftools2.NewExtractImages(),
+		pdftools2.NewExtractPages(),
+		pdftools2.NewRemovePages(),
+		pdftools2.NewExtractFonts(),
+		pdftools2.NewExtractAttachments(),
+		pdftools2.NewExtractMetadata(),
+		pdftools2.NewPermissions(),
+		pdftools2.NewComparePDFs(),
+		pdftools2.NewAddAttachments(),
+		pdftools2.NewImagesToPDF(),
+		pdftools2.NewCreatePDF(),
+		pdftools2.NewNUp(),
 		imgtools.NewConvertImage(),
 		imgtools.NewResizeImage(),
 		imgtools.NewWatermarkImage(),
@@ -183,6 +196,18 @@ func runCLI() bool {
 		pdftools.NewWatermarkPDF(),
 		pdftools.NewCompressPDF(),
 		pdftools.NewExtractTextPDF(),
+		pdftools2.NewExtractImages(),
+		pdftools2.NewExtractPages(),
+		pdftools2.NewRemovePages(),
+		pdftools2.NewExtractFonts(),
+		pdftools2.NewExtractAttachments(),
+		pdftools2.NewExtractMetadata(),
+		pdftools2.NewPermissions(),
+		pdftools2.NewComparePDFs(),
+		pdftools2.NewAddAttachments(),
+		pdftools2.NewImagesToPDF(),
+		pdftools2.NewCreatePDF(),
+		pdftools2.NewNUp(),
 		imgtools.NewConvertImage(),
 		imgtools.NewResizeImage(),
 		imgtools.NewWatermarkImage(),
