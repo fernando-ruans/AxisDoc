@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>AxisDoc</title>
+    <script>
+      try {
+        if ((localStorage.getItem('axisdoc.theme') || 'dark') === 'dark') {
+          document.documentElement.classList.add('dark');
+        }
+      } catch (e) { document.documentElement.classList.add('dark'); }
+    </script>
+</head>
+<body>
+<div id="root"></div>
+<script src="./src/main.tsx" type="module"></script>
+</body>
+</html>
+

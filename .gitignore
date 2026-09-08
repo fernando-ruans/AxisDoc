@@ -1,0 +1,8 @@
+build/bin
+node_modules
+frontend/dist
+frontend/test-results
+frontend/playwright-report
+coverage.out
+*.sqlite3
+*.sqlite3-*

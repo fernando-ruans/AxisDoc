@@ -1,0 +1,50 @@
+version: '3'
+
+tasks:
+  dev:
+    desc: Roda o app em modo dev (Wails + Vite)
+    cmd: wails dev
+
+  build:
+    desc: Build de produção (frontend + binário)
+    cmd: wails build
+
+  test:go:
+    desc: Testes Go com race e cobertura
+    cmds:
+      - go vet ./...
+      - go test ./internal/... -count=1 -covermode=atomic -coverprofile={{.TASKFILE_DIR}}/coverage.out
+      - go run ./scripts/coverage-gate {{.TASKFILE_DIR}}/coverage.out 70
+
+  test:fe:
+    desc: Testes frontend (Vitest)
+    dir: frontend
+    cmd: npm test
+
+  test:e2e:
+    desc: Testes E2E (Playwright)
+    dir: frontend
+    cmd: npm run e2e
+
+  test:
+    desc: Todos os testes (Go + frontend)
+    cmds:
+      - task: test:go
+      - task: test:fe
+
+  test:update-golden:
+    desc: Atualiza golden files dos testes Go
+    cmd: go test ./internal/... -count=1 -update
+
+  clean:
+    desc: Limpa artefatos de build
+    cmds:
+      - cmd: if (Test-Path frontend/dist) { Remove-Item -Recurse -Force frontend/dist }
+        platforms: [windows]
+      - cmd: rm -rf frontend/dist
+        platforms: [linux]
+      - cmd: if (Test-Path coverage.out) { Remove-Item -Force coverage.out }
+        platforms: [windows]
+      - cmd: rm -f coverage.out
+        platforms: [linux]
+

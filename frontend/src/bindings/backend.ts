@@ -1,0 +1,125 @@
+export interface ToolParam {
+  key: string
+  label: string
+  type: 'select' | 'number' | 'bool' | 'text' | 'output' | 'folder'
+  options?: string[]
+  default?: unknown
+  required?: boolean
+  min?: number
+  max?: number
+}
+
+export interface ToolInfo {
+  id: string
+  category: string
+  titleKey: string
+  descKey: string
+  icon: string
+  stepNames: string[]
+  params?: ToolParam[]
+  frontendDriven?: boolean
+}
+
+export interface PreviewRef {
+  token: string
+  name: string
+}
+
+export interface StructuredSummary {
+  kind: 'table' | 'pdf'
+  rows: number
+  cols: number
+  sample: string[][]
+  pages: number
+  title: string
+}
+
+export interface SearchHit {
+  docId: string
+  path: string
+  title: string
+  snippet: string
+  rank: number
+}
+
+export interface PipelineStep {
+  toolId: string
+  params: Record<string, unknown>
+}
+
+export interface Pipeline {
+  id: string
+  name: string
+  steps: PipelineStep[]
+}
+
+export interface WatchRuleOut {
+  id: string
+  folder: string
+  pattern: string
+  pipeline: Pipeline
+}
+
+export interface Job {
+  id: string
+  toolId: string
+  status: 'queued' | 'running' | 'done' | 'failed' | 'canceled'
+  input: Record<string, unknown>
+  output?: Record<string, unknown>
+  error?: string
+  progress: number
+  createdAt: string
+  updatedAt: string
+}
+
+export interface JobInput {
+  paths?: string[]
+  params?: Record<string, unknown>
+}
+
+/**
+ * Contrato do backend. A implementação real usa os bindings gerados pelo
+ * Wails (window.go); os testes injetam fakes via setBackend().
+ */
+export interface Backend {
+  listTools(): Promise<ToolInfo[]>
+  enqueue(toolId: string, input: JobInput): Promise<Job>
+  cancel(id: string): Promise<void>
+  listJobs(limit: number): Promise<Job[]>
+  pickFiles(): Promise<string[]>
+  pickFolder(): Promise<string>
+  savePath(defaultName: string): Promise<string>
+  version(): Promise<string>
+  ping(): Promise<string>
+  checkUpdate(): Promise<{ hasUpdate: boolean; tag: string }>
+  deleteJob(id: string): Promise<void>
+  clearHistory(): Promise<void>
+  openPath(path: string): Promise<void>
+  revealInFolder(path: string): Promise<void>
+  registerPreviewFiles(paths: string[]): Promise<PreviewRef[]>
+  previewText(token: string, maxLines: number): Promise<string>
+  previewSummary(token: string): Promise<StructuredSummary>
+  previewFor(toolId: string, params: Record<string, unknown>): Promise<string>
+  saveRenderedPage(outputDir: string, baseName: string, page: number, ext: string, base64: string): Promise<string>
+  searchQuery(q: string, limit: number): Promise<SearchHit[]>
+  searchCount(): Promise<number>
+  pipelineList(): Promise<Pipeline[]>
+  pipelineSave(p: Pipeline): Promise<void>
+  pipelineDelete(id: string): Promise<void>
+  pipelineRun(p: Pipeline, paths: string[]): Promise<{ paths: string[]; message: string }>
+  watchList(): Promise<WatchRuleOut[]>
+  watchAdd(folder: string, pattern: string, p: Pipeline): Promise<void>
+  watchRemove(id: string): Promise<void>
+  onEvent(name: string, cb: (data: unknown) => void): () => void
+}
+
+let backend: Backend | null = null
+
+export function getBackend(): Backend {
+  if (backend) return backend
+  throw new Error('backend não inicializado')
+}
+
+export function setBackend(b: Backend): void {
+  backend = b
+}
