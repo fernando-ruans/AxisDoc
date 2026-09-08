@@ -3,6 +3,21 @@ node_modules
 frontend/dist
 frontend/test-results
 frontend/playwright-report
+frontend/e2e-out.txt
 coverage.out
+cover-test
 *.sqlite3
 *.sqlite3-*
+# artefatos gerados pelos testes de tools (outputs no mesmo dir do input)
+internal/tool/datafiles/conf*.json
+internal/tool/datafiles/conf*.toml
+internal/tool/datafiles/conf*.yaml
+internal/tool/datafiles/dados*.csv
+internal/tool/datafiles/dados*.xlsx
+internal/tool/datafiles/p*.json
+internal/tool/imgtools/img*.jpg
+internal/tool/imgtools/img*.png
+internal/tool/pdftools/doc_*.pdf
+internal/tool/pdftools/merged_*/
+# binários de terceiros embutidos (licenciados separadamente)
+build/windows/installer/tmp/
