@@ -198,6 +198,26 @@ export const es: Dict = {
       title: 'N-up de PDF',
       desc: 'Pone 2, 4 u 8 páginas por hoja',
     },
+    pdfrearrange: {
+      title: 'Reordenar páginas',
+      desc: 'Reordena páginas en cualquier orden (ej.: 3,1,2)',
+    },
+    pdfprotect: {
+      title: 'Proteger PDF',
+      desc: 'Cifra el PDF con contraseña (AES)',
+    },
+    pdfunlock: {
+      title: 'Desbloquear PDF',
+      desc: 'Elimina la contraseña de un PDF',
+    },
+    pdfoverlay: {
+      title: 'Superponer PDF',
+      desc: 'Aplica un PDF sobre otro como sello',
+    },
+    pdfpagenumbers: {
+      title: 'Numerar páginas',
+      desc: 'Añade numeración a cada página',
+    },
     csv2sql: {
       title: 'Tabla a SQL',
       desc: 'Genera INSERTs desde CSV/XLSX',
@@ -259,6 +279,14 @@ export const es: Dict = {
       docbody: { label: 'Texto' },
       blankpages: { label: 'Páginas en blanco extra' },
       nup: { label: 'Páginas por hoja' },
+      order: { label: 'Nuevo orden (ej.: 3,1,2)' },
+      userpw: { label: 'Contraseña de usuario' },
+      ownerpw: { label: 'Contraseña de propietario' },
+      keylen: { label: 'Clave (bits)' },
+      password: { label: 'Contraseña' },
+      overlay: { label: 'PDF de superposición' },
+      ontop: { label: 'Sobre el contenido' },
+      numformat: { label: 'Formato (use %p y %P)' },
     },
     img: {
       format: { label: 'Formato' },

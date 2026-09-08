@@ -198,6 +198,26 @@ export const en: Dict = {
       title: 'PDF N-up',
       desc: 'Put 2, 4 or 8 pages per sheet',
     },
+    pdfrearrange: {
+      title: 'Reorder pages',
+      desc: 'Reorder pages in any order (e.g. 3,1,2)',
+    },
+    pdfprotect: {
+      title: 'Protect PDF',
+      desc: 'Encrypt the PDF with password (AES)',
+    },
+    pdfunlock: {
+      title: 'Unlock PDF',
+      desc: 'Remove the password from a PDF',
+    },
+    pdfoverlay: {
+      title: 'Overlay PDF',
+      desc: 'Stamp one PDF over another',
+    },
+    pdfpagenumbers: {
+      title: 'Number pages',
+      desc: 'Add page numbers to each page',
+    },
     csv2sql: {
       title: 'Table to SQL',
       desc: 'Generate INSERTs from CSV/XLSX',
@@ -259,6 +279,14 @@ export const en: Dict = {
       docbody: { label: 'Text' },
       blankpages: { label: 'Extra blank pages' },
       nup: { label: 'Pages per sheet' },
+      order: { label: 'New order (e.g. 3,1,2)' },
+      userpw: { label: 'User password' },
+      ownerpw: { label: 'Owner password' },
+      keylen: { label: 'Key (bits)' },
+      password: { label: 'Password' },
+      overlay: { label: 'Overlay PDF' },
+      ontop: { label: 'Over content' },
+      numformat: { label: 'Format (use %p and %P)' },
     },
     img: {
       format: { label: 'Format' },

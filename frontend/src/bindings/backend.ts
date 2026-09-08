@@ -1,7 +1,7 @@
 export interface ToolParam {
   key: string
   label: string
-  type: 'select' | 'number' | 'bool' | 'text' | 'output' | 'folder'
+  type: 'select' | 'number' | 'bool' | 'text' | 'output' | 'folder' | 'password'
   options?: string[]
   default?: unknown
   required?: boolean

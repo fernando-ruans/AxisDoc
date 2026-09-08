@@ -57,7 +57,7 @@ test('catálogo real renderiza labels resolvidos', async ({ page }) => {
       expect(p.key, `${t.id}: param sem key`).toBeTruthy()
       expect(p.label, `${t.id}.${p.key}: param sem label`).toBeTruthy()
       expect(
-        ['select', 'number', 'bool', 'text', 'output', 'folder'],
+        ['select', 'number', 'bool', 'text', 'output', 'folder', 'password'],
         `${t.id}.${p.key}: type inválido`,
       ).toContain(p.type)
       if (p.type === 'select') {

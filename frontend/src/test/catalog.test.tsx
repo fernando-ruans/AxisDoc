@@ -24,10 +24,10 @@ beforeEach(() => {
 })
 
 describe('catálogo canônico', () => {
-  it('tem 54 tools com IDs únicos', () => {
+  it('tem 59 tools com IDs únicos', () => {
     const ids = CANONICAL_CATALOG.map((t) => t.id)
-    expect(ids).toHaveLength(54)
-    expect(new Set(ids).size).toBe(54)
+    expect(ids).toHaveLength(59)
+    expect(new Set(ids).size).toBe(59)
   })
 
   it('todos os ícones estão no mapa do AppShell', () => {
@@ -41,7 +41,7 @@ describe('catálogo canônico', () => {
       for (const p of t.params ?? []) {
         if (!p.key) bad.push(`${t.id}: key vazia`)
         if (!p.label) bad.push(`${t.id}.${p.key}: label vazio`)
-        if (!['select', 'number', 'bool', 'text', 'output', 'folder'].includes(p.type)) {
+        if (!['select', 'number', 'bool', 'text', 'output', 'folder', 'password'].includes(p.type)) {
           bad.push(`${t.id}.${p.key}: type ${p.type}`)
         }
         if (p.type === 'select' && (!p.options || p.options.length === 0)) {

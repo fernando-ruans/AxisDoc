@@ -196,6 +196,26 @@ export const ptBR = {
       title: 'N-up de PDF',
       desc: 'Coloca 2, 4 ou 8 páginas por folha',
     },
+    pdfrearrange: {
+      title: 'Reordenar páginas',
+      desc: 'Reordena páginas em qualquer ordem (ex.: 3,1,2)',
+    },
+    pdfprotect: {
+      title: 'Proteger PDF',
+      desc: 'Criptografa o PDF com senha (AES)',
+    },
+    pdfunlock: {
+      title: 'Desbloquear PDF',
+      desc: 'Remove a senha de um PDF',
+    },
+    pdfoverlay: {
+      title: 'Sobrepor PDF',
+      desc: 'Aplica um PDF sobre outro como carimbo',
+    },
+    pdfpagenumbers: {
+      title: 'Numerar páginas',
+      desc: 'Adiciona numeração em cada página',
+    },
     csv2sql: {
       title: 'Tabela para SQL',
       desc: 'Gera INSERTs a partir de CSV/XLSX',
@@ -257,6 +277,14 @@ export const ptBR = {
       docbody: { label: 'Texto' },
       blankpages: { label: 'Páginas em branco extras' },
       nup: { label: 'Páginas por folha' },
+      order: { label: 'Nova ordem (ex.: 3,1,2)' },
+      userpw: { label: 'Senha do usuário' },
+      ownerpw: { label: 'Senha do dono' },
+      keylen: { label: 'Chave (bits)' },
+      password: { label: 'Senha' },
+      overlay: { label: 'PDF de sobreposição' },
+      ontop: { label: 'Sobre o conteúdo' },
+      numformat: { label: 'Formato (use %p e %P)' },
     },
     img: {
       format: { label: 'Formato' },

@@ -22,6 +22,7 @@ import (
 	"github.com/ferna/axisdoc/internal/tool/imgtools2"
 	"github.com/ferna/axisdoc/internal/tool/pdftools"
 	"github.com/ferna/axisdoc/internal/tool/pdftools2"
+	"github.com/ferna/axisdoc/internal/tool/pdftools3"
 	"github.com/ferna/axisdoc/internal/tool/texttools"
 	"github.com/ferna/axisdoc/internal/tool/texttools2"
 	"github.com/ferna/axisdoc/internal/update"
@@ -84,6 +85,11 @@ func NewRegistry() *tool.Registry {
 		pdftools2.NewImagesToPDF(),
 		pdftools2.NewCreatePDF(),
 		pdftools2.NewNUp(),
+		pdftools3.NewRearrange(),
+		pdftools3.NewProtect(),
+		pdftools3.NewUnlock(),
+		pdftools3.NewOverlay(),
+		pdftools3.NewPageNumbers(),
 		imgtools.NewConvertImage(),
 		imgtools.NewResizeImage(),
 		imgtools.NewWatermarkImage(),
@@ -229,6 +235,11 @@ func runCLI() bool {
 		pdftools2.NewImagesToPDF(),
 		pdftools2.NewCreatePDF(),
 		pdftools2.NewNUp(),
+		pdftools3.NewRearrange(),
+		pdftools3.NewProtect(),
+		pdftools3.NewUnlock(),
+		pdftools3.NewOverlay(),
+		pdftools3.NewPageNumbers(),
 		imgtools.NewConvertImage(),
 		imgtools.NewResizeImage(),
 		imgtools.NewWatermarkImage(),

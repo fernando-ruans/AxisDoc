@@ -159,6 +159,51 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     ],
   },
   {
+    id: 'pdf.rearrange', category: 'pdf', titleKey: 'tool.pdfrearrange.title',
+    descKey: 'tool.pdfrearrange.desc', icon: 'list-ordered', stepNames: ['step.pdf.rearrange'],
+    params: [
+      param('order', 'param.pdf.order.label', 'text', { required: true, default: '' }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'pdf.protect', category: 'pdf', titleKey: 'tool.pdfprotect.title',
+    descKey: 'tool.pdfprotect.desc', icon: 'lock', stepNames: ['step.pdf.protect'],
+    params: [
+      param('userPassword', 'param.pdf.userpw.label', 'password', { required: true, default: '' }),
+      param('ownerPassword', 'param.pdf.ownerpw.label', 'password', { default: '' }),
+      param('keyLength', 'param.pdf.keylen.label', 'select', { options: ['40', '128', '256'], default: '256' }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'pdf.unlock', category: 'pdf', titleKey: 'tool.pdfunlock.title',
+    descKey: 'tool.pdfunlock.desc', icon: 'lock-open', stepNames: ['step.pdf.unlock'],
+    params: [
+      param('password', 'param.pdf.password.label', 'password', { required: true, default: '' }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'pdf.overlay', category: 'pdf', titleKey: 'tool.pdfoverlay.title',
+    descKey: 'tool.pdfoverlay.desc', icon: 'layers', stepNames: ['step.pdf.overlay'],
+    params: [
+      param('overlay', 'param.pdf.overlay.label', 'text', { required: true, default: '' }),
+      param('onTop', 'param.pdf.ontop.label', 'bool', { default: true }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'pdf.pagenumbers', category: 'pdf', titleKey: 'tool.pdfpagenumbers.title',
+    descKey: 'tool.pdfpagenumbers.desc', icon: 'list-ordered', stepNames: ['step.pdf.pagenumbers'],
+    params: [
+      param('format', 'param.pdf.numformat.label', 'text', { required: true, default: 'Página %p de %P' }),
+      param('position', 'param.img.position.label', 'select', { options: ['bottomCenter', 'topCenter', 'bottomRight', 'bottomLeft'], default: 'bottomCenter' }),
+      param('fontSize', 'param.pdf.fontsize.label', 'number', { default: 10, min: 6, max: 48 }),
+      outputDir(),
+    ],
+  },
+  {
     id: 'pdf.toimage', category: 'pdf', titleKey: 'tool.pdf2img.title',
     descKey: 'tool.pdf2img.desc', icon: 'file-image', stepNames: [], frontendDriven: true,
     params: [
@@ -433,5 +478,5 @@ export const VALID_ICONS = [
   'type', 'paperclip', 'info', 'lock', 'images', 'file-plus', 'layout-grid',
   'database-zap', 'file-spreadsheet', 'table', 'align-left', 'binary', 'clock',
   'link', 'columns-3', 'code-2', 'crop', 'flip-horizontal', 'wand', 'shapes',
-  'film', 'palette',
+  'film', 'palette', 'list-ordered', 'lock-open', 'layers',
 ]

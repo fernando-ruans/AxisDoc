@@ -184,7 +184,7 @@ export function GenericToolForm({ tool }: { tool: ToolInfo }): React.JSX.Element
             </label>
             <input
               id={`p-${p.key}`}
-              type={p.type === 'number' ? 'number' : 'text'}
+              type={p.type === 'number' ? 'number' : p.type === 'password' ? 'password' : 'text'}
               value={String(params[p.key] ?? '')}
               onChange={(e) =>
                 setParam(p.key, p.type === 'number' ? Number(e.target.value) : e.target.value)

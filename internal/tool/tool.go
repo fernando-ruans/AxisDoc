@@ -52,12 +52,13 @@ type Tool interface {
 
 // Tipos de parâmetro suportados pela UI genérica.
 const (
-	ParamSelect = "select"
-	ParamNumber = "number"
-	ParamBool   = "bool"
-	ParamText   = "text"
-	ParamOutput = "output" // diálogo de salvar arquivo
-	ParamFolder = "folder" // diálogo de escolher pasta (destino)
+	ParamSelect   = "select"
+	ParamNumber   = "number"
+	ParamBool     = "bool"
+	ParamText     = "text"
+	ParamOutput   = "output"   // diálogo de salvar arquivo
+	ParamFolder   = "folder"   // diálogo de escolher pasta (destino)
+	ParamPassword = "password" // texto com máscara (senhas)
 )
 
 // Param descreve um campo do formulário da ferramenta.
@@ -112,7 +113,7 @@ func (p Param) Validate() error {
 				return fmt.Errorf("param %q: default de bool deve ser booleano", p.Key)
 			}
 		}
-	case ParamText, ParamOutput, ParamFolder:
+	case ParamText, ParamOutput, ParamFolder, ParamPassword:
 		if p.Default != nil {
 			if _, ok := p.Default.(string); !ok {
 				return fmt.Errorf("param %q: default de %s deve ser string", p.Key, p.Type)
