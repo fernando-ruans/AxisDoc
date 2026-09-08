@@ -41,6 +41,7 @@ type App struct {
 	searchSvc   *SearchService
 	pipelineSvc *PipelineService
 	watchSvc    *WatchService
+	pdfEditSvc  *PdfEditService
 }
 
 // NewApp cria a aplicação com todos os serviços registrados.
@@ -54,8 +55,9 @@ func NewApp() *App {
 		jobSvc:      &JobService{},
 		sysSvc:      &SystemService{},
 		searchSvc:   searchSvc,
-		pipelineSvc: &PipelineService{repo: newPipelineRepoFallback(), runner: newPipelineRunnerFallback(reg)},
+		pipelineSvc: &PipelineService{},
 		watchSvc:    newWatchServiceFallback(),
+		pdfEditSvc:  &PdfEditService{},
 	}
 }
 

@@ -1,5 +1,19 @@
 export namespace main {
 	
+	export class PageRotation {
+	    page: number;
+	    angle: number;
+	
+	    static createFrom(source: any = {}) {
+	        return new PageRotation(source);
+	    }
+	
+	    constructor(source: any = {}) {
+	        if ('string' === typeof source) source = JSON.parse(source);
+	        this.page = source["page"];
+	        this.angle = source["angle"];
+	    }
+	}
 	export class PreviewRef {
 	    token: string;
 	    name: string;

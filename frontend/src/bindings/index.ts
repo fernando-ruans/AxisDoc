@@ -61,6 +61,10 @@ function createWailsBackend(): Backend {
     watchList: () => call('WatchService', 'ListRules'),
     watchAdd: (folder, pattern, p) => call('WatchService', 'AddRule', folder, pattern, p),
     watchRemove: (id) => call('WatchService', 'RemoveRule', id),
+    pdfEditRemove: (pdfPath, range, outputDir) => call('PdfEditService', 'Remove', pdfPath, range, outputDir),
+    pdfEditReorder: (pdfPath, order, outputDir) => call('PdfEditService', 'Reorder', pdfPath, order, outputDir),
+    pdfEditRotate: (pdfPath, rots, outputDir) => call('PdfEditService', 'Rotate', pdfPath, rots, outputDir),
+    pdfEditInsertBlank: (pdfPath, count, outputDir) => call('PdfEditService', 'InsertBlank', pdfPath, count, outputDir),
     onEvent: (name, cb) => w.runtime.EventsOn(name, cb),
   }
 }

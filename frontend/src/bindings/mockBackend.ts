@@ -198,6 +198,26 @@ export class MockBackend implements Backend {
     // noop
   }
 
+  async pdfEditRemove(_pdfPath: string, _range: string, _outputDir: string): Promise<string[]> {
+    return ['C:/fixtures/editado.pdf']
+  }
+
+  async pdfEditReorder(_pdfPath: string, _order: string, _outputDir: string): Promise<string[]> {
+    return ['C:/fixtures/editado.pdf']
+  }
+
+  async pdfEditRotate(
+    _pdfPath: string,
+    _rots: Array<{ page: number; angle: number }>,
+    _outputDir: string,
+  ): Promise<string[]> {
+    return ['C:/fixtures/editado.pdf']
+  }
+
+  async pdfEditInsertBlank(_pdfPath: string, _count: number, _outputDir: string): Promise<string[]> {
+    return ['C:/fixtures/editado.pdf']
+  }
+
   onEvent(name: string, cb: (data: unknown) => void): () => void {
     if (!this.listeners.has(name)) this.listeners.set(name, new Set())
     this.listeners.get(name)!.add(cb)

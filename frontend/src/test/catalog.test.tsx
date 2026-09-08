@@ -24,10 +24,10 @@ beforeEach(() => {
 })
 
 describe('catálogo canônico', () => {
-  it('tem 59 tools com IDs únicos', () => {
+  it('tem 60 tools com IDs únicos', () => {
     const ids = CANONICAL_CATALOG.map((t) => t.id)
-    expect(ids).toHaveLength(59)
-    expect(new Set(ids).size).toBe(59)
+    expect(ids).toHaveLength(60)
+    expect(new Set(ids).size).toBe(60)
   })
 
   it('todos os ícones estão no mapa do AppShell', () => {
@@ -64,8 +64,13 @@ describe('formulário de cada tool (golden por tool)', () => {
       const user = userEvent.setup()
       render(<GenericToolForm tool={tool} />)
 
-      if (tool.id === 'pdf.toimage') {
-        expect(screen.getByTestId('pdf2img-runner')).toBeInTheDocument()
+      if (tool.id === 'pdf.toimage' || tool.id === 'pdf.editor') {
+        if (tool.id === 'pdf.toimage') {
+          expect(screen.getByTestId('pdf2img-runner')).toBeInTheDocument()
+        } else {
+          // sem PDF selecionado o editor não monta nada; só o param outputDir existe
+          expect(screen.getByTestId('param-outputDir')).toBeInTheDocument()
+        }
         return
       }
 
@@ -102,4 +107,17 @@ describe('formulário de cada tool (golden por tool)', () => {
       })
     }
   }
+
+  it('pdf.editor: monta o grid ao selecionar um PDF', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.editor')
+    if (!tool) throw new Error('pdf.editor ausente do catálogo')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    await user.click(screen.getByTestId('pick-files'))
+    // mock retorna C:/fixtures/amostra.txt + relatorio.pdf → editor monta para o .pdf
+    const editors = await screen.findAllByTestId('pdf-editor')
+    expect(editors.length).toBeGreaterThan(0)
+    expect(screen.getAllByTestId('pdf-editor-grid').length).toBeGreaterThan(0)
+  })
 })

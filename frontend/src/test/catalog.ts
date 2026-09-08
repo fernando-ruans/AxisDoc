@@ -382,6 +382,12 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     ],
   },
   {
+    id: 'pdf.editor', category: 'pdf', titleKey: 'tool.pdfeditor.title',
+    descKey: 'tool.pdfeditor.desc', icon: 'pencil-ruler', stepNames: ['step.pdf.editor'],
+    params: [outputDir()],
+    frontendDriven: true,
+  },
+  {
     id: 'data.csv2sql', category: 'data', titleKey: 'tool.csv2sql.title',
     descKey: 'tool.csv2sql.desc', icon: 'database-zap', stepNames: ['step.data.csv2sql'],
     params: [
@@ -478,5 +484,5 @@ export const VALID_ICONS = [
   'type', 'paperclip', 'info', 'lock', 'images', 'file-plus', 'layout-grid',
   'database-zap', 'file-spreadsheet', 'table', 'align-left', 'binary', 'clock',
   'link', 'columns-3', 'code-2', 'crop', 'flip-horizontal', 'wand', 'shapes',
-  'film', 'palette', 'list-ordered', 'lock-open', 'layers',
+  'film', 'palette', 'list-ordered', 'lock-open', 'layers', 'pencil-ruler',
 ]

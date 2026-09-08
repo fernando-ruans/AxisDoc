@@ -110,6 +110,10 @@ export interface Backend {
   watchList(): Promise<WatchRuleOut[]>
   watchAdd(folder: string, pattern: string, p: Pipeline): Promise<void>
   watchRemove(id: string): Promise<void>
+  pdfEditRemove(pdfPath: string, range: string, outputDir: string): Promise<string[]>
+  pdfEditReorder(pdfPath: string, order: string, outputDir: string): Promise<string[]>
+  pdfEditRotate(pdfPath: string, rots: Array<{ page: number; angle: number }>, outputDir: string): Promise<string[]>
+  pdfEditInsertBlank(pdfPath: string, count: number, outputDir: string): Promise<string[]>
   onEvent(name: string, cb: (data: unknown) => void): () => void
 }
 

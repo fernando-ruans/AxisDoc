@@ -10,6 +10,7 @@ import { PdfToImageRunner } from './PdfToImageRunner'
 import { InlineJobResult } from './InlineJobResult'
 import { QrLivePreview } from './QrLivePreview'
 import { BarcodeLivePreview } from './BarcodeLivePreview'
+import { PdfPageEditor } from './PdfPageEditor'
 
 // Valores iniciais dos params a partir dos defaults.
 function initialParams(tool: ToolInfo): Record<string, unknown> {
@@ -18,6 +19,16 @@ function initialParams(tool: ToolInfo): Record<string, unknown> {
     if (p.default !== undefined) out[p.key] = p.default
   }
   return out
+}
+
+function PdfEditorRunner({ paths, params }: { paths: string[]; params: Record<string, unknown> }): React.JSX.Element | null {
+  const { t } = useTranslation()
+  const pdfPath = paths.find((p) => p.toLowerCase().endsWith('.pdf'))
+  const outputDir = String(params.outputDir ?? '')
+  if (!pdfPath) {
+    return null
+  }
+  return <PdfPageEditor pdfPath={pdfPath} outputDir={outputDir} />
 }
 
 export function GenericToolForm({ tool }: { tool: ToolInfo }): React.JSX.Element {
@@ -93,7 +104,7 @@ export function GenericToolForm({ tool }: { tool: ToolInfo }): React.JSX.Element
             ))}
           </ul>
         )}
-        {tool.id !== 'pdf.toimage' && (
+        {tool.id !== 'pdf.toimage' && tool.id !== 'pdf.editor' && (
           <FilePreview paths={paths} toolId={tool.id} params={params} />
         )}
         {tool.id === 'text.qrcode' && (
@@ -111,6 +122,10 @@ export function GenericToolForm({ tool }: { tool: ToolInfo }): React.JSX.Element
 
       {tool.id === 'pdf.toimage' ? (
         <PdfToImageRunner paths={paths} params={params} />
+      ) : null}
+
+      {tool.id === 'pdf.editor' ? (
+        <PdfEditorRunner paths={paths} params={params} />
       ) : null}
 
       {(tool.params ?? []).map((p: ToolParam) => {
@@ -202,7 +217,7 @@ export function GenericToolForm({ tool }: { tool: ToolInfo }): React.JSX.Element
         </p>
       )}
 
-      {tool.id !== 'pdf.toimage' && (
+      {tool.id !== 'pdf.toimage' && tool.id !== 'pdf.editor' && (
         <button
           onClick={() => void run()}
           disabled={!canRun}
@@ -212,6 +227,10 @@ export function GenericToolForm({ tool }: { tool: ToolInfo }): React.JSX.Element
           {t('common.run')}
         </button>
       )}
+
+      {tool.id === 'pdf.editor' ? (
+        <PdfEditorRunner paths={paths} params={params} />
+      ) : null}
 
       {lastJob != null && (lastJob.status === 'running' || lastJob.status === 'queued') && (
         <div className="h-1.5 w-full overflow-hidden rounded bg-surface-2" data-testid="inline-progress">

@@ -42,6 +42,7 @@ func main() {
 			app.searchSvc,
 			app.pipelineSvc,
 			app.watchSvc,
+			app.pdfEditSvc,
 		},
 		Windows: &windows.Options{
 			WebviewIsTransparent: false,

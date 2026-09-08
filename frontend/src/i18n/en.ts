@@ -218,6 +218,10 @@ export const en: Dict = {
       title: 'Number pages',
       desc: 'Add page numbers to each page',
     },
+    pdfeditor: {
+      title: 'PDF editor',
+      desc: 'Edit pages: remove, reorder, rotate and insert blanks',
+    },
     csv2sql: {
       title: 'Table to SQL',
       desc: 'Generate INSERTs from CSV/XLSX',
@@ -380,6 +384,14 @@ export const en: Dict = {
     title: 'Preview',
     rows: 'rows',
     cols: 'columns',
+  },
+  pdfeditor: {
+    apply: 'Apply edits',
+    rotate: 'Rotate 90°',
+    remove: 'Remove',
+    insertBlank: 'Insert blank page after',
+    blank: 'Blank',
+    noChanges: 'No changes to apply',
   },
   search: {
     title: 'Search',

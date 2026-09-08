@@ -216,6 +216,10 @@ export const ptBR = {
       title: 'Numerar páginas',
       desc: 'Adiciona numeração em cada página',
     },
+    pdfeditor: {
+      title: 'Editor de PDF',
+      desc: 'Edite páginas: remova, reordene, gire e insira brancas',
+    },
     csv2sql: {
       title: 'Tabela para SQL',
       desc: 'Gera INSERTs a partir de CSV/XLSX',
@@ -378,6 +382,14 @@ export const ptBR = {
     title: 'Pré-visualização',
     rows: 'linhas',
     cols: 'colunas',
+  },
+  pdfeditor: {
+    apply: 'Aplicar edições',
+    rotate: 'Girar 90°',
+    remove: 'Remover',
+    insertBlank: 'Inserir página em branco após',
+    blank: 'Em branco',
+    noChanges: 'Nenhuma alteração para aplicar',
   },
   search: {
     title: 'Busca',

@@ -71,6 +71,11 @@ func (t *Rearrange) Steps() []tool.Step {
 }
 
 // parseOrder converte "3,1,2" ou "3,1-2" em seleção pdfcpu (qualquer ordem, duplicatas ok).
+// Exportado para o PdfEditService (editor visual).
+func ParseOrder(spec string) ([]string, error) {
+	return parseOrder(spec)
+}
+
 func parseOrder(spec string) ([]string, error) {
 	tokens := strings.Split(strings.TrimSpace(spec), ",")
 	if len(tokens) == 0 {

@@ -9,6 +9,7 @@ import {
   Search as SearchIcon, Workflow, FolderClock, DatabaseZap,
   FileSpreadsheet, Table, AlignLeft, Binary, Clock, Link, Columns3, Code,
   Crop, FlipHorizontal, Wand2, Shapes, Film, Palette, ListOrdered, Lock, LockOpen, Layers,
+  PencilRuler,
 } from 'lucide-react'
 import { useCatalog } from '../stores/catalog'
 import { useTheme } from '../stores/theme'
@@ -65,6 +66,7 @@ const ICONS: Record<string, IconComponent> = {
   lock: Lock,
   'lock-open': LockOpen,
   layers: Layers,
+  'pencil-ruler': PencilRuler,
 }
 
 function iconFor(name: string): IconComponent {
