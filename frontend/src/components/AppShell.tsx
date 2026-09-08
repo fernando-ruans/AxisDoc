@@ -6,7 +6,8 @@ import {
   FileText, FilePlus2, Scissors, RotateCw, Stamp, Minimize2,
   Repeat, Scaling, Table2, GitCompare, Braces, Code2, FileJson,
   Pencil, List, QrCode, ScanBarcode, Database, ScanText, FileImage,
-  Search as SearchIcon, Workflow, FolderClock,
+  Search as SearchIcon, Workflow, FolderClock, DatabaseZap,
+  FileSpreadsheet, Table, AlignLeft, Binary, Clock, Link, Columns3, Code,
 } from 'lucide-react'
 import { useCatalog } from '../stores/catalog'
 import { useTheme } from '../stores/theme'
@@ -44,6 +45,15 @@ const ICONS: Record<string, IconComponent> = {
   'scan-barcode': ScanBarcode,
   database: Database,
   'scan-text': ScanText,
+  'database-zap': DatabaseZap,
+  'file-spreadsheet': FileSpreadsheet,
+  table: Table,
+  'align-left': AlignLeft,
+  binary: Binary,
+  clock: Clock,
+  link: Link,
+  'columns-3': Columns3,
+  'code-2': Code,
 }
 
 function iconFor(name: string): IconComponent {

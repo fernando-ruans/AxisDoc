@@ -164,6 +164,46 @@ export const ptBR = {
       title: 'N-up de PDF',
       desc: 'Coloca 2, 4 ou 8 páginas por folha',
     },
+    csv2sql: {
+      title: 'Tabela para SQL',
+      desc: 'Gera INSERTs a partir de CSV/XLSX',
+    },
+    sql2csv: {
+      title: 'SQL para tabela',
+      desc: 'Extrai CSV de dumps INSERT',
+    },
+    json2table: {
+      title: 'JSON para tabela',
+      desc: 'Converte array de objetos em XLSX/CSV',
+    },
+    lorem: {
+      title: 'Lorem ipsum',
+      desc: 'Gera texto de preenchimento',
+    },
+    baseconvert: {
+      title: 'Base numérica',
+      desc: 'Converte entre bases 2, 8, 10, 16 e 36',
+    },
+    epoch: {
+      title: 'Timestamp',
+      desc: 'Converte epoch ↔ data, mostra agora',
+    },
+    uuid: {
+      title: 'UUID',
+      desc: 'Gera UUIDs v4 ou v7',
+    },
+    slug: {
+      title: 'Slug',
+      desc: 'Converte texto em slug de URL',
+    },
+    columnize: {
+      title: 'Colunas de texto',
+      desc: 'Alinha texto delimitado em colunas',
+    },
+    escape: {
+      title: 'Escape HTML/URL',
+      desc: 'Escapa ou decodifica HTML e URLs',
+    },
   },
   step: {
     hashfile: { compute: 'Calculando hashes' },
@@ -199,12 +239,26 @@ export const ptBR = {
       format: { label: 'Formato de saída' },
       format2: { label: 'Formato de saída' },
       mode: { label: 'Modo' },
+      table: { label: 'Nome da tabela' },
+      dialect: { label: 'Dialeto SQL' },
+      batch: { label: 'Linhas por INSERT' },
     },
     text: {
       pattern: { label: 'Padrão (regex)' },
       replacement: { label: 'Substituição' },
       undo: { label: 'Desfazer renomeações' },
       barkind: { label: 'Tipo' },
+      paragraphs: { label: 'Parágrafos' },
+      words: { label: 'Palavras por parágrafo' },
+      value: { label: 'Valor' },
+      frombase: { label: 'Base de origem' },
+      tobase: { label: 'Base de destino' },
+      count: { label: 'Quantidade' },
+      uuidver: { label: 'Versão' },
+      separator: { label: 'Separador' },
+      delimiter: { label: 'Delimitador' },
+      padding: { label: 'Espaçamento' },
+      escapekind: { label: 'Operação' },
     },
     search: {
       recursive: { label: 'Incluir subpastas' },

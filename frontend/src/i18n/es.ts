@@ -166,6 +166,46 @@ export const es: Dict = {
       title: 'N-up de PDF',
       desc: 'Pone 2, 4 u 8 páginas por hoja',
     },
+    csv2sql: {
+      title: 'Tabla a SQL',
+      desc: 'Genera INSERTs desde CSV/XLSX',
+    },
+    sql2csv: {
+      title: 'SQL a tabla',
+      desc: 'Extrae CSV de dumps INSERT',
+    },
+    json2table: {
+      title: 'JSON a tabla',
+      desc: 'Convierte array de objetos a XLSX/CSV',
+    },
+    lorem: {
+      title: 'Lorem ipsum',
+      desc: 'Genera texto de relleno',
+    },
+    baseconvert: {
+      title: 'Base numérica',
+      desc: 'Convierte entre bases 2, 8, 10, 16 y 36',
+    },
+    epoch: {
+      title: 'Timestamp',
+      desc: 'Convierte epoch ↔ fecha, muestra ahora',
+    },
+    uuid: {
+      title: 'UUID',
+      desc: 'Genera UUIDs v4 o v7',
+    },
+    slug: {
+      title: 'Slug',
+      desc: 'Convierte texto en slug de URL',
+    },
+    columnize: {
+      title: 'Columnas de texto',
+      desc: 'Alinea texto delimitado en columnas',
+    },
+    escape: {
+      title: 'Escape HTML/URL',
+      desc: 'Escapa o decodifica HTML y URLs',
+    },
   },
   step: {
     hashfile: { compute: 'Calculando hashes' },
@@ -201,12 +241,26 @@ export const es: Dict = {
       format: { label: 'Formato de salida' },
       format2: { label: 'Formato de salida' },
       mode: { label: 'Modo' },
+      table: { label: 'Nombre de la tabla' },
+      dialect: { label: 'Dialecto SQL' },
+      batch: { label: 'Filas por INSERT' },
     },
     text: {
       pattern: { label: 'Patrón (regex)' },
       replacement: { label: 'Reemplazo' },
       undo: { label: 'Deshacer renombres' },
       barkind: { label: 'Tipo' },
+      paragraphs: { label: 'Párrafos' },
+      words: { label: 'Palabras por párrafo' },
+      value: { label: 'Valor' },
+      frombase: { label: 'Base de origen' },
+      tobase: { label: 'Base de destino' },
+      count: { label: 'Cantidad' },
+      uuidver: { label: 'Versión' },
+      separator: { label: 'Separador' },
+      delimiter: { label: 'Delimitador' },
+      padding: { label: 'Espaciado' },
+      escapekind: { label: 'Operación' },
     },
     search: {
       recursive: { label: 'Incluir subcarpetas' },

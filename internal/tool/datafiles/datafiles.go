@@ -88,6 +88,11 @@ func readXLSX(path string) ([][]string, error) {
 
 // writeTabular grava matriz como CSV ou XLSX.
 func writeTabular(rows [][]string, dest string) error {
+	return WriteTabular(rows, dest)
+}
+
+// WriteTabular grava matriz como CSV ou XLSX (exportado para datafiles2).
+func WriteTabular(rows [][]string, dest string) error {
 	switch strings.ToLower(filepath.Ext(dest)) {
 	case ".csv":
 		return writeCSV(rows, dest)
@@ -252,6 +257,57 @@ func readAnyStruct(path string) (map[string]any, error) {
 	default:
 		return nil, fmt.Errorf("datafiles: formato não suportado: %s", filepath.Ext(path))
 	}
+}
+
+// ReadAnyArray lê JSON (array de objetos) ou YAML equivalente em lista genérica.
+// Exportado para datafiles2 (JSON→tabela).
+func ReadAnyArray(path string) ([]map[string]any, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+	switch strings.ToLower(filepath.Ext(path)) {
+	case ".json":
+		var arr []map[string]any
+		if err := json.Unmarshal(data, &arr); err != nil {
+			return nil, fmt.Errorf("json deve ser array de objetos: %w", err)
+		}
+		return arr, nil
+	case ".yaml", ".yml":
+		var arr []map[string]any
+		if err := yaml.Unmarshal(data, &arr); err != nil {
+			return nil, fmt.Errorf("yaml inválido: %w", err)
+		}
+		return arr, nil
+	default:
+		return nil, fmt.Errorf("datafiles: formato não suportado: %s", filepath.Ext(path))
+	}
+}
+
+// ArrayToTable converte lista de objetos em matriz (cabeçalho + linhas).
+// Exportado para datafiles2.
+func ArrayToTable(arr []map[string]any) [][]string {
+	keys := map[string]bool{}
+	var order []string
+	for _, obj := range arr {
+		for k := range obj {
+			if !keys[k] {
+				keys[k] = true
+				order = append(order, k)
+			}
+		}
+	}
+	rows := [][]string{order}
+	for _, obj := range arr {
+		row := make([]string, len(order))
+		for i, k := range order {
+			if v, ok := obj[k]; ok && v != nil {
+				row[i] = fmt.Sprintf("%v", v)
+			}
+		}
+		rows = append(rows, row)
+	}
+	return rows
 }
 
 func writeAnyStruct(m map[string]any, dest string) error {

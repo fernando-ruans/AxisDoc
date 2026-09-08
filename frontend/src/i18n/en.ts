@@ -166,6 +166,46 @@ export const en: Dict = {
       title: 'PDF N-up',
       desc: 'Put 2, 4 or 8 pages per sheet',
     },
+    csv2sql: {
+      title: 'Table to SQL',
+      desc: 'Generate INSERTs from CSV/XLSX',
+    },
+    sql2csv: {
+      title: 'SQL to table',
+      desc: 'Extract CSV from INSERT dumps',
+    },
+    json2table: {
+      title: 'JSON to table',
+      desc: 'Convert object array to XLSX/CSV',
+    },
+    lorem: {
+      title: 'Lorem ipsum',
+      desc: 'Generate placeholder text',
+    },
+    baseconvert: {
+      title: 'Number base',
+      desc: 'Convert between bases 2, 8, 10, 16 and 36',
+    },
+    epoch: {
+      title: 'Timestamp',
+      desc: 'Convert epoch ↔ date, show now',
+    },
+    uuid: {
+      title: 'UUID',
+      desc: 'Generate v4 or v7 UUIDs',
+    },
+    slug: {
+      title: 'Slug',
+      desc: 'Convert text to URL slug',
+    },
+    columnize: {
+      title: 'Text columns',
+      desc: 'Align delimited text into columns',
+    },
+    escape: {
+      title: 'Escape HTML/URL',
+      desc: 'Escape or decode HTML and URLs',
+    },
   },
   step: {
     hashfile: { compute: 'Computing hashes' },
@@ -201,12 +241,26 @@ export const en: Dict = {
       format: { label: 'Output format' },
       format2: { label: 'Output format' },
       mode: { label: 'Mode' },
+      table: { label: 'Table name' },
+      dialect: { label: 'SQL dialect' },
+      batch: { label: 'Rows per INSERT' },
     },
     text: {
       pattern: { label: 'Pattern (regex)' },
       replacement: { label: 'Replacement' },
       undo: { label: 'Undo renames' },
       barkind: { label: 'Type' },
+      paragraphs: { label: 'Paragraphs' },
+      words: { label: 'Words per paragraph' },
+      value: { label: 'Value' },
+      frombase: { label: 'Source base' },
+      tobase: { label: 'Target base' },
+      count: { label: 'Quantity' },
+      uuidver: { label: 'Version' },
+      separator: { label: 'Separator' },
+      delimiter: { label: 'Delimiter' },
+      padding: { label: 'Spacing' },
+      escapekind: { label: 'Operation' },
     },
     search: {
       recursive: { label: 'Include subfolders' },

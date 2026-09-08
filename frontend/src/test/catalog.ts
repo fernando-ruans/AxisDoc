@@ -273,6 +273,84 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     ],
   },
   {
+    id: 'data.csv2sql', category: 'data', titleKey: 'tool.csv2sql.title',
+    descKey: 'tool.csv2sql.desc', icon: 'database-zap', stepNames: ['step.data.csv2sql'],
+    params: [
+      param('table', 'param.data.table.label', 'text', { required: true, default: 'dados' }),
+      param('dialect', 'param.data.dialect.label', 'select', { options: ['sqlite', 'postgres', 'mysql'], default: 'sqlite' }),
+      param('batch', 'param.data.batch.label', 'number', { default: 100, min: 1, max: 10000 }),
+    ],
+  },
+  {
+    id: 'data.sql2csv', category: 'data', titleKey: 'tool.sql2csv.title',
+    descKey: 'tool.sql2csv.desc', icon: 'file-spreadsheet', stepNames: ['step.data.sql2csv'],
+  },
+  {
+    id: 'data.json2table', category: 'data', titleKey: 'tool.json2table.title',
+    descKey: 'tool.json2table.desc', icon: 'table', stepNames: ['step.data.json2table'],
+    params: [
+      param('format', 'param.data.format.label', 'select', { options: ['xlsx', 'csv'], default: 'xlsx', required: true }),
+    ],
+  },
+  {
+    id: 'text.lorem', category: 'text', titleKey: 'tool.lorem.title',
+    descKey: 'tool.lorem.desc', icon: 'align-left', stepNames: ['step.text.lorem'],
+    params: [
+      param('paragraphs', 'param.text.paragraphs.label', 'number', { default: 3, min: 1, max: 100 }),
+      param('wordsPerParagraph', 'param.text.words.label', 'number', { default: 60, min: 5, max: 500 }),
+      outputDir(),
+    ],
+  },
+  {
+    id: 'text.baseconvert', category: 'text', titleKey: 'tool.baseconvert.title',
+    descKey: 'tool.baseconvert.desc', icon: 'binary', stepNames: ['step.text.baseconvert'],
+    params: [
+      param('value', 'param.text.value.label', 'text', { required: true, default: '' }),
+      param('from', 'param.text.frombase.label', 'select', { options: ['10', '16', '8', '2', '36'], default: '10' }),
+      param('to', 'param.text.tobase.label', 'select', { options: ['10', '16', '8', '2', '36'], default: '16' }),
+    ],
+  },
+  {
+    id: 'text.epoch', category: 'text', titleKey: 'tool.epoch.title',
+    descKey: 'tool.epoch.desc', icon: 'clock', stepNames: ['step.text.epoch'],
+    params: [
+      param('mode', 'param.data.mode.label', 'select', { options: ['now', 'toDate', 'toEpoch'], default: 'now' }),
+      param('value', 'param.text.value.label', 'text', { default: '' }),
+    ],
+  },
+  {
+    id: 'text.uuid', category: 'text', titleKey: 'tool.uuid.title',
+    descKey: 'tool.uuid.desc', icon: 'fingerprint', stepNames: ['step.text.uuid'],
+    params: [
+      param('count', 'param.text.count.label', 'number', { default: 1, min: 1, max: 1000 }),
+      param('version', 'param.text.uuidver.label', 'select', { options: ['v4', 'v7'], default: 'v4' }),
+    ],
+  },
+  {
+    id: 'text.slug', category: 'text', titleKey: 'tool.slug.title',
+    descKey: 'tool.slug.desc', icon: 'link', stepNames: ['step.text.slug'],
+    params: [
+      param('text', 'param.pdf.text.label', 'text', { required: true, default: '' }),
+      param('separator', 'param.text.separator.label', 'select', { options: ['-', '_'], default: '-' }),
+    ],
+  },
+  {
+    id: 'text.columnize', category: 'text', titleKey: 'tool.columnize.title',
+    descKey: 'tool.columnize.desc', icon: 'columns-3', stepNames: ['step.text.columnize'],
+    params: [
+      param('delimiter', 'param.text.delimiter.label', 'text', { default: '|' }),
+      param('padding', 'param.text.padding.label', 'number', { default: 2, min: 1, max: 20 }),
+    ],
+  },
+  {
+    id: 'text.escape', category: 'text', titleKey: 'tool.escape.title',
+    descKey: 'tool.escape.desc', icon: 'code-2', stepNames: ['step.text.escape'],
+    params: [
+      param('kind', 'param.text.escapekind.label', 'select', { options: ['htmlEscape', 'htmlUnescape', 'urlEncode', 'urlDecode', 'queryEscape'], default: 'htmlEscape' }),
+      param('text', 'param.pdf.text.label', 'text', { default: '' }),
+    ],
+  },
+  {
     id: 'ocr.image', category: 'ocr', titleKey: 'tool.ocr.title',
     descKey: 'tool.ocr.desc', icon: 'scan-text', stepNames: ['step.ocr'],
     params: [
@@ -289,4 +367,6 @@ export const VALID_ICONS = [
   'git-compare', 'braces', 'code', 'file-json', 'pencil', 'list', 'qr-code',
   'scan-barcode', 'database', 'scan-text', 'image', 'file-output', 'file-x',
   'type', 'paperclip', 'info', 'lock', 'images', 'file-plus', 'layout-grid',
+  'database-zap', 'file-spreadsheet', 'table', 'align-left', 'binary', 'clock',
+  'link', 'columns-3', 'code-2',
 ]

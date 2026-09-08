@@ -24,10 +24,10 @@ beforeEach(() => {
 })
 
 describe('catálogo canônico', () => {
-  it('tem 36 tools com IDs únicos', () => {
+  it('tem 46 tools com IDs únicos', () => {
     const ids = CANONICAL_CATALOG.map((t) => t.id)
-    expect(ids).toHaveLength(36)
-    expect(new Set(ids).size).toBe(36)
+    expect(ids).toHaveLength(46)
+    expect(new Set(ids).size).toBe(46)
   })
 
   it('todos os ícones estão no mapa do AppShell', () => {

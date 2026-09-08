@@ -16,11 +16,13 @@ import (
 	"github.com/ferna/axisdoc/internal/store"
 	"github.com/ferna/axisdoc/internal/tool"
 	"github.com/ferna/axisdoc/internal/tool/datafiles"
+	"github.com/ferna/axisdoc/internal/tool/datafiles2"
 	"github.com/ferna/axisdoc/internal/tool/hashfile"
 	"github.com/ferna/axisdoc/internal/tool/imgtools"
 	"github.com/ferna/axisdoc/internal/tool/pdftools"
 	"github.com/ferna/axisdoc/internal/tool/pdftools2"
 	"github.com/ferna/axisdoc/internal/tool/texttools"
+	"github.com/ferna/axisdoc/internal/tool/texttools2"
 	"github.com/ferna/axisdoc/internal/update"
 	wruntime "github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -89,11 +91,21 @@ func NewRegistry() *tool.Registry {
 		datafiles.NewStructConvert(),
 		datafiles.NewJSONFormat(),
 		datafiles.NewTableToJSON(),
+		datafiles2.NewCSVToSQL(),
+		datafiles2.NewSQLToCSV(),
+		datafiles2.NewJSONToTable(),
 		texttools.NewTextDiff(),
 		renameTool,
 		texttools.NewTextStats(),
 		texttools.NewQRCode(),
 		texttools.NewBarcodeTool(),
+		texttools2.NewLorem(),
+		texttools2.NewBaseConvert(),
+		texttools2.NewEpoch(),
+		texttools2.NewUUID(),
+		texttools2.NewSlug(),
+		texttools2.NewColumnize(),
+		texttools2.NewEscape(),
 	} {
 		if err := reg.Register(t); err != nil {
 			slog.Error("registrar ferramenta", "id", t.ID(), "err", err)
@@ -216,11 +228,21 @@ func runCLI() bool {
 		datafiles.NewStructConvert(),
 		datafiles.NewJSONFormat(),
 		datafiles.NewTableToJSON(),
+		datafiles2.NewCSVToSQL(),
+		datafiles2.NewSQLToCSV(),
+		datafiles2.NewJSONToTable(),
 		texttools.NewTextDiff(),
 		texttools.NewBatchRename(),
 		texttools.NewTextStats(),
 		texttools.NewQRCode(),
 		texttools.NewBarcodeTool(),
+		texttools2.NewLorem(),
+		texttools2.NewBaseConvert(),
+		texttools2.NewEpoch(),
+		texttools2.NewUUID(),
+		texttools2.NewSlug(),
+		texttools2.NewColumnize(),
+		texttools2.NewEscape(),
 	} {
 		_ = reg.Register(t)
 	}
