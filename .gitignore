@@ -21,3 +21,5 @@ internal/tool/pdftools/doc_*.pdf
 internal/tool/pdftools/merged_*/
 # binários de terceiros embutidos (licenciados separadamente)
 build/windows/installer/tmp/
+
+internal/tool/texttools2/lorem*.txt
