@@ -2,7 +2,7 @@ import type React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Moon, Sun, History, FileSearch, Download,
+  Moon, Sun, History, FileSearch, Download, ChevronDown,
   Search as SearchIcon, Workflow, FolderClock,
 } from 'lucide-react'
 import { useCatalog } from '../stores/catalog'
@@ -17,6 +17,7 @@ import { PipelinesPage } from './PipelinesPage'
 import { WatchPage } from './WatchPage'
 import { getBackend } from '../bindings/backend'
 import { iconFor } from './icons'
+import { useJobs } from '../stores/jobs'
 import { cn } from '../lib/utils'
 
 export function AppShell(): React.JSX.Element {
@@ -29,9 +30,39 @@ export function AppShell(): React.JSX.Element {
   const toggleTheme = useTheme((s) => s.toggle)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [selected, setSelected] = useState<string | null>(null)
-  const [showJobs, setShowJobs] = useState(false)
-  const [view, setView] = useState<'tool' | 'search' | 'pipelines' | 'watch'>('tool')
+  // view única: 'tool' | 'search' | 'pipelines' | 'watch' | 'jobs' — Jobs virou
+  // view como as demais (antes era toggle sobreposto, que escondia a seleção).
+  const [view, setView] = useState<'tool' | 'search' | 'pipelines' | 'watch' | 'jobs'>('tool')
   const [updateTag, setUpdateTag] = useState<string | null>(null)
+  // seções colapsáveis da sidebar (lembra do localStorage)
+  const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
+    try {
+      return JSON.parse(localStorage.getItem('axisdoc.collapsed') ?? '{}') as Record<string, boolean>
+    } catch {
+      return {}
+    }
+  })
+  const runningJobs = useJobs((s) => s.jobs.filter((j) => j.status === 'running' || j.status === 'queued').length)
+
+  const goView = (v: typeof view): void => {
+    if (v !== 'tool') setSelected(null)
+    setView(v)
+  }
+  const goTool = (id: string): void => {
+    setSelected(id)
+    setView('tool')
+  }
+  const toggleSection = (cat: string): void => {
+    setCollapsed((prev) => {
+      const next = { ...prev, [cat]: !prev[cat] }
+      try {
+        localStorage.setItem('axisdoc.collapsed', JSON.stringify(next))
+      } catch {
+        // storage indisponível: mantém só em memória
+      }
+      return next
+    })
+  }
 
   useEffect(() => {
     void load()
@@ -66,6 +97,14 @@ export function AppShell(): React.JSX.Element {
 
   const selectedTool = tools.find((x) => x.id === selected)
 
+  // tools visíveis no menu de navegação rápida (rodapé)
+  const navItems = [
+    { view: 'search' as const, icon: SearchIcon, label: t('search.title'), testid: 'nav-search' },
+    { view: 'pipelines' as const, icon: Workflow, label: t('pipelines.title'), testid: 'nav-pipelines' },
+    { view: 'watch' as const, icon: FolderClock, label: t('watch.title'), testid: 'nav-watch' },
+    { view: 'jobs' as const, icon: History, label: t('job.title'), testid: 'toggle-jobs', badge: runningJobs > 0 ? runningJobs : null },
+  ]
+
   return (
     <div className="flex h-screen bg-bg text-text">
       <aside className="flex w-64 flex-col border-r border-border bg-surface" data-testid="sidebar">
@@ -99,78 +138,91 @@ export function AppShell(): React.JSX.Element {
               {t('common.error')}: {error}
             </p>
           )}
-          {categories.map(([cat, catTools]) => (
-            <div key={cat} className="mb-4">
-              <p className="px-2 pb-1 text-xs font-semibold uppercase tracking-wide text-text-muted">
-                {t(`category.${cat}`, { defaultValue: cat })}
-              </p>
-              <ul>
-                {catTools.map((tool) => {
-                  const Icon = iconFor(tool.icon)
-                  return (
-                    <li key={tool.id}>
-                      <button
-                        onClick={() => setSelected(tool.id)}
-                        className={cn(
-                          'flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm',
-                          selected === tool.id
-                            ? 'bg-accent/20 text-accent'
-                            : 'text-text hover:bg-surface-2',
-                        )}
-                        data-testid={`tool-${tool.id}`}
-                      >
-                        <Icon className="h-4 w-4" />
-                        {t(tool.titleKey)}
-                      </button>
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-          ))}
+          {categories.map(([cat, catTools]) => {
+            const isCollapsed = collapsed[cat] ?? false
+            const active = selected != null && catTools.some((x) => x.id === selected)
+            return (
+              <div key={cat} className="mb-1">
+                <button
+                  type="button"
+                  onClick={() => toggleSection(cat)}
+                  aria-expanded={!isCollapsed}
+                  data-testid={`section-${cat}`}
+                  className="flex w-full items-center gap-1 rounded px-2 py-1.5 text-xs font-semibold uppercase tracking-wide text-text-muted hover:bg-surface-2"
+                >
+                  <ChevronDown
+                    className={cn('h-3.5 w-3.5 transition-transform', isCollapsed && '-rotate-90')}
+                  />
+                  <span className="flex-1 text-left">
+                    {t(`category.${cat}`, { defaultValue: cat })}
+                  </span>
+                  <span className="rounded-full bg-surface-2 px-1.5 text-[10px] tabular-nums">
+                    {catTools.length}
+                  </span>
+                  {active && <span className="h-1.5 w-1.5 rounded-full bg-accent" data-testid={`section-active-${cat}`} />}
+                </button>
+                {!isCollapsed && (
+                  <ul>
+                    {catTools.map((tool) => {
+                      const Icon = iconFor(tool.icon)
+                      const isSel = selected === tool.id && view === 'tool'
+                      return (
+                        <li key={tool.id}>
+                          <button
+                            onClick={() => goTool(tool.id)}
+                            className={cn(
+                              'flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm',
+                              isSel
+                                ? 'bg-accent/20 text-accent'
+                                : 'text-text hover:bg-surface-2',
+                            )}
+                            data-testid={`tool-${tool.id}`}
+                          >
+                            <Icon className="h-4 w-4 shrink-0" />
+                            <span className="truncate">{t(tool.titleKey)}</span>
+                          </button>
+                        </li>
+                      )
+                    })}
+                  </ul>
+                )}
+              </div>
+            )
+          })}
         </nav>
 
-        <div className="border-t border-border p-3">
-          <button
-            onClick={() => { setShowJobs(false); setView('search') }}
-            className={cn('flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-surface-2', view === 'search' && !showJobs ? 'text-accent' : 'text-text')}
-            data-testid="nav-search"
-          >
-            <SearchIcon className="h-4 w-4" />
-            {t('search.title')}
-          </button>
-          <button
-            onClick={() => { setShowJobs(false); setView('pipelines') }}
-            className={cn('flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-surface-2', view === 'pipelines' && !showJobs ? 'text-accent' : 'text-text')}
-            data-testid="nav-pipelines"
-          >
-            <Workflow className="h-4 w-4" />
-            {t('pipelines.title')}
-          </button>
-          <button
-            onClick={() => { setShowJobs(false); setView('watch') }}
-            className={cn('flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm hover:bg-surface-2', view === 'watch' && !showJobs ? 'text-accent' : 'text-text')}
-            data-testid="nav-watch"
-          >
-            <FolderClock className="h-4 w-4" />
-            {t('watch.title')}
-          </button>
-          <button
-            onClick={() => setShowJobs((v) => !v)}
-            className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-text hover:bg-surface-2"
-            data-testid="toggle-jobs"
-          >
-            <History className="h-4 w-4" />
-            {t('job.title')}
-          </button>
+        <div className="border-t border-border p-2" data-testid="sidebar-footer">
+          {navItems.map((item) => {
+            const Icon = item.icon
+            const isActive = view === item.view
+            return (
+              <button
+                key={item.view}
+                onClick={() => goView(item.view)}
+                className={cn(
+                  'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm hover:bg-surface-2',
+                  isActive ? 'text-accent' : 'text-text',
+                )}
+                data-testid={item.testid}
+              >
+                <Icon className="h-4 w-4 shrink-0" />
+                <span className="flex-1 text-left">{item.label}</span>
+                {item.badge != null && (
+                  <span className="rounded-full bg-accent px-1.5 text-[10px] font-semibold tabular-nums text-white" data-testid="jobs-badge">
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            )
+          })}
           <button
             onClick={toggleTheme}
-            className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-sm text-text hover:bg-surface-2"
+            className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-2"
             data-testid="toggle-theme"
             aria-label={t('app.theme')}
           >
-            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            {t('app.theme')}
+            {theme === 'dark' ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
+            <span className="flex-1 text-left">{t('app.theme')}</span>
           </button>
           {updateTag && (
             <p className="mt-1 flex items-center gap-1 px-2 text-xs text-warn-text" data-testid="update-badge">
@@ -182,7 +234,7 @@ export function AppShell(): React.JSX.Element {
       </aside>
 
       <main className="flex-1 overflow-y-auto p-8" data-testid="main">
-        {showJobs ? (
+        {view === 'jobs' ? (
           <div className="mx-auto max-w-2xl">
             <h2 className="mb-4 text-xl font-semibold">{t('job.title')}</h2>
             <JobList />
@@ -213,15 +265,11 @@ export function AppShell(): React.JSX.Element {
         open={paletteOpen}
         onClose={() => setPaletteOpen(false)}
         onSelect={(id) => {
-          setShowJobs(false)
           if (id === '__view:search' || id === '__view:pipelines' || id === '__view:watch' || id === '__view:jobs') {
-            if (id === '__view:jobs') setShowJobs(true)
-            else setView(id.replace('__view:', '') as typeof view)
-            setSelected(null)
+            goView(id.replace('__view:', '') as typeof view)
             return
           }
-          setView('tool')
-          setSelected(id)
+          goTool(id)
         }}
       />
     </div>

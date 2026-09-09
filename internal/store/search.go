@@ -56,9 +56,12 @@ func (r *SearchRepo) Remove(ctx context.Context, docID string) error {
 
 // Query busca no índice com snippet destacado.
 func (r *SearchRepo) Query(ctx context.Context, q string, limit int) ([]SearchHit, error) {
-	q = strings.TrimSpace(q)
-	if q == "" {
-		return nil, nil
+	normalized, err := normalizeQuery(q)
+	if err != nil {
+		return nil, err
+	}
+	if normalized == "" {
+		return []SearchHit{}, nil
 	}
 	if limit <= 0 {
 		limit = 50
@@ -69,7 +72,7 @@ func (r *SearchRepo) Query(ctx context.Context, q string, limit int) ([]SearchHi
 			bm25(search_index) AS rank
 		FROM search_index
 		WHERE search_index MATCH ?
-		ORDER BY rank LIMIT ?`, q, limit)
+		ORDER BY rank LIMIT ?`, normalized, limit)
 	if err != nil {
 		return nil, fmt.Errorf("search: query: %w", err)
 	}
@@ -83,6 +86,38 @@ func (r *SearchRepo) Query(ctx context.Context, q string, limit int) ([]SearchHi
 		out = append(out, h)
 	}
 	return out, rows.Err()
+}
+
+// normalizeQuery converte texto livre em query FTS5 segura:
+// - ignora vazio (retorna "" sem erro)
+// - cada termo vira prefixo com * (busca parcial: "json" acha "jsonformat")
+// - escapa aspas e remove operadores FTS5 digitados pelo usuário
+func normalizeQuery(q string) (string, error) {
+	q = strings.TrimSpace(q)
+	if q == "" {
+		return "", nil
+	}
+	var terms []string
+	for _, tok := range strings.Fields(q) {
+		// remove caracteres com significado FTS5: " * ^ : ( )
+		clean := strings.Map(func(r rune) rune {
+			switch r {
+			case '"', '*', '^', ':', '(', ')':
+				return -1
+			default:
+				return r
+			}
+		}, tok)
+		clean = strings.TrimSpace(clean)
+		if clean == "" {
+			continue
+		}
+		terms = append(terms, `"`+clean+`"*`)
+	}
+	if len(terms) == 0 {
+		return "", nil
+	}
+	return strings.Join(terms, " "), nil
 }
 
 // Count retorna o número de documentos indexados.

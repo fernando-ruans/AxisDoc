@@ -149,3 +149,22 @@ func TestCountAndEmptyQuery(t *testing.T) {
 	require.NoError(t, err)
 	require.Empty(t, hits)
 }
+
+func TestQueryPrefixAndOperators(t *testing.T) {
+	svc, ctx := setup(t)
+	require.NoError(t, svc.repo.Index(ctx, store.SearchDoc{
+		DocID: "d1", Path: "/a.txt", Title: "a", Content: "conversor jsonformat instalado",
+	}))
+	// prefixo: "json" acha "jsonformat"
+	hits, err := svc.Query(ctx, "json", 10)
+	require.NoError(t, err)
+	require.Len(t, hits, 1)
+	// operadores FTS5 digitados não quebram a busca (AND implícito entre termos)
+	hits, err = svc.Query(ctx, `json instalado`, 10)
+	require.NoError(t, err)
+	require.Len(t, hits, 1)
+	// só operadores → vazio, sem erro
+	hits, err = svc.Query(ctx, `" * ^`, 10)
+	require.NoError(t, err)
+	require.Empty(t, hits)
+}

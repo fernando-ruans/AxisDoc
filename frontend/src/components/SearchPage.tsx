@@ -12,17 +12,21 @@ export function SearchPage(): React.JSX.Element {
   const [count, setCount] = useState(0)
   const [busy, setBusy] = useState(false)
   const [searched, setSearched] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const run = async (): Promise<void> => {
     setBusy(true)
+    setError(null)
     try {
       const [h, c] = await Promise.all([
         getBackend().searchQuery(query, 50),
         getBackend().searchCount(),
       ])
-      setHits(h)
+      setHits(h ?? [])
       setCount(c)
       setSearched(true)
+    } catch (e) {
+      setError(String(e))
     } finally {
       setBusy(false)
     }
@@ -31,8 +35,13 @@ export function SearchPage(): React.JSX.Element {
   const indexFolder = async (): Promise<void> => {
     const folder = await getBackend().pickFolder()
     if (!folder) return
-    await getBackend().enqueue('search.index', { paths: [folder], params: { recursive: true } })
-    setCount(await getBackend().searchCount())
+    setError(null)
+    try {
+      await getBackend().enqueue('search.index', { paths: [folder], params: { recursive: true } })
+      setCount(await getBackend().searchCount())
+    } catch (e) {
+      setError(String(e))
+    }
   }
 
   const highlight = (snippet: string): React.JSX.Element[] => {
@@ -76,7 +85,12 @@ export function SearchPage(): React.JSX.Element {
           {t('search.indexFolder')}
         </button>
       </div>
-      {searched && hits.length === 0 && (
+      {error && (
+        <p className="mt-2 text-sm text-danger" data-testid="search-error">
+          {t('common.error')}: {error}
+        </p>
+      )}
+      {searched && !error && hits.length === 0 && (
         <p className="mt-4 text-sm text-text-muted" data-testid="search-empty">{t('search.noResults')}</p>
       )}
       {!searched && count === 0 && (
