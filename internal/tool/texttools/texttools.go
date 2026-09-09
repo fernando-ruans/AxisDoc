@@ -134,9 +134,12 @@ func (t *BatchRename) SetBackups(b *store.BackupRepo) *BatchRename {
 
 func (t *BatchRename) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "pattern", Label: "param.text.pattern.label", Type: tool.ParamText, Required: true, Default: "(.*)"},
-		{Key: "replacement", Label: "param.text.replacement.label", Type: tool.ParamText, Required: true, Default: "$1"},
-		{Key: "undo", Label: "param.text.undo.label", Type: tool.ParamBool, Default: false},
+		{Key: "pattern", Label: "param.text.pattern.label", Type: tool.ParamText, Required: true, Default: "(.*)",
+			Hint: "param.rename.pattern.hint"},
+		{Key: "replacement", Label: "param.text.replacement.label", Type: tool.ParamText, Required: true, Default: "$1",
+			Hint: "param.rename.replacement.hint"},
+		{Key: "undo", Label: "param.text.undo.label", Type: tool.ParamBool, Default: false,
+			Widget: tool.WidgetSwitch},
 	}
 }
 

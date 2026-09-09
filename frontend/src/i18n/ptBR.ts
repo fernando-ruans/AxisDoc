@@ -372,7 +372,7 @@ export const ptBR = {
       margin: { label: 'Margem (px)' },
     },
     data: {
-      format: { label: 'Formato de saída' },
+      format: { label: 'Formato de saída', hint: 'Destino: pasta do 1º arquivo' },
       format2: { label: 'Formato de saída' },
       mode: { label: 'Modo' },
       table: { label: 'Nome da tabela' },
@@ -397,7 +397,14 @@ export const ptBR = {
       escapekind: { label: 'Operação' },
     },
     search: {
-      recursive: { label: 'Incluir subpastas' },
+      recursive: { label: 'Incluir subpastas', hint: 'Percorre a pasta inteira' },
+    },
+    rename: {
+      pattern: { hint: 'Ex.: (.*) casa tudo; use grupos (a|b)' },
+      replacement: { hint: 'Ex.: prefixo_$1 (use $1, $2…)' },
+    },
+    csv2sql: {
+      table: { placeholder: 'Ex.: clientes' },
     },
     ocr: {
       lang: { label: 'Idioma' },

@@ -145,7 +145,8 @@ func (t *IndexTool) Description() string { return "tool.searchindex.desc" }
 func (t *IndexTool) Icon() string        { return "database" }
 func (t *IndexTool) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "recursive", Label: "param.search.recursive.label", Type: tool.ParamBool, Default: false},
+		{Key: "recursive", Label: "param.search.recursive.label", Type: tool.ParamBool, Default: false,
+			Widget: tool.WidgetSwitch, Hint: "param.search.recursive.hint"},
 	}
 }
 

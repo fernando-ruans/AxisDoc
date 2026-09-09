@@ -292,8 +292,7 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'data.tabular', category: 'data', titleKey: 'tool.tabular.title',
     descKey: 'tool.tabular.desc', icon: 'table-2', stepNames: ['step.data.tabular'],
     params: [
-      param('format', 'param.data.format.label', 'select', { options: ['xlsx', 'csv'], default: 'xlsx', required: true }),
-      outputDir(),
+      param('format', 'param.data.format.label', 'select', { options: ['xlsx', 'csv'], default: 'xlsx', required: true, widget: 'segmented', hint: 'param.data.format.hint' }),
     ],
   },
   {
@@ -304,21 +303,19 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'data.struct', category: 'data', titleKey: 'tool.struct.title',
     descKey: 'tool.struct.desc', icon: 'braces', stepNames: ['step.data.struct'],
     params: [
-      param('format', 'param.data.format2.label', 'select', { options: ['json', 'yaml', 'toml'], default: 'yaml', required: true }),
-      outputDir(),
+      param('format', 'param.data.format.label', 'select', { options: ['json', 'yaml', 'toml'], default: 'yaml', required: true, widget: 'segmented', hint: 'param.data.format.hint' }),
     ],
   },
   {
     id: 'data.jsonformat', category: 'data', titleKey: 'tool.jsonformat.title',
     descKey: 'tool.jsonformat.desc', icon: 'code', stepNames: ['step.data.jsonformat'],
     params: [
-      param('mode', 'param.data.mode.label', 'select', { options: ['format', 'minify'], default: 'format' }),
+      param('mode', 'param.data.mode.label', 'select', { options: ['format', 'minify'], default: 'format', widget: 'segmented' }),
     ],
   },
   {
     id: 'data.tablejson', category: 'data', titleKey: 'tool.tablejson.title',
     descKey: 'tool.tablejson.desc', icon: 'file-json', stepNames: ['step.data.tablejson'],
-    params: [outputDir()],
   },
   {
     id: 'text.diff', category: 'text', titleKey: 'tool.diff.title',
@@ -328,9 +325,9 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'text.rename', category: 'text', titleKey: 'tool.rename.title',
     descKey: 'tool.rename.desc', icon: 'pencil', stepNames: ['step.text.rename'],
     params: [
-      param('pattern', 'param.text.pattern.label', 'text', { required: true, default: '(.*)' }),
-      param('replacement', 'param.text.replacement.label', 'text', { required: true, default: '$1' }),
-      param('undo', 'param.text.undo.label', 'bool', { default: false }),
+      param('pattern', 'param.text.pattern.label', 'text', { required: true, default: '(.*)', hint: 'param.rename.pattern.hint' }),
+      param('replacement', 'param.text.replacement.label', 'text', { required: true, default: '$1', hint: 'param.rename.replacement.hint' }),
+      param('undo', 'param.text.undo.label', 'bool', { default: false, widget: 'switch' }),
     ],
   },
   {
@@ -361,7 +358,7 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'search.index', category: 'search', titleKey: 'tool.searchindex.title',
     descKey: 'tool.searchindex.desc', icon: 'database', stepNames: ['step.search.index'],
     params: [
-      param('recursive', 'param.search.recursive.label', 'bool', { default: false }),
+      param('recursive', 'param.search.recursive.label', 'bool', { default: false, widget: 'switch', hint: 'param.search.recursive.hint' }),
     ],
   },
   {
@@ -374,9 +371,8 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'data.csv2sql', category: 'data', titleKey: 'tool.csv2sql.title',
     descKey: 'tool.csv2sql.desc', icon: 'database-zap', stepNames: ['step.data.csv2sql'],
     params: [
-      param('table', 'param.data.table.label', 'text', { required: true, default: 'dados' }),
-      param('dialect', 'param.data.dialect.label', 'select', { options: ['sqlite', 'postgres', 'mysql'], default: 'sqlite' }),
-      param('batch', 'param.data.batch.label', 'number', { default: 100, min: 1, max: 10000 }),
+      param('table', 'param.data.table.label', 'text', { required: true, default: 'dados', placeholder: 'param.csv2sql.table.placeholder' }),
+      param('dialect', 'param.data.dialect.label', 'select', { options: ['sqlite', 'postgres', 'mysql'], default: 'sqlite', widget: 'segmented' }),
     ],
   },
   {
@@ -387,7 +383,7 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'data.json2table', category: 'data', titleKey: 'tool.json2table.title',
     descKey: 'tool.json2table.desc', icon: 'table', stepNames: ['step.data.json2table'],
     params: [
-      param('format', 'param.data.format.label', 'select', { options: ['xlsx', 'csv'], default: 'xlsx', required: true }),
+      param('format', 'param.data.format.label', 'select', { options: ['xlsx', 'csv'], default: 'xlsx', required: true, widget: 'segmented', hint: 'param.data.format.hint' }),
     ],
   },
   {
@@ -453,7 +449,7 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'ocr.image', category: 'ocr', titleKey: 'tool.ocr.title',
     descKey: 'tool.ocr.desc', icon: 'scan-text', stepNames: ['step.ocr'],
     params: [
-      param('lang', 'param.ocr.lang.label', 'select', { options: ['por+eng', 'por', 'eng'], default: 'por+eng' }),
+      param('lang', 'param.ocr.lang.label', 'select', { options: ['por+eng', 'por', 'eng'], default: 'por+eng', widget: 'segmented' }),
     ],
     // condicional: só aparece quando tesseract está instalado
   },

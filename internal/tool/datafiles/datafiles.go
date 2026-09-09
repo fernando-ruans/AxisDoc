@@ -137,8 +137,8 @@ func NewTabularConvert() *TabularConvert {
 func (t *TabularConvert) Params() []tool.Param {
 	return []tool.Param{
 		{Key: "format", Label: "param.data.format.label", Type: tool.ParamSelect,
-			Options: []string{"xlsx", "csv"}, Default: "xlsx", Required: true},
-		{Key: "outputDir", Label: "param.outputDir.label", Type: tool.ParamFolder},
+			Options: []string{"xlsx", "csv"}, Default: "xlsx", Required: true,
+			Widget: tool.WidgetSegmented, Hint: "param.data.format.hint"},
 	}
 }
 
@@ -349,9 +349,9 @@ func NewStructConvert() *StructConvert {
 
 func (t *StructConvert) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "format", Label: "param.data.format2.label", Type: tool.ParamSelect,
-			Options: []string{"json", "yaml", "toml"}, Default: "yaml", Required: true},
-		{Key: "outputDir", Label: "param.outputDir.label", Type: tool.ParamFolder},
+		{Key: "format", Label: "param.data.format.label", Type: tool.ParamSelect,
+			Options: []string{"json", "yaml", "toml"}, Default: "yaml", Required: true,
+			Widget: tool.WidgetSegmented, Hint: "param.data.format.hint"},
 	}
 }
 
@@ -392,7 +392,7 @@ func NewJSONFormat() *JSONFormat {
 func (t *JSONFormat) Params() []tool.Param {
 	return []tool.Param{
 		{Key: "mode", Label: "param.data.mode.label", Type: tool.ParamSelect,
-			Options: []string{"format", "minify"}, Default: "format"},
+			Options: []string{"format", "minify"}, Default: "format", Widget: tool.WidgetSegmented},
 	}
 }
 
@@ -435,11 +435,7 @@ func NewTableToJSON() *TableToJSON {
 	return &TableToJSON{base{"data.tablejson", "data", "tool.tablejson.title", "tool.tablejson.desc", "file-json"}}
 }
 
-func (t *TableToJSON) Params() []tool.Param {
-	return []tool.Param{
-		{Key: "outputDir", Label: "param.outputDir.label", Type: tool.ParamFolder},
-	}
-}
+func (t *TableToJSON) Params() []tool.Param { return nil }
 
 func (t *TableToJSON) Steps() []tool.Step {
 	return []tool.Step{stepFunc{"step.data.tablejson", t.run}}

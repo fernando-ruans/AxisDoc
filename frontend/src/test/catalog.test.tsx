@@ -55,7 +55,7 @@ describe('catálogo canônico', () => {
 
 describe('formulário de cada tool (golden por tool)', () => {
   for (const tool of CANONICAL_CATALOG) {
-    // tools migradas para layouts dedicados têm golden próprio abaixo
+    // tools migradas para layouts dedicados têm golden próprio (it.each de layouts)
     if (['text.qrcode', 'img.convert', 'pdf.info', 'text.barcode', 'text.uuid', 'text.lorem', 'text.epoch',
       'img.resize', 'img.transform', 'img.filters', 'img.icon', 'img.gifextract', 'img.gifbuild',
       'img.watermark', 'img.watermarkpos', 'img.palette', 'img.crop',
@@ -63,7 +63,12 @@ describe('formulário de cada tool (golden por tool)', () => {
       'pdf.extractimages', 'pdf.extractpages', 'pdf.removepages', 'pdf.extractfonts', 'pdf.extractattachments',
       'pdf.extractmetadata', 'pdf.permissions', 'pdf.diff', 'pdf.addattachments', 'pdf.fromimages',
       'pdf.create', 'pdf.nup', 'pdf.rearrange', 'pdf.protect', 'pdf.unlock', 'pdf.overlay',
-      'pdf.pagenumbers'].includes(tool.id)) continue
+      'pdf.pagenumbers', 'pdf.toimage', 'pdf.editor',
+      'text.slug', 'text.baseconvert', 'text.escape', 'text.diff', 'text.stats', 'text.columnize',
+      'security.hashfile',
+      'data.tabular', 'data.xlsxdiff', 'data.struct', 'data.jsonformat', 'data.tablejson',
+      'data.csv2sql', 'data.sql2csv', 'data.json2table',
+      'text.rename', 'search.index', 'ocr.image'].includes(tool.id)) continue
     it(`${tool.id}: renderiza label + controle para cada param`, async () => {
       if (tool.id === 'ocr.image') {
         // sem backend real de OCR no teste de UI; pula
@@ -208,6 +213,17 @@ describe('formulário de cada tool (golden por tool)', () => {
     ['pdf.unlock', 'layout-transform-pdf.unlock'],
     ['pdf.overlay', 'layout-transform-pdf.overlay'],
     ['pdf.pagenumbers', 'layout-transform-pdf.pagenumbers'],
+    ['data.tabular', 'layout-transform-data.tabular'],
+    ['data.xlsxdiff', 'layout-inspector-data.xlsxdiff'],
+    ['data.struct', 'layout-transform-data.struct'],
+    ['data.jsonformat', 'layout-inspector-data.jsonformat'],
+    ['data.tablejson', 'layout-transform-data.tablejson'],
+    ['data.csv2sql', 'layout-generator-data.csv2sql'],
+    ['data.sql2csv', 'layout-transform-data.sql2csv'],
+    ['data.json2table', 'layout-transform-data.json2table'],
+    ['text.rename', 'layout-transform-text.rename'],
+    ['search.index', 'layout-transform-search.index'],
+    ['ocr.image', 'layout-transform-ocr.image'],
   ])('%s usa o layout %s', async (id, layoutId) => {
     const tool = CANONICAL_CATALOG.find((t) => t.id === id)
     if (!tool) throw new Error(`${id} ausente`)

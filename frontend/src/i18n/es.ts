@@ -374,7 +374,7 @@ export const es: Dict = {
       margin: { label: 'Margen (px)' },
     },
     data: {
-      format: { label: 'Formato de salida' },
+      format: { label: 'Formato de salida', hint: 'Destino: carpeta del 1º archivo' },
       format2: { label: 'Formato de salida' },
       mode: { label: 'Modo' },
       table: { label: 'Nombre de la tabla' },
@@ -399,7 +399,14 @@ export const es: Dict = {
       escapekind: { label: 'Operación' },
     },
     search: {
-      recursive: { label: 'Incluir subcarpetas' },
+      recursive: { label: 'Incluir subcarpetas', hint: 'Recorre toda la carpeta' },
+    },
+    rename: {
+      pattern: { hint: 'Ej.: (.*) casa todo; use grupos (a|b)' },
+      replacement: { hint: 'Ej.: prefijo_$1 (use $1, $2…)' },
+    },
+    csv2sql: {
+      table: { placeholder: 'Ej.: clientes' },
     },
     ocr: {
       lang: { label: 'Idioma' },

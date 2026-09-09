@@ -374,7 +374,7 @@ export const en: Dict = {
       margin: { label: 'Margin (px)' },
     },
     data: {
-      format: { label: 'Output format' },
+      format: { label: 'Output format', hint: 'Destination: 1st file folder' },
       format2: { label: 'Output format' },
       mode: { label: 'Mode' },
       table: { label: 'Table name' },
@@ -399,7 +399,14 @@ export const en: Dict = {
       escapekind: { label: 'Operation' },
     },
     search: {
-      recursive: { label: 'Include subfolders' },
+      recursive: { label: 'Include subfolders', hint: 'Walks the whole folder' },
+    },
+    rename: {
+      pattern: { hint: 'E.g. (.*) matches all; use groups (a|b)' },
+      replacement: { hint: 'E.g. prefix_$1 (use $1, $2…)' },
+    },
+    csv2sql: {
+      table: { placeholder: 'E.g. customers' },
     },
     ocr: {
       lang: { label: 'Language' },

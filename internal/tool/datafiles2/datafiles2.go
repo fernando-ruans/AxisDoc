@@ -54,10 +54,10 @@ func NewCSVToSQL() *CSVToSQL {
 
 func (t *CSVToSQL) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "table", Label: "param.data.table.label", Type: tool.ParamText, Required: true, Default: "dados"},
+		{Key: "table", Label: "param.data.table.label", Type: tool.ParamText, Required: true, Default: "dados",
+			Placeholder: "param.csv2sql.table.placeholder"},
 		{Key: "dialect", Label: "param.data.dialect.label", Type: tool.ParamSelect,
-			Options: []string{"sqlite", "postgres", "mysql"}, Default: "sqlite"},
-		{Key: "batch", Label: "param.data.batch.label", Type: tool.ParamNumber, Default: 100, Min: 1, Max: 10000},
+			Options: []string{"sqlite", "postgres", "mysql"}, Default: "sqlite", Widget: tool.WidgetSegmented},
 	}
 }
 
@@ -426,7 +426,8 @@ func NewJSONToTable() *JSONToTable {
 func (t *JSONToTable) Params() []tool.Param {
 	return []tool.Param{
 		{Key: "format", Label: "param.data.format.label", Type: tool.ParamSelect,
-			Options: []string{"xlsx", "csv"}, Default: "xlsx", Required: true},
+			Options: []string{"xlsx", "csv"}, Default: "xlsx", Required: true, Widget: tool.WidgetSegmented,
+			Hint: "param.data.format.hint"},
 	}
 }
 

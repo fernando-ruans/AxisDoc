@@ -65,6 +65,18 @@ const LAYOUTS: Record<string, 'transform' | 'generator' | 'inspector'> = {
   'pdf.unlock': 'transform',
   'pdf.overlay': 'transform',
   'pdf.pagenumbers': 'transform',
+  // L4 — dados + rename + busca/ocr
+  'data.tabular': 'transform',
+  'data.xlsxdiff': 'inspector',
+  'data.struct': 'transform',
+  'data.jsonformat': 'inspector',
+  'data.tablejson': 'transform',
+  'data.csv2sql': 'generator',
+  'data.sql2csv': 'transform',
+  'data.json2table': 'transform',
+  'text.rename': 'transform',
+  'search.index': 'transform',
+  'ocr.image': 'transform',
 }
 
 // Valores iniciais dos params a partir dos defaults.

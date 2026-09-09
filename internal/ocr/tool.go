@@ -25,7 +25,8 @@ func (t *OCRTool) Icon() string        { return "scan-text" }
 func (t *OCRTool) Params() []tool.Param {
 	return []tool.Param{
 		{Key: "lang", Label: "param.ocr.lang.label", Type: tool.ParamSelect,
-			Options: []string{"por+eng", "por", "eng"}, Default: "por+eng"},
+			Options: []string{"por+eng", "por", "eng"}, Default: "por+eng",
+			Widget: tool.WidgetSegmented},
 	}
 }
 
