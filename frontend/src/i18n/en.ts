@@ -447,6 +447,8 @@ export const en: Dict = {
     copyPath: 'Copy path',
     outputDir: 'Output folder',
     outputDirHint: 'Empty = same folder as the file',
+    outputFile: 'Output file',
+    outputFileHint: 'Generated file name',
     clear: 'Clear',
     remove: 'remove',
     pages: 'pages',

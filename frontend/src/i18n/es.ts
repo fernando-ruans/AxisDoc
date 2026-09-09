@@ -447,6 +447,8 @@ export const es: Dict = {
     copyPath: 'Copiar ruta',
     outputDir: 'Carpeta de destino',
     outputDirHint: 'Vacío = misma carpeta del archivo',
+    outputFile: 'Archivo de salida',
+    outputFileHint: 'Nombre del archivo generado',
     clear: 'Limpiar',
     remove: 'quitar',
     pages: 'páginas',

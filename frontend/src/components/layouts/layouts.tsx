@@ -134,12 +134,26 @@ function RunBar({ ctx, disabledReason }: { ctx: Ctx; disabledReason: string | nu
 }
 
 function DestField({ ctx, hasDest }: { ctx: Ctx; hasDest: boolean }): React.JSX.Element | null {
+  const { t } = useTranslation()
   if (!hasDest) return null
+  const destName = String(ctx.params.outputPath ?? '')
   return (
-    <OutputDirField
-      value={ctx.params.outputDir}
-      onChange={(v) => ctx.setParam('outputDir', v)}
-    />
+    <div>
+      <span className="mb-1 block text-sm font-medium text-text">{t('common.outputFile')}</span>
+      <div className="flex items-center gap-2">
+        <input
+          value={destName}
+          onChange={(e) => ctx.setParam('outputPath', e.target.value)}
+          placeholder={t('common.outputFileHint')}
+          className="min-w-0 flex-1 rounded-md border border-border bg-surface px-3 py-2 text-sm text-text"
+          data-testid="output-name"
+        />
+        <OutputDirField
+          value={ctx.params.outputDir}
+          onChange={(v) => ctx.setParam('outputDir', v)}
+        />
+      </div>
+    </div>
   )
 }
 

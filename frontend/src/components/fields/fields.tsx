@@ -251,21 +251,19 @@ export function FileField({ param, value, onChange }: FieldProps): React.JSX.Ele
 export function OutputDirField({ value, onChange }: { value: unknown; onChange: (v: string) => void }): React.JSX.Element {
   const { t } = useTranslation()
   return (
-    <div>
-      <span className="mb-1 block text-sm font-medium text-text">{t('common.outputDir')}</span>
-      <button
-        type="button"
-        onClick={async () => {
-          const folder = await getBackend().pickFolder()
-          if (folder) onChange(folder)
-        }}
-        className="flex w-full items-center gap-2 rounded-md border border-border px-3 py-2 text-left text-sm text-text hover:border-accent"
-        data-testid="output-dir"
-      >
-        <FolderOpen className="h-4 w-4 shrink-0 text-text-muted" />
-        <span className="truncate">{String(value ?? '') || t('common.outputDirHint')}</span>
-      </button>
-    </div>
+    <button
+      type="button"
+      onClick={async () => {
+        const folder = await getBackend().pickFolder()
+        if (folder) onChange(folder)
+      }}
+      title={t('common.outputDir')}
+      className="flex shrink-0 items-center gap-2 rounded-md border border-border px-3 py-2 text-left text-sm text-text hover:border-accent"
+      data-testid="output-dir"
+    >
+      <FolderOpen className="h-4 w-4 shrink-0 text-text-muted" />
+      <span className="max-w-48 truncate">{String(value ?? '') || t('common.outputDirHint')}</span>
+    </button>
   )
 }
 

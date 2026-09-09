@@ -445,6 +445,8 @@ export const ptBR = {
     copyPath: 'Copiar caminho',
     outputDir: 'Pasta de destino',
     outputDirHint: 'Vazio = mesma pasta do arquivo',
+    outputFile: 'Arquivo de saída',
+    outputFileHint: 'Nome do arquivo gerado',
     clear: 'Limpar',
     remove: 'remover',
     pages: 'páginas',
