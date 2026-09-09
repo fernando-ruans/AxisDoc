@@ -411,6 +411,9 @@ type SystemService struct {
 	emitter runtimei.Emitter
 }
 
+// Version é a versão atual do app (usada no check de updates e no README).
+const Version = "1.0.0"
+
 // PickFiles abre o seletor de arquivos.
 func (s *SystemService) PickFiles() ([]string, error) {
 	return s.dialogs.OpenFiles()
@@ -437,14 +440,14 @@ func (s *SystemService) RevealInFolder(path string) error {
 }
 
 // Version retorna a versão do app.
-func (s *SystemService) Version() string { return "0.2.0" }
+func (s *SystemService) Version() string { return Version }
 
 // Ping verifica comunicação com o backend (usado em smoke tests).
 func (s *SystemService) Ping() string { return "pong" }
 
 // CheckUpdate consulta o GitHub Releases (sem telemetria; falha de rede é silenciosa).
 func (s *SystemService) CheckUpdate() (bool, string, error) {
-	c := update.NewChecker("ferna", "axisdoc", "0.2.0")
+	c := update.NewChecker("fernando-ruans", "AxisDoc", Version)
 	rel, err := c.Latest(context.Background())
 	if err != nil {
 		return false, "", nil // offline: ignora silenciosamente
