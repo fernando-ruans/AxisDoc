@@ -142,7 +142,7 @@ export function AppShell(): React.JSX.Element {
             />
             <div className="min-w-0 leading-tight">
               <h1 className="text-lg font-bold tracking-tight">{t('app.name')}</h1>
-              <p className="truncate text-[11px] text-text-muted" title={t('app.tagline')}>{t('app.tagline')}</p>
+              <p className="text-[11px] leading-snug text-text-muted">{t('app.tagline')}</p>
             </div>
           </div>
         </div>
