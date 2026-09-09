@@ -1,0 +1,1536 @@
+[
+  {
+    "id": "data.csv2sql",
+    "category": "data",
+    "titleKey": "tool.csv2sql.title",
+    "descKey": "tool.csv2sql.desc",
+    "icon": "database-zap",
+    "stepNames": [
+      "step.data.csv2sql"
+    ],
+    "params": [
+      {
+        "key": "table",
+        "label": "param.data.table.label",
+        "type": "text",
+        "default": "dados",
+        "required": true,
+        "placeholder": "param.csv2sql.table.placeholder"
+      },
+      {
+        "key": "dialect",
+        "label": "param.data.dialect.label",
+        "type": "select",
+        "options": [
+          "sqlite",
+          "postgres",
+          "mysql"
+        ],
+        "default": "sqlite",
+        "widget": "segmented"
+      }
+    ]
+  },
+  {
+    "id": "data.json2table",
+    "category": "data",
+    "titleKey": "tool.json2table.title",
+    "descKey": "tool.json2table.desc",
+    "icon": "table",
+    "stepNames": [
+      "step.data.json2table"
+    ],
+    "params": [
+      {
+        "key": "format",
+        "label": "param.data.format.label",
+        "type": "select",
+        "options": [
+          "xlsx",
+          "csv"
+        ],
+        "default": "xlsx",
+        "required": true,
+        "hint": "param.data.format.hint",
+        "widget": "segmented"
+      }
+    ]
+  },
+  {
+    "id": "data.jsonformat",
+    "category": "data",
+    "titleKey": "tool.jsonformat.title",
+    "descKey": "tool.jsonformat.desc",
+    "icon": "code",
+    "stepNames": [
+      "step.data.jsonformat"
+    ],
+    "params": [
+      {
+        "key": "mode",
+        "label": "param.data.mode.label",
+        "type": "select",
+        "options": [
+          "format",
+          "minify"
+        ],
+        "default": "format",
+        "widget": "segmented"
+      }
+    ]
+  },
+  {
+    "id": "data.sql2csv",
+    "category": "data",
+    "titleKey": "tool.sql2csv.title",
+    "descKey": "tool.sql2csv.desc",
+    "icon": "file-spreadsheet",
+    "stepNames": [
+      "step.data.sql2csv"
+    ],
+    "params": []
+  },
+  {
+    "id": "data.struct",
+    "category": "data",
+    "titleKey": "tool.struct.title",
+    "descKey": "tool.struct.desc",
+    "icon": "braces",
+    "stepNames": [
+      "step.data.struct"
+    ],
+    "params": [
+      {
+        "key": "format",
+        "label": "param.data.format.label",
+        "type": "select",
+        "options": [
+          "json",
+          "yaml",
+          "toml"
+        ],
+        "default": "yaml",
+        "required": true,
+        "hint": "param.data.format.hint",
+        "widget": "segmented"
+      }
+    ]
+  },
+  {
+    "id": "data.tablejson",
+    "category": "data",
+    "titleKey": "tool.tablejson.title",
+    "descKey": "tool.tablejson.desc",
+    "icon": "file-json",
+    "stepNames": [
+      "step.data.tablejson"
+    ],
+    "params": []
+  },
+  {
+    "id": "data.tabular",
+    "category": "data",
+    "titleKey": "tool.tabular.title",
+    "descKey": "tool.tabular.desc",
+    "icon": "table-2",
+    "stepNames": [
+      "step.data.tabular"
+    ],
+    "params": [
+      {
+        "key": "format",
+        "label": "param.data.format.label",
+        "type": "select",
+        "options": [
+          "xlsx",
+          "csv"
+        ],
+        "default": "xlsx",
+        "required": true,
+        "hint": "param.data.format.hint",
+        "widget": "segmented"
+      }
+    ]
+  },
+  {
+    "id": "data.xlsxdiff",
+    "category": "data",
+    "titleKey": "tool.xlsxdiff.title",
+    "descKey": "tool.xlsxdiff.desc",
+    "icon": "git-compare",
+    "stepNames": [
+      "step.data.xlsxdiff"
+    ],
+    "params": []
+  },
+  {
+    "id": "img.convert",
+    "category": "image",
+    "titleKey": "tool.imgconvert.title",
+    "descKey": "tool.imgconvert.desc",
+    "icon": "repeat",
+    "stepNames": [
+      "step.img.convert"
+    ],
+    "params": [
+      {
+        "key": "format",
+        "label": "param.img.format.label",
+        "type": "select",
+        "options": [
+          "jpg",
+          "png",
+          "gif",
+          "bmp",
+          "tiff"
+        ],
+        "default": "png",
+        "required": true,
+        "widget": "cards"
+      },
+      {
+        "key": "quality",
+        "label": "param.img.quality.label",
+        "type": "number",
+        "default": 85,
+        "min": 1,
+        "max": 100,
+        "hint": "param.img.quality.hint",
+        "visibleIf": {
+          "key": "format",
+          "equals": "jpg"
+        },
+        "widget": "slider"
+      }
+    ]
+  },
+  {
+    "id": "img.crop",
+    "category": "image",
+    "titleKey": "tool.imgcrop.title",
+    "descKey": "tool.imgcrop.desc",
+    "icon": "crop",
+    "stepNames": [
+      "step.img2.crop"
+    ],
+    "params": [
+      {
+        "key": "ratio",
+        "label": "param.img.ratio.label",
+        "type": "select",
+        "options": [
+          "free",
+          "1:1",
+          "4:3",
+          "16:9"
+        ],
+        "default": "free",
+        "hint": "param.img.ratio.hint",
+        "widget": "segmented"
+      },
+      {
+        "key": "x",
+        "label": "param.img.x.label",
+        "type": "number",
+        "default": 0,
+        "hint": "param.img.coords.hint"
+      },
+      {
+        "key": "y",
+        "label": "param.img.y.label",
+        "type": "number",
+        "default": 0
+      },
+      {
+        "key": "w",
+        "label": "param.img.width.label",
+        "type": "number",
+        "default": 100,
+        "min": 1
+      },
+      {
+        "key": "h",
+        "label": "param.img.height.label",
+        "type": "number",
+        "default": 100,
+        "min": 1
+      }
+    ]
+  },
+  {
+    "id": "img.filters",
+    "category": "image",
+    "titleKey": "tool.imgfilters.title",
+    "descKey": "tool.imgfilters.desc",
+    "icon": "wand",
+    "stepNames": [
+      "step.img2.filters"
+    ],
+    "params": [
+      {
+        "key": "filter",
+        "label": "param.img.filter.label",
+        "type": "select",
+        "options": [
+          "grayscale",
+          "invert",
+          "blur",
+          "sharpen",
+          "sepia",
+          "contrast",
+          "brightness"
+        ],
+        "default": "grayscale",
+        "widget": "cards"
+      },
+      {
+        "key": "strength",
+        "label": "param.img.strength.label",
+        "type": "number",
+        "default": 5,
+        "max": 10,
+        "hint": "param.img.strength.hint",
+        "widget": "slider"
+      }
+    ]
+  },
+  {
+    "id": "img.gifbuild",
+    "category": "image",
+    "titleKey": "tool.gifbuild.title",
+    "descKey": "tool.gifbuild.desc",
+    "icon": "film",
+    "stepNames": [
+      "step.img2.gifbuild"
+    ],
+    "params": [
+      {
+        "key": "delay",
+        "label": "param.gif.delay.label",
+        "type": "number",
+        "default": 100,
+        "min": 20,
+        "max": 5000,
+        "widget": "slider"
+      },
+      {
+        "key": "outputPath",
+        "label": "param.outputPath.label",
+        "type": "output",
+        "default": "animacao.gif"
+      }
+    ]
+  },
+  {
+    "id": "img.gifextract",
+    "category": "image",
+    "titleKey": "tool.gifextract.title",
+    "descKey": "tool.gifextract.desc",
+    "icon": "film",
+    "stepNames": [
+      "step.img2.gifextract"
+    ],
+    "params": [
+      {
+        "key": "outputDir",
+        "label": "param.outputDir.label",
+        "type": "folder"
+      }
+    ]
+  },
+  {
+    "id": "img.icon",
+    "category": "image",
+    "titleKey": "tool.imgicon.title",
+    "descKey": "tool.imgicon.desc",
+    "icon": "shapes",
+    "stepNames": [
+      "step.img2.icon"
+    ],
+    "params": [
+      {
+        "key": "outputPath",
+        "label": "param.outputPath.label",
+        "type": "output",
+        "default": "icon.ico"
+      }
+    ]
+  },
+  {
+    "id": "img.palette",
+    "category": "image",
+    "titleKey": "tool.imgpalette.title",
+    "descKey": "tool.imgpalette.desc",
+    "icon": "palette",
+    "stepNames": [
+      "step.img2.palette"
+    ],
+    "params": []
+  },
+  {
+    "id": "img.resize",
+    "category": "image",
+    "titleKey": "tool.imgresize.title",
+    "descKey": "tool.imgresize.desc",
+    "icon": "scaling",
+    "stepNames": [
+      "step.img.resize"
+    ],
+    "params": [
+      {
+        "key": "preset",
+        "label": "param.img.preset.label",
+        "type": "select",
+        "options": [
+          "custom",
+          "320",
+          "800",
+          "1920",
+          "original"
+        ],
+        "default": "800",
+        "hint": "param.img.preset.hint",
+        "widget": "segmented"
+      },
+      {
+        "key": "width",
+        "label": "param.img.maxwidth.label",
+        "type": "number",
+        "default": 800,
+        "min": 1,
+        "max": 20000,
+        "visibleIf": {
+          "key": "preset",
+          "equals": "custom"
+        }
+      }
+    ]
+  },
+  {
+    "id": "img.transform",
+    "category": "image",
+    "titleKey": "tool.imgtransform.title",
+    "descKey": "tool.imgtransform.desc",
+    "icon": "flip-horizontal",
+    "stepNames": [
+      "step.img2.transform"
+    ],
+    "params": [
+      {
+        "key": "op",
+        "label": "param.img.transform.label",
+        "type": "select",
+        "options": [
+          "rotate90",
+          "rotate180",
+          "rotate270",
+          "flipH",
+          "flipV"
+        ],
+        "default": "rotate90",
+        "widget": "cards"
+      }
+    ]
+  },
+  {
+    "id": "img.watermark",
+    "category": "image",
+    "titleKey": "tool.imgwm.title",
+    "descKey": "tool.imgwm.desc",
+    "icon": "stamp",
+    "stepNames": [
+      "step.img.watermark"
+    ],
+    "params": [
+      {
+        "key": "kind",
+        "label": "param.img.wmkind.label",
+        "type": "select",
+        "options": [
+          "text",
+          "image"
+        ],
+        "default": "text",
+        "widget": "segmented"
+      },
+      {
+        "key": "text",
+        "label": "param.pdf.text.label",
+        "type": "text",
+        "default": "© AxisDoc",
+        "required": true,
+        "visibleIf": {
+          "key": "kind",
+          "equals": "text"
+        }
+      },
+      {
+        "key": "opacity",
+        "label": "param.img.opacity.label",
+        "type": "number",
+        "default": 0.3,
+        "min": 0.05,
+        "max": 1,
+        "visibleIf": {
+          "key": "kind",
+          "equals": "text"
+        },
+        "widget": "slider"
+      },
+      {
+        "key": "image",
+        "label": "param.img.wmimage.label",
+        "type": "file",
+        "visibleIf": {
+          "key": "kind",
+          "equals": "image"
+        },
+        "accept": [
+          ".png",
+          ".jpg",
+          ".jpeg"
+        ]
+      },
+      {
+        "key": "position",
+        "label": "param.img.position.label",
+        "type": "select",
+        "options": [
+          "topLeft",
+          "topRight",
+          "center",
+          "bottomLeft",
+          "bottomRight"
+        ],
+        "default": "bottomRight",
+        "visibleIf": {
+          "key": "kind",
+          "equals": "image"
+        },
+        "widget": "segmented"
+      },
+      {
+        "key": "scale",
+        "label": "param.img.wmscale.label",
+        "type": "number",
+        "default": 20,
+        "min": 5,
+        "max": 90,
+        "visibleIf": {
+          "key": "kind",
+          "equals": "image"
+        },
+        "widget": "slider"
+      }
+    ]
+  },
+  {
+    "id": "img.watermarkpos",
+    "category": "image",
+    "titleKey": "tool.imgwmpos.title",
+    "descKey": "tool.imgwmpos.desc",
+    "icon": "stamp",
+    "stepNames": [
+      "step.img2.watermarkpos"
+    ],
+    "params": [
+      {
+        "key": "image",
+        "label": "param.img.wmimage.label",
+        "type": "file",
+        "required": true,
+        "accept": [
+          ".png",
+          ".jpg",
+          ".jpeg"
+        ]
+      },
+      {
+        "key": "position",
+        "label": "param.img.position.label",
+        "type": "select",
+        "options": [
+          "topLeft",
+          "topRight",
+          "center",
+          "bottomLeft",
+          "bottomRight"
+        ],
+        "default": "bottomRight",
+        "widget": "segmented"
+      },
+      {
+        "key": "scale",
+        "label": "param.img.wmscale.label",
+        "type": "number",
+        "default": 20,
+        "min": 5,
+        "max": 90,
+        "widget": "slider"
+      }
+    ]
+  },
+  {
+    "id": "pdf.addattachments",
+    "category": "pdf",
+    "titleKey": "tool.pdfaddattachments.title",
+    "descKey": "tool.pdfaddattachments.desc",
+    "icon": "paperclip",
+    "stepNames": [
+      "step.pdf.addattachments"
+    ],
+    "params": [
+      {
+        "key": "files",
+        "label": "param.pdf.attachfiles.label",
+        "type": "file",
+        "required": true,
+        "hint": "param.pdf.attachfiles.hint",
+        "accept": [
+          ".pdf",
+          ".txt",
+          ".png",
+          ".jpg",
+          ".csv",
+          ".xlsx"
+        ]
+      }
+    ]
+  },
+  {
+    "id": "pdf.compress",
+    "category": "pdf",
+    "titleKey": "tool.pdfcompress.title",
+    "descKey": "tool.pdfcompress.desc",
+    "icon": "minimize-2",
+    "stepNames": [
+      "step.pdf.compress"
+    ],
+    "params": [
+      {
+        "key": "level",
+        "label": "param.pdf.compress.label",
+        "type": "select",
+        "options": [
+          "balanced",
+          "max"
+        ],
+        "default": "balanced",
+        "hint": "param.pdf.compress.hint",
+        "widget": "segmented"
+      }
+    ]
+  },
+  {
+    "id": "pdf.create",
+    "category": "pdf",
+    "titleKey": "tool.pdfcreate.title",
+    "descKey": "tool.pdfcreate.desc",
+    "icon": "file-plus",
+    "stepNames": [
+      "step.pdf.create"
+    ],
+    "params": [
+      {
+        "key": "title",
+        "label": "param.pdf.doctitle.label",
+        "type": "text",
+        "default": "",
+        "required": true,
+        "placeholder": "param.pdf.doctitle.placeholder"
+      },
+      {
+        "key": "body",
+        "label": "param.pdf.docbody.label",
+        "type": "textarea",
+        "default": "",
+        "required": true,
+        "placeholder": "param.pdf.docbody.placeholder"
+      },
+      {
+        "key": "pages",
+        "label": "param.pdf.blankpages.label",
+        "type": "number",
+        "default": 0,
+        "max": 50,
+        "visibleIf": {
+          "key": "title",
+          "equals": ""
+        },
+        "widget": "slider"
+      },
+      {
+        "key": "outputPath",
+        "label": "param.outputPath.label",
+        "type": "output",
+        "default": "novo.pdf"
+      }
+    ]
+  },
+  {
+    "id": "pdf.diff",
+    "category": "pdf",
+    "titleKey": "tool.pdfdiff.title",
+    "descKey": "tool.pdfdiff.desc",
+    "icon": "git-compare",
+    "stepNames": [
+      "step.pdf.diff"
+    ],
+    "params": []
+  },
+  {
+    "id": "pdf.extractattachments",
+    "category": "pdf",
+    "titleKey": "tool.pdfextractattachments.title",
+    "descKey": "tool.pdfextractattachments.desc",
+    "icon": "paperclip",
+    "stepNames": [
+      "step.pdf.extractattachments"
+    ],
+    "params": []
+  },
+  {
+    "id": "pdf.extractfonts",
+    "category": "pdf",
+    "titleKey": "tool.pdfextractfonts.title",
+    "descKey": "tool.pdfextractfonts.desc",
+    "icon": "type",
+    "stepNames": [
+      "step.pdf.extractfonts"
+    ],
+    "params": [
+      {
+        "key": "pages",
+        "label": "param.pdf.pages.label",
+        "type": "text",
+        "default": "",
+        "placeholder": "param.pdf.pages.optional",
+        "hint": "param.pdf.pages.hint"
+      }
+    ]
+  },
+  {
+    "id": "pdf.extractimages",
+    "category": "pdf",
+    "titleKey": "tool.pdfextractimages.title",
+    "descKey": "tool.pdfextractimages.desc",
+    "icon": "image",
+    "stepNames": [
+      "step.pdf.extractimages"
+    ],
+    "params": [
+      {
+        "key": "pages",
+        "label": "param.pdf.pages.label",
+        "type": "text",
+        "default": "",
+        "placeholder": "param.pdf.pages.optional",
+        "hint": "param.pdf.pages.hint"
+      }
+    ]
+  },
+  {
+    "id": "pdf.extractmetadata",
+    "category": "pdf",
+    "titleKey": "tool.pdfextractmetadata.title",
+    "descKey": "tool.pdfextractmetadata.desc",
+    "icon": "info",
+    "stepNames": [
+      "step.pdf.extractmetadata"
+    ],
+    "params": []
+  },
+  {
+    "id": "pdf.extractpages",
+    "category": "pdf",
+    "titleKey": "tool.pdfextractpages.title",
+    "descKey": "tool.pdfextractpages.desc",
+    "icon": "file-output",
+    "stepNames": [
+      "step.pdf.extractpages"
+    ],
+    "params": [
+      {
+        "key": "pages",
+        "label": "param.pdf.pages.label",
+        "type": "text",
+        "default": "",
+        "required": true,
+        "placeholder": "param.pdf.pages.placeholder",
+        "hint": "param.pdf.pages.hint"
+      }
+    ]
+  },
+  {
+    "id": "pdf.extracttext",
+    "category": "pdf",
+    "titleKey": "tool.pdfextract.title",
+    "descKey": "tool.pdfextract.desc",
+    "icon": "file-text",
+    "stepNames": [
+      "step.pdf.extracttext"
+    ],
+    "params": []
+  },
+  {
+    "id": "pdf.fromimages",
+    "category": "pdf",
+    "titleKey": "tool.pdffromimages.title",
+    "descKey": "tool.pdffromimages.desc",
+    "icon": "images",
+    "stepNames": [
+      "step.pdf.fromimages"
+    ],
+    "params": [
+      {
+        "key": "outputPath",
+        "label": "param.outputPath.label",
+        "type": "output",
+        "default": "imagens.pdf",
+        "hint": "param.pdffromimages.output.hint"
+      }
+    ]
+  },
+  {
+    "id": "pdf.info",
+    "category": "pdf",
+    "titleKey": "tool.pdfinfo.title",
+    "descKey": "tool.pdfinfo.desc",
+    "icon": "file-info",
+    "stepNames": [
+      "step.pdf.info"
+    ],
+    "params": []
+  },
+  {
+    "id": "pdf.merge",
+    "category": "pdf",
+    "titleKey": "tool.pdfmerge.title",
+    "descKey": "tool.pdfmerge.desc",
+    "icon": "file-plus-2",
+    "stepNames": [
+      "step.pdf.merge"
+    ],
+    "params": [
+      {
+        "key": "outputPath",
+        "label": "param.outputPath.label",
+        "type": "output",
+        "default": "merged.pdf",
+        "hint": "param.pdfmerge.output.hint"
+      }
+    ]
+  },
+  {
+    "id": "pdf.nup",
+    "category": "pdf",
+    "titleKey": "tool.pdfnup.title",
+    "descKey": "tool.pdfnup.desc",
+    "icon": "layout-grid",
+    "stepNames": [
+      "step.pdf.nup"
+    ],
+    "params": [
+      {
+        "key": "n",
+        "label": "param.pdf.nup.label",
+        "type": "select",
+        "options": [
+          "2",
+          "4",
+          "8"
+        ],
+        "default": "2",
+        "widget": "cards"
+      }
+    ]
+  },
+  {
+    "id": "pdf.overlay",
+    "category": "pdf",
+    "titleKey": "tool.pdfoverlay.title",
+    "descKey": "tool.pdfoverlay.desc",
+    "icon": "layers",
+    "stepNames": [
+      "step.pdf.overlay"
+    ],
+    "params": [
+      {
+        "key": "overlay",
+        "label": "param.pdf.overlay.label",
+        "type": "file",
+        "required": true,
+        "hint": "param.pdf.overlay.hint",
+        "accept": [
+          ".pdf"
+        ]
+      },
+      {
+        "key": "onTop",
+        "label": "param.pdf.ontop.label",
+        "type": "bool",
+        "default": true,
+        "widget": "switch"
+      }
+    ]
+  },
+  {
+    "id": "pdf.pagenumbers",
+    "category": "pdf",
+    "titleKey": "tool.pdfpagenumbers.title",
+    "descKey": "tool.pdfpagenumbers.desc",
+    "icon": "list-ordered",
+    "stepNames": [
+      "step.pdf.pagenumbers"
+    ],
+    "params": [
+      {
+        "key": "format",
+        "label": "param.pdf.numformat.label",
+        "type": "text",
+        "default": "Página %p de %P",
+        "required": true,
+        "hint": "param.pdf.numformat.hint"
+      },
+      {
+        "key": "position",
+        "label": "param.img.position.label",
+        "type": "select",
+        "options": [
+          "bottomCenter",
+          "topCenter",
+          "bottomRight",
+          "bottomLeft"
+        ],
+        "default": "bottomCenter",
+        "widget": "segmented"
+      },
+      {
+        "key": "fontSize",
+        "label": "param.pdf.fontsize.label",
+        "type": "number",
+        "default": 10,
+        "min": 6,
+        "max": 48,
+        "widget": "slider"
+      }
+    ]
+  },
+  {
+    "id": "pdf.permissions",
+    "category": "pdf",
+    "titleKey": "tool.pdfpermissions.title",
+    "descKey": "tool.pdfpermissions.desc",
+    "icon": "lock",
+    "stepNames": [
+      "step.pdf.permissions"
+    ],
+    "params": []
+  },
+  {
+    "id": "pdf.protect",
+    "category": "pdf",
+    "titleKey": "tool.pdfprotect.title",
+    "descKey": "tool.pdfprotect.desc",
+    "icon": "lock",
+    "stepNames": [
+      "step.pdf.protect"
+    ],
+    "params": [
+      {
+        "key": "userPassword",
+        "label": "param.pdf.userpw.label",
+        "type": "password",
+        "default": "",
+        "required": true,
+        "hint": "param.pdf.userpw.hint"
+      },
+      {
+        "key": "ownerPassword",
+        "label": "param.pdf.ownerpw.label",
+        "type": "password",
+        "default": "",
+        "placeholder": "param.pdf.ownerpw.placeholder"
+      },
+      {
+        "key": "keyLength",
+        "label": "param.pdf.keylen.label",
+        "type": "select",
+        "options": [
+          "40",
+          "128",
+          "256"
+        ],
+        "default": "256",
+        "widget": "segmented"
+      }
+    ]
+  },
+  {
+    "id": "pdf.rearrange",
+    "category": "pdf",
+    "titleKey": "tool.pdfrearrange.title",
+    "descKey": "tool.pdfrearrange.desc",
+    "icon": "list-ordered",
+    "stepNames": [
+      "step.pdf.rearrange"
+    ],
+    "params": [
+      {
+        "key": "order",
+        "label": "param.pdf.order.label",
+        "type": "text",
+        "default": "",
+        "required": true,
+        "placeholder": "param.pdf.order.placeholder",
+        "hint": "param.pdf.order.hint"
+      }
+    ]
+  },
+  {
+    "id": "pdf.removepages",
+    "category": "pdf",
+    "titleKey": "tool.pdfremovepages.title",
+    "descKey": "tool.pdfremovepages.desc",
+    "icon": "file-x",
+    "stepNames": [
+      "step.pdf.removepages"
+    ],
+    "params": [
+      {
+        "key": "pages",
+        "label": "param.pdf.pages.label",
+        "type": "text",
+        "default": "",
+        "required": true,
+        "placeholder": "param.pdf.pages.placeholder",
+        "hint": "param.pdf.pages.hint"
+      }
+    ]
+  },
+  {
+    "id": "pdf.rotate",
+    "category": "pdf",
+    "titleKey": "tool.pdfrotate.title",
+    "descKey": "tool.pdfrotate.desc",
+    "icon": "rotate-cw",
+    "stepNames": [
+      "step.pdf.rotate"
+    ],
+    "params": [
+      {
+        "key": "angle",
+        "label": "param.pdf.angle.label",
+        "type": "select",
+        "options": [
+          "90",
+          "180",
+          "270"
+        ],
+        "default": "90",
+        "widget": "segmented"
+      }
+    ]
+  },
+  {
+    "id": "pdf.split",
+    "category": "pdf",
+    "titleKey": "tool.pdfsplit.title",
+    "descKey": "tool.pdfsplit.desc",
+    "icon": "scissors",
+    "stepNames": [
+      "step.pdf.split"
+    ],
+    "params": [
+      {
+        "key": "mode",
+        "label": "param.pdf.splitmode.label",
+        "type": "select",
+        "options": [
+          "pages",
+          "everyN"
+        ],
+        "default": "everyN",
+        "widget": "segmented"
+      },
+      {
+        "key": "n",
+        "label": "param.pdf.n.label",
+        "type": "number",
+        "default": 1,
+        "min": 1,
+        "max": 1000,
+        "visibleIf": {
+          "key": "mode",
+          "equals": "everyN"
+        }
+      }
+    ]
+  },
+  {
+    "id": "pdf.unlock",
+    "category": "pdf",
+    "titleKey": "tool.pdfunlock.title",
+    "descKey": "tool.pdfunlock.desc",
+    "icon": "lock-open",
+    "stepNames": [
+      "step.pdf.unlock"
+    ],
+    "params": [
+      {
+        "key": "password",
+        "label": "param.pdf.password.label",
+        "type": "password",
+        "default": "",
+        "required": true
+      }
+    ]
+  },
+  {
+    "id": "pdf.watermark",
+    "category": "pdf",
+    "titleKey": "tool.pdfwm.title",
+    "descKey": "tool.pdfwm.desc",
+    "icon": "stamp",
+    "stepNames": [
+      "step.pdf.watermark"
+    ],
+    "params": [
+      {
+        "key": "text",
+        "label": "param.pdf.text.label",
+        "type": "text",
+        "default": "CONFIDENCIAL",
+        "required": true,
+        "placeholder": "param.pdfwm.placeholder"
+      },
+      {
+        "key": "fontSize",
+        "label": "param.pdf.fontsize.label",
+        "type": "number",
+        "default": 48,
+        "min": 6,
+        "max": 200,
+        "widget": "slider"
+      }
+    ]
+  },
+  {
+    "id": "security.hashfile",
+    "category": "security",
+    "titleKey": "tool.hashfile.title",
+    "descKey": "tool.hashfile.desc",
+    "icon": "fingerprint",
+    "stepNames": [
+      "step.hashfile.compute"
+    ],
+    "params": [
+      {
+        "key": "algorithm",
+        "label": "param.algorithm.label",
+        "type": "select",
+        "options": [
+          "sha256",
+          "sha512",
+          "sha1",
+          "md5",
+          "crc32"
+        ],
+        "default": "sha256",
+        "required": true,
+        "hint": "param.hashfile.algorithm.hint",
+        "widget": "segmented"
+      }
+    ]
+  },
+  {
+    "id": "text.barcode",
+    "category": "text",
+    "titleKey": "tool.barcode.title",
+    "descKey": "tool.barcode.desc",
+    "icon": "scan-barcode",
+    "stepNames": [
+      "step.text.barcode"
+    ],
+    "params": [
+      {
+        "key": "text",
+        "label": "param.pdf.text.label",
+        "type": "textarea",
+        "required": true,
+        "placeholder": "param.barcode.placeholder",
+        "hint": "param.barcode.hint"
+      },
+      {
+        "key": "kind",
+        "label": "param.text.barkind.label",
+        "type": "select",
+        "options": [
+          "code128",
+          "ean13"
+        ],
+        "default": "code128",
+        "widget": "segmented"
+      },
+      {
+        "key": "width",
+        "label": "param.img.width.label",
+        "type": "number",
+        "default": 400,
+        "min": 50,
+        "max": 4000,
+        "widget": "slider"
+      },
+      {
+        "key": "height",
+        "label": "param.img.height.label",
+        "type": "number",
+        "default": 100,
+        "min": 20,
+        "max": 1000,
+        "widget": "slider"
+      }
+    ]
+  },
+  {
+    "id": "text.baseconvert",
+    "category": "text",
+    "titleKey": "tool.baseconvert.title",
+    "descKey": "tool.baseconvert.desc",
+    "icon": "binary",
+    "stepNames": [
+      "step.text.baseconvert"
+    ],
+    "params": [
+      {
+        "key": "value",
+        "label": "param.text.value.label",
+        "type": "text",
+        "default": "",
+        "required": true,
+        "placeholder": "param.baseconvert.placeholder"
+      },
+      {
+        "key": "from",
+        "label": "param.text.frombase.label",
+        "type": "select",
+        "options": [
+          "10",
+          "16",
+          "8",
+          "2",
+          "36"
+        ],
+        "default": "10",
+        "widget": "segmented"
+      },
+      {
+        "key": "to",
+        "label": "param.text.tobase.label",
+        "type": "select",
+        "options": [
+          "10",
+          "16",
+          "8",
+          "2",
+          "36"
+        ],
+        "default": "16",
+        "widget": "segmented"
+      }
+    ]
+  },
+  {
+    "id": "text.columnize",
+    "category": "text",
+    "titleKey": "tool.columnize.title",
+    "descKey": "tool.columnize.desc",
+    "icon": "columns-3",
+    "stepNames": [
+      "step.text.columnize"
+    ],
+    "params": [
+      {
+        "key": "delimiter",
+        "label": "param.text.delimiter.label",
+        "type": "text",
+        "default": "|",
+        "placeholder": "param.columnize.placeholder"
+      },
+      {
+        "key": "padding",
+        "label": "param.text.padding.label",
+        "type": "number",
+        "default": 2,
+        "min": 1,
+        "max": 20,
+        "widget": "slider"
+      },
+      {
+        "key": "text",
+        "label": "param.columnize.text.label",
+        "type": "textarea",
+        "default": "",
+        "placeholder": "param.columnize.textplaceholder"
+      }
+    ]
+  },
+  {
+    "id": "text.diff",
+    "category": "text",
+    "titleKey": "tool.diff.title",
+    "descKey": "tool.diff.desc",
+    "icon": "git-compare",
+    "stepNames": [
+      "step.text.diff"
+    ],
+    "params": []
+  },
+  {
+    "id": "text.epoch",
+    "category": "text",
+    "titleKey": "tool.epoch.title",
+    "descKey": "tool.epoch.desc",
+    "icon": "clock",
+    "stepNames": [
+      "step.text.epoch"
+    ],
+    "params": [
+      {
+        "key": "mode",
+        "label": "param.data.mode.label",
+        "type": "select",
+        "options": [
+          "now",
+          "toDate",
+          "toEpoch"
+        ],
+        "default": "now",
+        "widget": "segmented"
+      },
+      {
+        "key": "value",
+        "label": "param.text.value.label",
+        "type": "text",
+        "default": "",
+        "placeholder": "param.epoch.placeholder",
+        "visibleIf": {
+          "key": "mode",
+          "equals": "toDate"
+        }
+      },
+      {
+        "key": "value2",
+        "label": "param.text.value.label",
+        "type": "text",
+        "default": "",
+        "placeholder": "param.epoch.placeholder2",
+        "visibleIf": {
+          "key": "mode",
+          "equals": "toEpoch"
+        }
+      }
+    ]
+  },
+  {
+    "id": "text.escape",
+    "category": "text",
+    "titleKey": "tool.escape.title",
+    "descKey": "tool.escape.desc",
+    "icon": "code-2",
+    "stepNames": [
+      "step.text.escape"
+    ],
+    "params": [
+      {
+        "key": "kind",
+        "label": "param.text.escapekind.label",
+        "type": "select",
+        "options": [
+          "htmlEscape",
+          "htmlUnescape",
+          "urlEncode",
+          "urlDecode",
+          "queryEscape"
+        ],
+        "default": "htmlEscape",
+        "widget": "segmented"
+      },
+      {
+        "key": "text",
+        "label": "param.pdf.text.label",
+        "type": "textarea",
+        "default": "",
+        "placeholder": "param.escape.placeholder"
+      }
+    ]
+  },
+  {
+    "id": "text.lorem",
+    "category": "text",
+    "titleKey": "tool.lorem.title",
+    "descKey": "tool.lorem.desc",
+    "icon": "align-left",
+    "stepNames": [
+      "step.text.lorem"
+    ],
+    "params": [
+      {
+        "key": "paragraphs",
+        "label": "param.text.paragraphs.label",
+        "type": "number",
+        "default": 3,
+        "min": 1,
+        "max": 100,
+        "widget": "slider"
+      },
+      {
+        "key": "wordsPerParagraph",
+        "label": "param.text.words.label",
+        "type": "number",
+        "default": 60,
+        "min": 5,
+        "max": 500,
+        "widget": "slider"
+      }
+    ]
+  },
+  {
+    "id": "text.qrcode",
+    "category": "text",
+    "titleKey": "tool.qrcode.title",
+    "descKey": "tool.qrcode.desc",
+    "icon": "qr-code",
+    "stepNames": [
+      "step.text.qrcode"
+    ],
+    "params": [
+      {
+        "key": "text",
+        "label": "param.pdf.text.label",
+        "type": "textarea",
+        "required": true,
+        "placeholder": "param.qrcode.placeholder",
+        "hint": "param.qrcode.hint"
+      },
+      {
+        "key": "size",
+        "label": "param.img.qrsize.label",
+        "type": "number",
+        "default": 256,
+        "min": 64,
+        "max": 2000,
+        "widget": "slider"
+      }
+    ]
+  },
+  {
+    "id": "text.rename",
+    "category": "text",
+    "titleKey": "tool.rename.title",
+    "descKey": "tool.rename.desc",
+    "icon": "pencil",
+    "stepNames": [
+      "step.text.rename"
+    ],
+    "params": [
+      {
+        "key": "pattern",
+        "label": "param.text.pattern.label",
+        "type": "text",
+        "default": "(.*)",
+        "required": true,
+        "hint": "param.rename.pattern.hint"
+      },
+      {
+        "key": "replacement",
+        "label": "param.text.replacement.label",
+        "type": "text",
+        "default": "$1",
+        "required": true,
+        "hint": "param.rename.replacement.hint"
+      },
+      {
+        "key": "undo",
+        "label": "param.text.undo.label",
+        "type": "bool",
+        "default": false,
+        "widget": "switch"
+      }
+    ]
+  },
+  {
+    "id": "text.slug",
+    "category": "text",
+    "titleKey": "tool.slug.title",
+    "descKey": "tool.slug.desc",
+    "icon": "link",
+    "stepNames": [
+      "step.text.slug"
+    ],
+    "params": [
+      {
+        "key": "text",
+        "label": "param.pdf.text.label",
+        "type": "textarea",
+        "default": "",
+        "required": true,
+        "placeholder": "param.slug.placeholder"
+      },
+      {
+        "key": "separator",
+        "label": "param.text.separator.label",
+        "type": "select",
+        "options": [
+          "-",
+          "_"
+        ],
+        "default": "-",
+        "widget": "segmented"
+      }
+    ]
+  },
+  {
+    "id": "text.stats",
+    "category": "text",
+    "titleKey": "tool.stats.title",
+    "descKey": "tool.stats.desc",
+    "icon": "list",
+    "stepNames": [
+      "step.text.stats"
+    ],
+    "params": []
+  },
+  {
+    "id": "text.uuid",
+    "category": "text",
+    "titleKey": "tool.uuid.title",
+    "descKey": "tool.uuid.desc",
+    "icon": "fingerprint",
+    "stepNames": [
+      "step.text.uuid"
+    ],
+    "params": [
+      {
+        "key": "count",
+        "label": "param.text.count.label",
+        "type": "number",
+        "default": 1,
+        "min": 1,
+        "max": 1000,
+        "widget": "slider"
+      },
+      {
+        "key": "version",
+        "label": "param.text.uuidver.label",
+        "type": "select",
+        "options": [
+          "v4",
+          "v7"
+        ],
+        "default": "v4",
+        "widget": "segmented"
+      }
+    ]
+  }
+]

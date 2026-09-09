@@ -304,7 +304,12 @@ func NewExtractFonts() *ExtractFonts {
 	return &ExtractFonts{base{"pdf.extractfonts", "pdf", "tool.pdfextractfonts.title", "tool.pdfextractfonts.desc", "type"}}
 }
 
-func (t *ExtractFonts) Params() []tool.Param { return []tool.Param{pagesParam(), outputDirParam()} }
+func (t *ExtractFonts) Params() []tool.Param {
+	return []tool.Param{
+		{Key: "pages", Label: "param.pdf.pages.label", Type: tool.ParamText, Default: "",
+			Placeholder: "param.pdf.pages.optional", Hint: "param.pdf.pages.hint"},
+	}
+}
 
 func (t *ExtractFonts) Steps() []tool.Step {
 	return []tool.Step{stepFunc{"step.pdf.extractfonts", t.run}}
@@ -346,7 +351,7 @@ func NewExtractAttachments() *ExtractAttachments {
 	return &ExtractAttachments{base{"pdf.extractattachments", "pdf", "tool.pdfextractattachments.title", "tool.pdfextractattachments.desc", "paperclip"}}
 }
 
-func (t *ExtractAttachments) Params() []tool.Param { return []tool.Param{outputDirParam()} }
+func (t *ExtractAttachments) Params() []tool.Param { return nil }
 
 func (t *ExtractAttachments) Steps() []tool.Step {
 	return []tool.Step{stepFunc{"step.pdf.extractattachments", t.run}}
@@ -550,7 +555,7 @@ func NewAddAttachments() *AddAttachments {
 
 func (t *AddAttachments) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "files", Label: "param.pdf.attachfiles.label", Type: tool.ParamFile, Required: true, Default: "",
+		{Key: "files", Label: "param.pdf.attachfiles.label", Type: tool.ParamFile, Required: true,
 			Accept: []string{".pdf", ".txt", ".png", ".jpg", ".csv", ".xlsx"},
 			Hint: "param.pdf.attachfiles.hint"},
 	}
@@ -649,9 +654,9 @@ func NewCreatePDF() *CreatePDF {
 func (t *CreatePDF) Params() []tool.Param {
 	return []tool.Param{
 		{Key: "title", Label: "param.pdf.doctitle.label", Type: tool.ParamText, Required: true, Default: "",
-			Placeholder: "param.pdfcreate.title.placeholder"},
+			Placeholder: "param.pdf.doctitle.placeholder"},
 		{Key: "body", Label: "param.pdf.docbody.label", Type: tool.ParamTextarea, Required: true, Default: "",
-			Placeholder: "param.pdfcreate.body.placeholder"},
+			Placeholder: "param.pdf.docbody.placeholder"},
 		{Key: "pages", Label: "param.pdf.blankpages.label", Type: tool.ParamNumber, Default: 0, Min: 0, Max: 50,
 			Widget: tool.WidgetSlider, VisibleIf: &tool.VisibleIf{Key: "title", Equals: ""}},
 		{Key: "outputPath", Label: "param.outputPath.label", Type: tool.ParamOutput, Default: "novo.pdf"},

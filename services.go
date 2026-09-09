@@ -396,9 +396,9 @@ func previewForTool(toolID string, params map[string]any) (string, error) {
 	}
 }
 
-// PreviewTransform aplica a transformação da tool sobre UMA imagem e retorna
-// base64 PNG (sem gravar). Usado pelo live preview: clicar na opção mostra
-// o resultado na hora. Suporta img.* transformadoras + pdf.* visuais.
+// PreviewTransform aplica a transformação da tool sobre UM arquivo e retorna
+// base64 (sem gravar). Se a saída for PDF, renderiza a 1ª página em PNG via
+// pdfium (go-pdfium) para o live preview funcionar em tools PDF.
 func (s *SystemService) PreviewTransform(toolID, path string, params map[string]any) (string, error) {
 	return previewTransform(toolID, path, params)
 }
@@ -416,11 +416,20 @@ func previewTransform(toolID, path string, params map[string]any) (string, error
 		return "", fmt.Errorf("sem saída")
 	}
 	defer os.Remove(out.Paths[0])
-	raw, err := os.ReadFile(out.Paths[0])
+	raw, err := previewBytes(out.Paths[0])
 	if err != nil {
 		return "", err
 	}
 	return base64.StdEncoding.EncodeToString(raw), nil
+}
+
+// previewBytes lê o arquivo de saída; se for PDF, tenta rasterizar a 1ª
+// página (requer lib pdfium do sistema via CGO — ver pdfrender_*.go).
+func previewBytes(path string) ([]byte, error) {
+	if !strings.EqualFold(filepath.Ext(path), ".pdf") {
+		return os.ReadFile(path)
+	}
+	return renderPDFPage(path, 0, 600)
 }
 
 // toolByID resolve a tool no registry global (mesmo usado pelo app/CLI).

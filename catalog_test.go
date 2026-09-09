@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -10,7 +11,8 @@ import (
 // TestCatalogContract valida o catálogo real contra o contrato da UI:
 // - todas as tools passam no Register (fail-fast de params)
 // - serialização JSON usa keys minúsculas (o que o TS espera)
-// - pdf.toimage é marcada como frontendDriven no catálogo TS (ver catalog.ts)
+// - snapshot completo em testdata/catalog.snapshot.json (trava anti-drift:
+//   qualquer mudança em tool/param gera diff e obriga atualizar o mirror TS)
 func TestCatalogContract(t *testing.T) {
 	svc := &ToolService{reg: NewRegistry()}
 	infos := svc.ListTools()
@@ -54,4 +56,22 @@ func TestCatalogContract(t *testing.T) {
 	} {
 		require.True(t, ids[want], "tool %q ausente do catálogo", want)
 	}
+
+	// 4. snapshot: o JSON canônico do catálogo deve ser idêntico ao gravado.
+	// NOTA: o snapshot cobre o registry estático (NewRegistry). Tools registradas
+	// no startup (search.index, ocr.image condicional) e tools frontend-driven
+	// (pdf.toimage, pdf.editor — sem backend) vivem só no mirror TS
+	// (frontend/src/test/catalog.ts), que é validado pelo golden por tool.
+	// Se este teste falhar, rode com UPDATE_SNAPSHOT=1 e atualize o mirror TS
+	// (frontend/src/test/catalog.ts) + dicionários i18n na mesma mudança.
+	snap, err := json.MarshalIndent(infos, "", "  ")
+	require.NoError(t, err)
+	const snapPath = "testdata/catalog.snapshot.json"
+	if os.Getenv("UPDATE_SNAPSHOT") == "1" {
+		require.NoError(t, os.MkdirAll("testdata", 0o755))
+		require.NoError(t, os.WriteFile(snapPath, append(snap, '\n'), 0o644))
+	}
+	want, err := os.ReadFile(snapPath)
+	require.NoError(t, err, "snapshot ausente: rode com UPDATE_SNAPSHOT=1")
+	require.JSONEq(t, string(want), string(snap), "catálogo mudou: atualize snapshot + mirror TS + i18n")
 }

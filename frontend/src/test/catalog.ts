@@ -14,7 +14,20 @@ function param(
   type: ToolParam['type'],
   extra: Partial<ToolParam> = {},
 ): ToolParam {
-  return { key, label, type, ...extra }
+  // normaliza igual ao snapshot do backend (sync-snapshot.cjs): só inclui
+  // o que foi serializado (omitempty do Go). Default:'' do Go serializa
+  // como "" — então string vazia explícita é mantida.
+  const p: ToolParam = { key, label, type, ...extra }
+  if (p.options != null && p.options.length === 0) delete p.options
+  if (!p.min) delete p.min
+  if (!p.max) delete p.max
+  if (!p.hint) delete p.hint
+  if (p.placeholder === undefined) delete p.placeholder
+  if (!p.widget) delete (p as unknown as Record<string, unknown>).widget
+  if (!p.required) delete p.required
+  if (p.accept != null && p.accept.length === 0) delete p.accept
+  if (p.visibleIf == null) delete p.visibleIf
+  return p
 }
 
 const outputDir = (): ToolParam => param('outputDir', 'param.outputDir.label', 'folder')
@@ -134,8 +147,8 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'pdf.create', category: 'pdf', titleKey: 'tool.pdfcreate.title',
     descKey: 'tool.pdfcreate.desc', icon: 'file-plus', stepNames: ['step.pdf.create'],
     params: [
-      param('title', 'param.pdf.doctitle.label', 'text', { required: true, default: '', placeholder: 'param.pdf.create.title.placeholder' }),
-      param('body', 'param.pdf.docbody.label', 'textarea', { required: true, default: '', placeholder: 'param.pdf.create.body.placeholder' }),
+      param('title', 'param.pdf.doctitle.label', 'text', { required: true, default: '', placeholder: 'param.pdf.doctitle.placeholder' }),
+      param('body', 'param.pdf.docbody.label', 'textarea', { required: true, default: '', placeholder: 'param.pdf.docbody.placeholder' }),
       param('pages', 'param.pdf.blankpages.label', 'number', { default: 0, min: 0, max: 50, widget: 'slider', visibleIf: { key: 'title', equals: '' } }),
       param('outputPath', 'param.outputPath.label', 'output', { default: 'novo.pdf' }),
     ],
@@ -206,7 +219,6 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
         default: 85, min: 1, max: 100, widget: 'slider',
         hint: 'param.img.quality.hint', visibleIf: { key: 'format', equals: 'jpg' },
       }),
-      outputDir(),
     ],
   },
   {
@@ -432,7 +444,7 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'text.columnize', category: 'text', titleKey: 'tool.columnize.title',
     descKey: 'tool.columnize.desc', icon: 'columns-3', stepNames: ['step.text.columnize'],
     params: [
-      param('delimiter', 'param.text.delimiter.label', 'text', { default: '|' }),
+      param('delimiter', 'param.text.delimiter.label', 'text', { default: '|', placeholder: 'param.columnize.placeholder' }),
       param('padding', 'param.text.padding.label', 'number', { default: 2, min: 1, max: 20, widget: 'slider' }),
       param('text', 'param.columnize.text.label', 'textarea', { default: '', placeholder: 'param.columnize.textplaceholder' }),
     ],

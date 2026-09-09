@@ -228,7 +228,7 @@ func NewOverlay() *Overlay {
 
 func (t *Overlay) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "overlay", Label: "param.pdf.overlay.label", Type: tool.ParamFile, Required: true, Default: "",
+		{Key: "overlay", Label: "param.pdf.overlay.label", Type: tool.ParamFile, Required: true,
 			Accept: []string{".pdf"}, Hint: "param.pdf.overlay.hint"},
 		{Key: "onTop", Label: "param.pdf.ontop.label", Type: tool.ParamBool, Default: true,
 			Widget: tool.WidgetSwitch},

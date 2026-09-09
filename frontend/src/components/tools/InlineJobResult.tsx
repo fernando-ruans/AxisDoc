@@ -4,39 +4,49 @@ import { useTranslation } from 'react-i18next'
 import { ExternalLink, FolderOpen, Copy, Check } from 'lucide-react'
 import { getBackend } from '../../bindings/backend'
 import type { Job } from '../../bindings/backend'
-import { BeforeAfter } from '../BeforeAfter'
+import { PdfViewer } from '../PdfViewer'
 
 // InlineJobResult mostra o resultado do último job executado na própria aba.
 export function InlineJobResult({ job, beforePath }: { job: Job | null; beforePath?: string }): React.JSX.Element | null {
   const { t } = useTranslation()
   const [copied, setCopied] = useState<string | null>(null)
   const [beforeToken, setBeforeToken] = useState<string | null>(null)
-  const [afterToken, setAfterToken] = useState<string | null>(null)
+  const [imgAfterToken, setImgAfterToken] = useState<string | null>(null)
+  const [pdfAfterToken, setPdfAfterToken] = useState<string | null>(null)
 
   const rawPaths = job?.output?.paths
   const paths: string[] = Array.isArray(rawPaths)
     ? rawPaths.filter((x): x is string => typeof x === 'string')
     : []
-  const firstImage = paths.find((p) => /\.(png|jpg|jpeg|gif|bmp|webp)$/i.test(p)) ?? null
+  const isImage = (p: string): boolean => /\.(png|jpg|jpeg|gif|bmp|webp)$/i.test(p)
+  const isPdf = (p: string): boolean => /\.pdf$/i.test(p)
+  const firstImage = paths.find((p) => isImage(p)) ?? null
+  const firstPdf = paths.find((p) => isPdf(p)) ?? null
+  const afterToken = firstImage != null ? imgAfterToken : pdfAfterToken
 
   useEffect(() => {
     setBeforeToken(null)
-    setAfterToken(null)
+    setImgAfterToken(null)
+    setPdfAfterToken(null)
     if (job == null || job.status !== 'done') return
-    if (beforePath == null || firstImage == null) return
+    if (beforePath == null || (firstImage == null && firstPdf == null)) return
     let cancelled = false
+    const targets = [beforePath]
+    if (firstImage != null) targets.push(firstImage)
+    else if (firstPdf != null) targets.push(firstPdf)
     void getBackend()
-      .registerPreviewFiles([beforePath, firstImage])
+      .registerPreviewFiles(targets)
       .then((refs) => {
         if (cancelled || refs.length < 2) return
         setBeforeToken(refs[0].token)
-        setAfterToken(refs[1].token)
+        if (firstImage != null) setImgAfterToken(refs[1].token)
+        else setPdfAfterToken(refs[1].token)
       })
       .catch(() => undefined)
     return () => {
       cancelled = true
     }
-  }, [job?.id, beforePath, firstImage])
+  }, [job?.id, beforePath, firstImage, firstPdf])
 
   if (job == null) return null
   if (job.status === 'queued' || job.status === 'running') return null
@@ -104,13 +114,18 @@ export function InlineJobResult({ job, beforePath }: { job: Job | null; beforePa
               ))}
             </ul>
           )}
-          {beforeToken != null && afterToken != null && (
-            <div className="mt-2">
-              <BeforeAfter
-                before={`/preview/${beforeToken}`}
-                after={`/preview/${afterToken}`}
-                label={t('preview.compare')}
-              />
+          {afterToken != null && (
+            <div className="mt-2" data-testid="inline-after">
+              {firstImage != null ? (
+                <img
+                  src={`/preview/${afterToken}`}
+                  alt=""
+                  className="mx-auto max-h-64 bg-white object-contain p-1"
+                  data-testid="inline-after-image"
+                />
+              ) : (
+                <PdfViewer src={`/preview/${afterToken}`} />
+              )}
             </div>
           )}
           {paths.length === 0 && (job.output?.message == null || job.output.message === '') && (

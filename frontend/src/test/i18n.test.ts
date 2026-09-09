@@ -35,8 +35,9 @@ describe('i18n completude', () => {
   })
 
   // Chaves exigidas pelo catálogo REAL (dirigido por CANONICAL_CATALOG,
-  // espelho do backend) — title/desc de cada tool + label de cada param.
-  it('catálogo: title/desc de cada tool + label de cada param existem nos 3 idiomas', () => {
+  // espelho do backend) — title/desc de cada tool + label/placeholder/hint
+  // de cada param + labels de options (param.options.<key>.<opt>).
+  it('catálogo: title/desc/params/options de cada tool existem nos 3 idiomas', () => {
     const missing: string[] = []
     const dicts = [
       ['pt', ptBR],
@@ -44,16 +45,41 @@ describe('i18n completude', () => {
       ['es', es],
     ] as const
     for (const [lng, dict] of dicts) {
+      const d = dict as unknown as Record<string, unknown>
       for (const tool of CANONICAL_CATALOG) {
-        if (!getPath(dict as unknown as Record<string, unknown>, tool.titleKey)) {
+        if (!getPath(d, tool.titleKey)) {
           missing.push(`${lng}.${tool.titleKey}`)
         }
-        if (!getPath(dict as unknown as Record<string, unknown>, tool.descKey)) {
+        if (!getPath(d, tool.descKey)) {
           missing.push(`${lng}.${tool.descKey}`)
         }
         for (const p of tool.params ?? []) {
-          if (!getPath(dict as unknown as Record<string, unknown>, p.label)) {
+          if (!getPath(d, p.label)) {
             missing.push(`${lng}.${p.label}`)
+          }
+          if (p.placeholder && !getPath(d, p.placeholder)) {
+            missing.push(`${lng}.${p.placeholder}`)
+          }
+          if (p.hint && !getPath(d, p.hint)) {
+            missing.push(`${lng}.${p.hint}`)
+          }
+          for (const opt of p.options ?? []) {
+            const alias: Record<string, string> = {
+              '90': 'deg90', '180': 'deg180', '270': 'deg270',
+              '2': 'n2', '4': 'n4', '8': 'n8',
+              '40': 'b40', '128': 'b128', '256': 'b256',
+              '10': 'base10', '16': 'base16', '36': 'base36',
+              topLeft: 'posTopLeft', topRight: 'posTopRight', center: 'posCenter',
+              bottomLeft: 'posBottomLeft', bottomRight: 'posBottomRight',
+              bottomCenter: 'posBottomCenter', topCenter: 'posTopCenter',
+              format: 'fmtFormat',
+              '-': 'dash', _: 'underscore',
+              v4: 'ver4', v7: 'ver7',
+            }
+            const optKey = `param.opt.${alias[opt] ?? opt}`
+            if (!getPath(d, optKey)) {
+              missing.push(`${lng}.${optKey}`)
+            }
           }
         }
       }

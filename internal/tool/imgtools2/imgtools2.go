@@ -574,7 +574,7 @@ func NewWatermarkPos() *WatermarkPos {
 
 func (t *WatermarkPos) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "image", Label: "param.img.wmimage.label", Type: tool.ParamFile, Required: true, Default: "",
+		{Key: "image", Label: "param.img.wmimage.label", Type: tool.ParamFile, Required: true,
 			Accept: []string{".png", ".jpg", ".jpeg"}},
 		{Key: "position", Label: "param.img.position.label", Type: tool.ParamSelect,
 			Options: []string{"topLeft", "topRight", "center", "bottomLeft", "bottomRight"},

@@ -6,6 +6,7 @@ import { setBackend } from '../bindings/backend'
 import type { Backend, Job, ToolInfo } from '../bindings/backend'
 import { MockBackend } from '../bindings/mockBackend'
 import { CANONICAL_CATALOG, VALID_ICONS } from './catalog'
+import { BACKEND_SNAPSHOT } from './catalog.snapshot'
 import { GenericToolForm } from '../components/tools/GenericToolForm'
 import '../i18n'
 import i18n from '../i18n'
@@ -32,6 +33,72 @@ describe('catálogo canônico', () => {
     const ids = CANONICAL_CATALOG.map((t) => t.id)
     expect(ids).toHaveLength(60)
     expect(new Set(ids).size).toBe(60)
+  })
+
+  // Trava anti-drift: cada tool do snapshot do backend deve existir idêntica
+  // no mirror TS (params, options, defaults, widgets, condicionais).
+  // Exceções documentadas: pdf.toimage/pdf.editor (frontend-driven, sem
+  // backend) e search.index/ocr.image (registradas no startup).
+  // Campos omitempty do Go ausentes no JSON viram null na comparação.
+  it('mirror TS espelha o snapshot do backend param a param', () => {
+    interface SnapParam {
+      key: string
+      label?: string
+      type?: string
+      options?: string[]
+      def?: unknown
+      req?: boolean
+      min?: number
+      max?: number
+      ph?: string
+      hint?: string
+      vis?: unknown
+      acc?: string[]
+      w?: string
+    }
+    const drift: string[] = []
+    const mirror = new Map(CANONICAL_CATALOG.map((t) => [t.id, t]))
+    const norm = (v: unknown): string => JSON.stringify(v ?? null)
+    const get = (o: unknown, k: string): unknown =>
+      o != null && typeof o === 'object' ? (o as Record<string, unknown>)[k] : undefined
+    for (const b of BACKEND_SNAPSHOT as unknown as Array<{ id: string; params: SnapParam[] }>) {
+      const m = mirror.get(b.id)
+      if (!m) {
+        drift.push(`${b.id}: ausente no mirror TS`)
+        continue
+      }
+      const mp = new Map((m.params ?? []).map((p) => [p.key, p]))
+      for (const bp of b.params) {
+        const q = mp.get(bp.key)
+        if (!q) {
+          drift.push(`${b.id}.${bp.key}: param ausente no mirror`)
+          continue
+        }
+        const checks: Array<[string, unknown, unknown]> = [
+          ['label', bp.label, get(q, 'label')],
+          ['type', bp.type, get(q, 'type')],
+          ['options', bp.options, get(q, 'options')],
+          ['default', bp.def, get(q, 'default')],
+          ['required', bp.req, get(q, 'required')],
+          ['min', bp.min, get(q, 'min')],
+          ['max', bp.max, get(q, 'max')],
+          ['placeholder', bp.ph, get(q, 'placeholder')],
+          ['hint', bp.hint, get(q, 'hint')],
+          ['visibleIf', bp.vis, get(q, 'visibleIf')],
+          ['accept', bp.acc, get(q, 'accept')],
+          ['widget', bp.w, get(q, 'widget')],
+        ]
+        for (const [field, want, got] of checks) {
+          if (norm(want) !== norm(got)) drift.push(`${b.id}.${bp.key}.${field}: backend=${norm(want)} mirror=${norm(got)}`)
+        }
+      }
+      for (const q of m.params ?? []) {
+        if (!b.params.some((bp) => bp.key === q.key)) {
+          drift.push(`${b.id}.${q.key}: param só existe no mirror (remover ou adicionar no Go)`)
+        }
+      }
+    }
+    expect(drift).toEqual([])
   })
 
   it('todos os ícones estão no mapa do AppShell', () => {
@@ -188,8 +255,9 @@ describe('formulário de cada tool (golden por tool)', () => {
     expect(await screen.findByTestId('param-quality')).toBeInTheDocument()
     await user.click(screen.getByTestId('param-format-png'))
     await waitFor(() => expect(screen.queryByTestId('param-quality')).not.toBeInTheDocument())
-    // destino único
+    // destino único (só pasta; convert gera nome automático)
     expect(screen.getByTestId('output-dir')).toBeInTheDocument()
+    expect(screen.queryByTestId('output-name')).not.toBeInTheDocument()
     // lista ordenável
     await user.click(screen.getByTestId('pick-files'))
     expect(await screen.findByTestId('selected-files')).toBeInTheDocument()
@@ -295,12 +363,13 @@ describe('formulário de cada tool (golden por tool)', () => {
     await waitFor(() => expect(screen.queryByTestId('param-n')).not.toBeInTheDocument())
   })
 
-  it('pdf.create usa GeneratorLayout com textarea e slider condicional', async () => {
+  it('pdf.create usa GeneratorLayout com nome de saída editável', async () => {
     const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.create')
     if (!tool) throw new Error('create ausente')
     setBackend(backendWith(CANONICAL_CATALOG))
     render(<GenericToolForm tool={tool} />)
     expect(screen.getByTestId('layout-generator-pdf.create')).toBeInTheDocument()
+    expect(screen.getByTestId('output-name')).toBeInTheDocument()
   })
 
   it('img.watermark alterna texto/imagem por kind', async () => {

@@ -292,16 +292,18 @@ export function ParamField(props: FieldProps & { optionLabel?: (opt: string) => 
   }
 }
 
-/** Filtra params visíveis (VisibleIf) e separa destino (outputDir/output). */
+/** Filtra params visíveis (VisibleIf) e separa destino.
+ * Destino único SEMPRE visível nos layouts Transform/Generator: mesmo sem
+ * outputDir declarado, o seletor permite escolher a pasta (backend usa a
+ * pasta do 1º arquivo quando vazio). */
 export function splitParams(
   params: ToolParam[],
   values: Record<string, unknown>,
 ): { visible: ToolParam[]; hasDest: boolean } {
   const visible = params.filter((p) => {
-    if (p.key === 'outputDir' || p.type === 'output' || p.type === 'folder') return false
+    if (p.key === 'outputDir' || p.key === 'outputPath' || p.type === 'output' || p.type === 'folder') return false
     if (!p.visibleIf) return true
     return values[p.visibleIf.key] === p.visibleIf.equals
   })
-  const hasDest = params.some((p) => p.key === 'outputDir' || p.type === 'output' || p.type === 'folder')
-  return { visible, hasDest }
+  return { visible, hasDest: true }
 }

@@ -13,10 +13,13 @@ import { VisualCropper } from '../tools/VisualCropper'
 import { BeforeAfter } from '../BeforeAfter'
 
 // Tools cujo Transform mostra live preview do 1º arquivo (clicar = ver na hora).
+// Só tools com saída em IMAGEM entram aqui: o live preview renderiza <img>.
+// Tools com saída PDF (rotate/watermark/nup/overlay/pagenumbers) já mostram
+// o PDF de entrada no FilePreview (PDF.js) — o resultado aparece no
+// InlineJobResult após Executar (FilePreview registra o output).
 const LIVE_TOOLS = new Set([
   'img.transform', 'img.filters', 'img.resize', 'img.convert', 'img.watermark',
   'img.watermarkpos', 'img.crop', 'img.icon', 'img.palette',
-  'pdf.rotate', 'pdf.watermark', 'pdf.nup', 'pdf.overlay', 'pdf.pagenumbers',
 ])
 
 // Tools Generator com live preview (além de qrcode/barcode que já têm o próprio).
@@ -63,8 +66,22 @@ function useToolCtx(tool: ToolInfo, initial: Record<string, unknown>): CtxFull {
     }
   }
 
+  // options numéricas colidem entre params (ex.: '8' em nup e base):
+  // mapeia para chaves únicas param.opt.*
+  const OPT_ALIAS: Record<string, string> = {
+    '90': 'deg90', '180': 'deg180', '270': 'deg270',
+    '2': 'n2', '4': 'n4', '8': 'n8',
+    '40': 'b40', '128': 'b128', '256': 'b256',
+    '10': 'base10', '16': 'base16', '36': 'base36',
+    topLeft: 'posTopLeft', topRight: 'posTopRight', center: 'posCenter',
+    bottomLeft: 'posBottomLeft', bottomRight: 'posBottomRight',
+    bottomCenter: 'posBottomCenter', topCenter: 'posTopCenter',
+    format: 'fmtFormat',
+    '-': 'dash', _: 'underscore',
+    v4: 'ver4', v7: 'ver7',
+  }
   const optionLabel = (paramKey: string, opt: string): string =>
-    t(`param.options.${paramKey}.${opt}`, { defaultValue: opt })
+    t(`param.opt.${OPT_ALIAS[opt] ?? opt}`, { defaultValue: opt })
 
   return { tool, paths, setPaths, params, setParam, run, busy, canRun: false, optionLabel, lastJobId, error }
 }
@@ -146,21 +163,24 @@ function RunBar({ ctx, disabledReason }: { ctx: Ctx; disabledReason: string | nu
   )
 }
 
-function DestField({ ctx, hasDest }: { ctx: Ctx; hasDest: boolean }): React.JSX.Element | null {
+function DestField({ ctx, hasDest, toolId }: { ctx: Ctx; hasDest: boolean; toolId: string }): React.JSX.Element | null {
   const { t } = useTranslation()
   if (!hasDest) return null
   const destName = String(ctx.params.outputPath ?? '')
+  const showName = OUTNAME_TOOLS.has(toolId)
   return (
     <div>
       <span className="mb-1 block text-sm font-medium text-text">{t('common.outputFile')}</span>
       <div className="flex items-center gap-2">
-        <input
-          value={destName}
-          onChange={(e) => ctx.setParam('outputPath', e.target.value)}
-          placeholder={t('common.outputFileHint')}
-          className="min-w-0 flex-1 rounded-md border border-border bg-surface px-3 py-2 text-sm text-text"
-          data-testid="output-name"
-        />
+        {showName && (
+          <input
+            value={destName}
+            onChange={(e) => ctx.setParam('outputPath', e.target.value)}
+            placeholder={t('common.outputFileHint')}
+            className="min-w-0 flex-1 rounded-md border border-border bg-surface px-3 py-2 text-sm text-text"
+            data-testid="output-name"
+          />
+        )}
         <OutputDirField
           value={ctx.params.outputDir}
           onChange={(v) => ctx.setParam('outputDir', v)}
@@ -169,6 +189,11 @@ function DestField({ ctx, hasDest }: { ctx: Ctx; hasDest: boolean }): React.JSX.
     </div>
   )
 }
+
+// Tools cujo outputPath é nome de arquivo digitável (merge/fromimages/create/gifbuild/icon).
+const OUTNAME_TOOLS = new Set([
+  'pdf.merge', 'pdf.fromimages', 'pdf.create', 'img.gifbuild', 'img.icon',
+])
 
 function LastResult({ ctx }: { ctx: CtxFull }): React.JSX.Element | null {
   const jobs = useJobs((s) => s.jobs)
@@ -211,7 +236,7 @@ export function TransformLayout({ tool, initial }: { tool: ToolInfo; initial: Re
       {visible.map((p) => (
         <ParamField key={p.key} param={p} value={ctx.params[p.key]} onChange={(v) => ctx.setParam(p.key, v)} optionLabel={(opt) => ctx.optionLabel(p.key, opt)} />
       ))}
-      <DestField ctx={ctx} hasDest={hasDest} />
+      <DestField ctx={ctx} hasDest={hasDest} toolId={tool.id} />
       {ctx.error && <p className="text-sm text-danger" data-testid="run-error">{ctx.error}</p>}
       <RunBar ctx={{ ...ctx, canRun: reason == null }} disabledReason={reason} />
       <LastResult ctx={ctx} />
@@ -240,7 +265,7 @@ export function GeneratorLayout({
       {visible.map((p) => (
         <ParamField key={p.key} param={p} value={ctx.params[p.key]} onChange={(v) => ctx.setParam(p.key, v)} optionLabel={(opt) => ctx.optionLabel(p.key, opt)} />
       ))}
-      <DestField ctx={ctx} hasDest={hasDest} />
+      <DestField ctx={ctx} hasDest={hasDest} toolId={tool.id} />
       {ctx.error && <p className="text-sm text-danger" data-testid="run-error">{ctx.error}</p>}
       <RunBar ctx={{ ...ctx, canRun: reason == null }} disabledReason={reason} />
       <LastResult ctx={ctx} />
