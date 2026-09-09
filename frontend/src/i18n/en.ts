@@ -271,9 +271,34 @@ export const en: Dict = {
     output: { label: 'Output file' },
     outputDir: { label: 'Output folder' },
     outputPath: { label: 'Output file' },
+    hashfile: {
+      algorithm: { hint: 'SHA-256 for general use; MD5/CRC-32 for quick checks only' },
+    },
     qrcode: {
       placeholder: 'Paste the link or text here…',
       hint: 'The QR updates itself as you type',
+    },
+    barcode: {
+      placeholder: 'Type the code…',
+      hint: 'EAN-13 requires 12–13 numeric digits',
+    },
+    baseconvert: {
+      placeholder: 'E.g. 255 or ff',
+    },
+    epoch: {
+      placeholder: 'E.g. 1750000000',
+      placeholder2: 'E.g. 2026-09-08T11:00:00',
+    },
+    slug: {
+      placeholder: 'E.g. My Awesome Post!',
+    },
+    columnize: {
+      text: { label: 'Text' },
+      textplaceholder: 'Or paste the text here…',
+      placeholder: 'E.g. | or ;',
+    },
+    escape: {
+      placeholder: 'Paste the text here…',
     },
     pdf: {
       splitmode: { label: 'Split mode' },

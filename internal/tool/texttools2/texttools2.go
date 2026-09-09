@@ -70,9 +70,10 @@ func NewLorem() *Lorem {
 
 func (t *Lorem) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "paragraphs", Label: "param.text.paragraphs.label", Type: tool.ParamNumber, Default: 3, Min: 1, Max: 100},
-		{Key: "wordsPerParagraph", Label: "param.text.words.label", Type: tool.ParamNumber, Default: 60, Min: 5, Max: 500},
-		outputDirParam(),
+		{Key: "paragraphs", Label: "param.text.paragraphs.label", Type: tool.ParamNumber, Default: 3, Min: 1, Max: 100,
+			Widget: tool.WidgetSlider},
+		{Key: "wordsPerParagraph", Label: "param.text.words.label", Type: tool.ParamNumber, Default: 60, Min: 5, Max: 500,
+			Widget: tool.WidgetSlider},
 	}
 }
 
@@ -126,11 +127,12 @@ func NewBaseConvert() *BaseConvert {
 
 func (t *BaseConvert) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "value", Label: "param.text.value.label", Type: tool.ParamText, Required: true, Default: ""},
+		{Key: "value", Label: "param.text.value.label", Type: tool.ParamText, Required: true, Default: "",
+			Placeholder: "param.baseconvert.placeholder"},
 		{Key: "from", Label: "param.text.frombase.label", Type: tool.ParamSelect,
-			Options: []string{"10", "16", "8", "2", "36"}, Default: "10"},
+			Options: []string{"10", "16", "8", "2", "36"}, Default: "10", Widget: tool.WidgetSegmented},
 		{Key: "to", Label: "param.text.tobase.label", Type: tool.ParamSelect,
-			Options: []string{"10", "16", "8", "2", "36"}, Default: "16"},
+			Options: []string{"10", "16", "8", "2", "36"}, Default: "16", Widget: tool.WidgetSegmented},
 	}
 }
 
@@ -164,8 +166,13 @@ func NewEpoch() *Epoch {
 func (t *Epoch) Params() []tool.Param {
 	return []tool.Param{
 		{Key: "mode", Label: "param.data.mode.label", Type: tool.ParamSelect,
-			Options: []string{"now", "toDate", "toEpoch"}, Default: "now"},
-		{Key: "value", Label: "param.text.value.label", Type: tool.ParamText, Default: ""},
+			Options: []string{"now", "toDate", "toEpoch"}, Default: "now", Widget: tool.WidgetSegmented},
+		{Key: "value", Label: "param.text.value.label", Type: tool.ParamText, Default: "",
+			Placeholder: "param.epoch.placeholder",
+			VisibleIf: &tool.VisibleIf{Key: "mode", Equals: "toDate"}},
+		{Key: "value2", Label: "param.text.value.label", Type: tool.ParamText, Default: "",
+			Placeholder: "param.epoch.placeholder2",
+			VisibleIf: &tool.VisibleIf{Key: "mode", Equals: "toEpoch"}},
 	}
 }
 
@@ -176,6 +183,9 @@ func (t *Epoch) Steps() []tool.Step {
 func (t *Epoch) run(_ context.Context, in tool.Input, _ func(pct float64)) (tool.Output, error) {
 	mode := tool.ParamString(in, "mode", "now")
 	val := strings.TrimSpace(tool.ParamString(in, "value", ""))
+	if val == "" {
+		val = strings.TrimSpace(tool.ParamString(in, "value2", ""))
+	}
 	switch mode {
 	case "now":
 		now := time.Now()
@@ -220,9 +230,10 @@ func NewUUID() *UUID {
 
 func (t *UUID) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "count", Label: "param.text.count.label", Type: tool.ParamNumber, Default: 1, Min: 1, Max: 1000},
+		{Key: "count", Label: "param.text.count.label", Type: tool.ParamNumber, Default: 1, Min: 1, Max: 1000,
+			Widget: tool.WidgetSlider},
 		{Key: "version", Label: "param.text.uuidver.label", Type: tool.ParamSelect,
-			Options: []string{"v4", "v7"}, Default: "v4"},
+			Options: []string{"v4", "v7"}, Default: "v4", Widget: tool.WidgetSegmented},
 	}
 }
 
@@ -266,9 +277,10 @@ func NewSlug() *Slug {
 
 func (t *Slug) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "text", Label: "param.pdf.text.label", Type: tool.ParamText, Required: true, Default: ""},
+		{Key: "text", Label: "param.pdf.text.label", Type: tool.ParamTextarea, Required: true, Default: "",
+			Placeholder: "param.slug.placeholder"},
 		{Key: "separator", Label: "param.text.separator.label", Type: tool.ParamSelect,
-			Options: []string{"-", "_"}, Default: "-"},
+			Options: []string{"-", "_"}, Default: "-", Widget: tool.WidgetSegmented},
 	}
 }
 
@@ -313,8 +325,12 @@ func NewColumnize() *Columnize {
 
 func (t *Columnize) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "delimiter", Label: "param.text.delimiter.label", Type: tool.ParamText, Default: "|"},
-		{Key: "padding", Label: "param.text.padding.label", Type: tool.ParamNumber, Default: 2, Min: 1, Max: 20},
+		{Key: "delimiter", Label: "param.text.delimiter.label", Type: tool.ParamText, Default: "|",
+			Placeholder: "param.columnize.placeholder"},
+		{Key: "padding", Label: "param.text.padding.label", Type: tool.ParamNumber, Default: 2, Min: 1, Max: 20,
+			Widget: tool.WidgetSlider},
+		{Key: "text", Label: "param.columnize.text.label", Type: tool.ParamTextarea, Default: "",
+			Placeholder: "param.columnize.textplaceholder"},
 	}
 }
 
@@ -323,22 +339,30 @@ func (t *Columnize) Steps() []tool.Step {
 }
 
 func (t *Columnize) run(_ context.Context, in tool.Input, _ func(pct float64)) (tool.Output, error) {
-	if len(in.Paths) == 0 {
-		return tool.Output{}, fmt.Errorf("text.columnize: nenhum arquivo")
-	}
+	text := tool.ParamString(in, "text", "")
 	delim := tool.ParamString(in, "delimiter", "|")
 	if delim == "" {
 		delim = "|"
 	}
 	pad := int(tool.ParamFloat(in, "padding", 2))
 	var sb strings.Builder
+	sources := map[string]string{}
+	if text != "" {
+		sources["texto"] = text
+	}
 	for _, p := range in.Paths {
 		data, err := os.ReadFile(p)
 		if err != nil {
 			fmt.Fprintf(&sb, "ERRO %s: %v\n", filepath.Base(p), err)
 			continue
 		}
-		lines := strings.Split(strings.TrimRight(string(data), "\n"), "\n")
+		sources[filepath.Base(p)] = string(data)
+	}
+	if len(sources) == 0 {
+		return tool.Output{}, fmt.Errorf("text.columnize: informe texto ou arquivo")
+	}
+	for name, content := range sources {
+		lines := strings.Split(strings.TrimRight(content, "\n"), "\n")
 		split := make([][]string, 0, len(lines))
 		widths := []int{}
 		for _, l := range lines {
@@ -356,7 +380,7 @@ func (t *Columnize) run(_ context.Context, in tool.Input, _ func(pct float64)) (
 				}
 			}
 		}
-		fmt.Fprintf(&sb, "=== %s ===\n", filepath.Base(p))
+		fmt.Fprintf(&sb, "=== %s ===\n", name)
 		for _, cols := range split {
 			for i, c := range cols {
 				sb.WriteString(c)
@@ -381,8 +405,10 @@ func NewEscape() *Escape {
 func (t *Escape) Params() []tool.Param {
 	return []tool.Param{
 		{Key: "kind", Label: "param.text.escapekind.label", Type: tool.ParamSelect,
-			Options: []string{"htmlEscape", "htmlUnescape", "urlEncode", "urlDecode", "queryEscape"}, Default: "htmlEscape"},
-		{Key: "text", Label: "param.pdf.text.label", Type: tool.ParamText, Default: ""},
+			Options: []string{"htmlEscape", "htmlUnescape", "urlEncode", "urlDecode", "queryEscape"}, Default: "htmlEscape",
+			Widget: tool.WidgetSegmented},
+		{Key: "text", Label: "param.pdf.text.label", Type: tool.ParamTextarea, Default: "",
+			Placeholder: "param.escape.placeholder"},
 	}
 }
 

@@ -24,8 +24,7 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'security.hashfile', category: 'security', titleKey: 'tool.hashfile.title',
     descKey: 'tool.hashfile.desc', icon: 'fingerprint', stepNames: ['step.hashfile.compute'],
     params: [
-      param('algorithm', 'param.algorithm.label', 'select', { options: ['sha256', 'sha512', 'sha1', 'md5', 'crc32'], default: 'sha256', required: true }),
-      param('outputPath', 'param.outputPath.label', 'output'),
+      param('algorithm', 'param.algorithm.label', 'select', { options: ['sha256', 'sha512', 'sha1', 'md5', 'crc32'], default: 'sha256', required: true, widget: 'segmented', hint: 'param.hashfile.algorithm.hint' }),
     ],
   },
   {
@@ -371,11 +370,10 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'text.barcode', category: 'text', titleKey: 'tool.barcode.title',
     descKey: 'tool.barcode.desc', icon: 'scan-barcode', stepNames: ['step.text.barcode'],
     params: [
-      param('text', 'param.pdf.text.label', 'text', { required: true }),
-      param('kind', 'param.text.barkind.label', 'select', { options: ['code128', 'ean13'], default: 'code128' }),
-      param('width', 'param.img.width.label', 'number', { default: 400, min: 50, max: 4000 }),
-      param('height', 'param.img.height.label', 'number', { default: 100, min: 20, max: 1000 }),
-      outputDir(),
+      param('text', 'param.pdf.text.label', 'textarea', { required: true, placeholder: 'param.barcode.placeholder', hint: 'param.barcode.hint' }),
+      param('kind', 'param.text.barkind.label', 'select', { options: ['code128', 'ean13'], default: 'code128', widget: 'segmented' }),
+      param('width', 'param.img.width.label', 'number', { default: 400, min: 50, max: 4000, widget: 'slider' }),
+      param('height', 'param.img.height.label', 'number', { default: 100, min: 20, max: 1000, widget: 'slider' }),
     ],
   },
   {
@@ -415,42 +413,42 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'text.lorem', category: 'text', titleKey: 'tool.lorem.title',
     descKey: 'tool.lorem.desc', icon: 'align-left', stepNames: ['step.text.lorem'],
     params: [
-      param('paragraphs', 'param.text.paragraphs.label', 'number', { default: 3, min: 1, max: 100 }),
-      param('wordsPerParagraph', 'param.text.words.label', 'number', { default: 60, min: 5, max: 500 }),
-      outputDir(),
+      param('paragraphs', 'param.text.paragraphs.label', 'number', { default: 3, min: 1, max: 100, widget: 'slider' }),
+      param('wordsPerParagraph', 'param.text.words.label', 'number', { default: 60, min: 5, max: 500, widget: 'slider' }),
     ],
   },
   {
     id: 'text.baseconvert', category: 'text', titleKey: 'tool.baseconvert.title',
     descKey: 'tool.baseconvert.desc', icon: 'binary', stepNames: ['step.text.baseconvert'],
     params: [
-      param('value', 'param.text.value.label', 'text', { required: true, default: '' }),
-      param('from', 'param.text.frombase.label', 'select', { options: ['10', '16', '8', '2', '36'], default: '10' }),
-      param('to', 'param.text.tobase.label', 'select', { options: ['10', '16', '8', '2', '36'], default: '16' }),
+      param('value', 'param.text.value.label', 'text', { required: true, default: '', placeholder: 'param.baseconvert.placeholder' }),
+      param('from', 'param.text.frombase.label', 'select', { options: ['10', '16', '8', '2', '36'], default: '10', widget: 'segmented' }),
+      param('to', 'param.text.tobase.label', 'select', { options: ['10', '16', '8', '2', '36'], default: '16', widget: 'segmented' }),
     ],
   },
   {
     id: 'text.epoch', category: 'text', titleKey: 'tool.epoch.title',
     descKey: 'tool.epoch.desc', icon: 'clock', stepNames: ['step.text.epoch'],
     params: [
-      param('mode', 'param.data.mode.label', 'select', { options: ['now', 'toDate', 'toEpoch'], default: 'now' }),
-      param('value', 'param.text.value.label', 'text', { default: '' }),
+      param('mode', 'param.data.mode.label', 'select', { options: ['now', 'toDate', 'toEpoch'], default: 'now', widget: 'segmented' }),
+      param('value', 'param.text.value.label', 'text', { default: '', placeholder: 'param.epoch.placeholder', visibleIf: { key: 'mode', equals: 'toDate' } }),
+      param('value2', 'param.text.value.label', 'text', { default: '', placeholder: 'param.epoch.placeholder2', visibleIf: { key: 'mode', equals: 'toEpoch' } }),
     ],
   },
   {
     id: 'text.uuid', category: 'text', titleKey: 'tool.uuid.title',
     descKey: 'tool.uuid.desc', icon: 'fingerprint', stepNames: ['step.text.uuid'],
     params: [
-      param('count', 'param.text.count.label', 'number', { default: 1, min: 1, max: 1000 }),
-      param('version', 'param.text.uuidver.label', 'select', { options: ['v4', 'v7'], default: 'v4' }),
+      param('count', 'param.text.count.label', 'number', { default: 1, min: 1, max: 1000, widget: 'slider' }),
+      param('version', 'param.text.uuidver.label', 'select', { options: ['v4', 'v7'], default: 'v4', widget: 'segmented' }),
     ],
   },
   {
     id: 'text.slug', category: 'text', titleKey: 'tool.slug.title',
     descKey: 'tool.slug.desc', icon: 'link', stepNames: ['step.text.slug'],
     params: [
-      param('text', 'param.pdf.text.label', 'text', { required: true, default: '' }),
-      param('separator', 'param.text.separator.label', 'select', { options: ['-', '_'], default: '-' }),
+      param('text', 'param.pdf.text.label', 'textarea', { required: true, default: '', placeholder: 'param.slug.placeholder' }),
+      param('separator', 'param.text.separator.label', 'select', { options: ['-', '_'], default: '-', widget: 'segmented' }),
     ],
   },
   {
@@ -458,15 +456,16 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     descKey: 'tool.columnize.desc', icon: 'columns-3', stepNames: ['step.text.columnize'],
     params: [
       param('delimiter', 'param.text.delimiter.label', 'text', { default: '|' }),
-      param('padding', 'param.text.padding.label', 'number', { default: 2, min: 1, max: 20 }),
+      param('padding', 'param.text.padding.label', 'number', { default: 2, min: 1, max: 20, widget: 'slider' }),
+      param('text', 'param.columnize.text.label', 'textarea', { default: '', placeholder: 'param.columnize.textplaceholder' }),
     ],
   },
   {
     id: 'text.escape', category: 'text', titleKey: 'tool.escape.title',
     descKey: 'tool.escape.desc', icon: 'code-2', stepNames: ['step.text.escape'],
     params: [
-      param('kind', 'param.text.escapekind.label', 'select', { options: ['htmlEscape', 'htmlUnescape', 'urlEncode', 'urlDecode', 'queryEscape'], default: 'htmlEscape' }),
-      param('text', 'param.pdf.text.label', 'text', { default: '' }),
+      param('kind', 'param.text.escapekind.label', 'select', { options: ['htmlEscape', 'htmlUnescape', 'urlEncode', 'urlDecode', 'queryEscape'], default: 'htmlEscape', widget: 'segmented' }),
+      param('text', 'param.pdf.text.label', 'textarea', { default: '', placeholder: 'param.escape.placeholder' }),
     ],
   },
   {

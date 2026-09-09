@@ -305,12 +305,14 @@ func NewBarcodeTool() *BarcodeTool {
 
 func (t *BarcodeTool) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "text", Label: "param.pdf.text.label", Type: tool.ParamText, Required: true},
+		{Key: "text", Label: "param.pdf.text.label", Type: tool.ParamTextarea, Required: true,
+			Placeholder: "param.barcode.placeholder", Hint: "param.barcode.hint"},
 		{Key: "kind", Label: "param.text.barkind.label", Type: tool.ParamSelect,
-			Options: []string{"code128", "ean13"}, Default: "code128"},
-		{Key: "width", Label: "param.img.width.label", Type: tool.ParamNumber, Default: 400, Min: 50, Max: 4000},
-		{Key: "height", Label: "param.img.height.label", Type: tool.ParamNumber, Default: 100, Min: 20, Max: 1000},
-		{Key: "outputDir", Label: "param.outputDir.label", Type: tool.ParamFolder},
+			Options: []string{"code128", "ean13"}, Default: "code128", Widget: tool.WidgetSegmented},
+		{Key: "width", Label: "param.img.width.label", Type: tool.ParamNumber, Default: 400, Min: 50, Max: 4000,
+			Widget: tool.WidgetSlider},
+		{Key: "height", Label: "param.img.height.label", Type: tool.ParamNumber, Default: 100, Min: 20, Max: 1000,
+			Widget: tool.WidgetSlider},
 	}
 }
 

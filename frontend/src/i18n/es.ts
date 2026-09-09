@@ -271,9 +271,34 @@ export const es: Dict = {
     output: { label: 'Archivo de salida' },
     outputDir: { label: 'Carpeta de destino' },
     outputPath: { label: 'Archivo de destino' },
+    hashfile: {
+      algorithm: { hint: 'SHA-256 para uso general; MD5/CRC-32 solo para chequeo rápido' },
+    },
     qrcode: {
       placeholder: 'Pegue el enlace o texto aquí…',
       hint: 'El QR se actualiza solo mientras escribe',
+    },
+    barcode: {
+      placeholder: 'Escriba el código…',
+      hint: 'EAN-13 requiere 12–13 dígitos numéricos',
+    },
+    baseconvert: {
+      placeholder: 'Ej.: 255 o ff',
+    },
+    epoch: {
+      placeholder: 'Ej.: 1750000000',
+      placeholder2: 'Ej.: 2026-09-08T11:00:00',
+    },
+    slug: {
+      placeholder: 'Ej.: ¡Mi Artículo Increíble!',
+    },
+    columnize: {
+      text: { label: 'Texto' },
+      textplaceholder: 'O pegue el texto aquí…',
+      placeholder: 'Ej.: | o ;',
+    },
+    escape: {
+      placeholder: 'Pegue el texto aquí…',
     },
     pdf: {
       splitmode: { label: 'Modo de división' },

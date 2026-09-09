@@ -13,11 +13,23 @@ import { BarcodeLivePreview } from './BarcodeLivePreview'
 import { PdfPageEditor } from './PdfPageEditor'
 import { TransformLayout, GeneratorLayout, InspectorLayout } from '../layouts/layouts'
 
-// Layout por tool (L0): 3 pilotos migrados; resto cai no LegacyForm abaixo.
+// Layout por tool (L0+L1): pilotos migrados; resto cai no LegacyForm abaixo.
 const LAYOUTS: Record<string, 'transform' | 'generator' | 'inspector'> = {
   'text.qrcode': 'generator',
   'img.convert': 'transform',
   'pdf.info': 'inspector',
+  // L1 — texto
+  'text.barcode': 'generator',
+  'text.uuid': 'generator',
+  'text.lorem': 'generator',
+  'text.slug': 'inspector',
+  'text.baseconvert': 'inspector',
+  'text.epoch': 'inspector',
+  'text.escape': 'inspector',
+  'text.diff': 'inspector',
+  'text.stats': 'inspector',
+  'text.columnize': 'inspector',
+  'security.hashfile': 'inspector',
 }
 
 // Valores iniciais dos params a partir dos defaults.
@@ -57,6 +69,26 @@ export function GenericToolForm({ tool }: { tool: ToolInfo }): React.JSX.Element
     return <TransformLayout tool={tool} initial={initial} />
   }
   if (layout === 'inspector' && tool.id === 'pdf.info') {
+    return <InspectorLayout tool={tool} initial={initial} />
+  }
+  if (layout != null) {
+    if (layout === 'generator') {
+      const preview =
+        tool.id === 'text.barcode'
+          ? (params: Record<string, unknown>): React.JSX.Element | null => (
+              <BarcodeLivePreview
+                text={String(params.text ?? '')}
+                kind={String(params.kind ?? 'code128')}
+                width={Number(params.width ?? 400)}
+                height={Number(params.height ?? 100)}
+              />
+            )
+          : undefined
+      return <GeneratorLayout tool={tool} initial={initial} preview={preview} />
+    }
+    if (layout === 'transform') {
+      return <TransformLayout tool={tool} initial={initial} />
+    }
     return <InspectorLayout tool={tool} initial={initial} />
   }
   return <LegacyForm tool={tool} initial={initial} />

@@ -120,8 +120,15 @@ func TestColumnize(t *testing.T) {
 	if idx1 != idx2 || idx1 < 0 {
 		t.Fatalf("colunas desalinhadas:\n%s", out.Message)
 	}
+	// via textarea (sem arquivo)
+	out = runOne(t, NewColumnize(), tool.Input{Params: map[string]any{
+		"text": "a|b\nc|d", "delimiter": "|", "padding": 2.0,
+	}})
+	if !strings.Contains(out.Message, "a") || !strings.Contains(out.Message, "d") {
+		t.Fatalf("via textarea falhou: %s", out.Message)
+	}
 	if _, err := NewColumnize().Steps()[0].Run(context.Background(), tool.Input{}, nil); err == nil {
-		t.Fatal("sem arquivos deveria falhar")
+		t.Fatal("sem texto nem arquivos deveria falhar")
 	}
 }
 

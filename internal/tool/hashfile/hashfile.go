@@ -55,8 +55,8 @@ func (h *HashFile) Icon() string { return "fingerprint" }
 // Params implementa tool.Tool.
 func (h *HashFile) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "algorithm", Label: "param.algorithm.label", Type: tool.ParamSelect, Options: Algorithms, Default: SHA256, Required: true},
-		{Key: "outputPath", Label: "param.outputPath.label", Type: tool.ParamOutput},
+		{Key: "algorithm", Label: "param.algorithm.label", Type: tool.ParamSelect, Options: Algorithms, Default: SHA256, Required: true,
+			Widget: tool.WidgetSegmented, Hint: "param.hashfile.algorithm.hint"},
 	}
 }
 

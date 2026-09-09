@@ -56,7 +56,7 @@ describe('catálogo canônico', () => {
 describe('formulário de cada tool (golden por tool)', () => {
   for (const tool of CANONICAL_CATALOG) {
     // tools migradas para layouts dedicados têm golden próprio abaixo
-    if (['text.qrcode', 'img.convert', 'pdf.info'].includes(tool.id)) continue
+    if (['text.qrcode', 'img.convert', 'pdf.info', 'text.barcode', 'text.uuid', 'text.lorem', 'text.epoch'].includes(tool.id)) continue
     it(`${tool.id}: renderiza label + controle para cada param`, async () => {
       if (tool.id === 'ocr.image') {
         // sem backend real de OCR no teste de UI; pula
@@ -154,6 +154,44 @@ describe('formulário de cada tool (golden por tool)', () => {
     expect(screen.getByTestId('layout-inspector-pdf.info')).toBeInTheDocument()
     expect(screen.queryByTestId('output-dir')).not.toBeInTheDocument()
     expect(screen.queryByTestId('param-outputDir')).not.toBeInTheDocument()
+  })
+
+  it.each([
+    ['text.barcode', 'layout-generator-text.barcode'],
+    ['text.uuid', 'layout-generator-text.uuid'],
+    ['text.lorem', 'layout-generator-text.lorem'],
+    ['text.slug', 'layout-inspector-text.slug'],
+    ['text.baseconvert', 'layout-inspector-text.baseconvert'],
+    ['text.epoch', 'layout-inspector-text.epoch'],
+    ['text.escape', 'layout-inspector-text.escape'],
+    ['text.diff', 'layout-inspector-text.diff'],
+    ['text.stats', 'layout-inspector-text.stats'],
+    ['text.columnize', 'layout-inspector-text.columnize'],
+    ['security.hashfile', 'layout-inspector-security.hashfile'],
+  ])('%s usa o layout %s', async (id, layoutId) => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === id)
+    if (!tool) throw new Error(`${id} ausente`)
+    setBackend(backendWith(CANONICAL_CATALOG))
+    render(<GenericToolForm tool={tool} />)
+    expect(screen.getByTestId(layoutId)).toBeInTheDocument()
+  })
+
+  it('text.epoch mostra value condicional ao modo', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'text.epoch')
+    if (!tool) throw new Error('epoch ausente')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    // modo now: nenhum value visível
+    expect(screen.queryByTestId('param-value')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('param-value2')).not.toBeInTheDocument()
+    // modo toDate: value aparece
+    await user.click(screen.getByTestId('param-mode-toDate'))
+    expect(await screen.findByTestId('param-value')).toBeInTheDocument()
+    // modo toEpoch: value2 aparece, value some
+    await user.click(screen.getByTestId('param-mode-toEpoch'))
+    await waitFor(() => expect(screen.queryByTestId('param-value')).not.toBeInTheDocument())
+    expect(screen.getByTestId('param-value2')).toBeInTheDocument()
   })
 
   it('pdf.editor: monta o grid ao selecionar um PDF', async () => {

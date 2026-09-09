@@ -269,9 +269,37 @@ export const ptBR = {
     output: { label: 'Arquivo de saída' },
     outputDir: { label: 'Pasta de destino' },
     outputPath: { label: 'Arquivo de destino' },
+    hashfile: {
+      algorithm: { hint: 'SHA-256 para uso geral; MD5/CRC-32 só p/ checagem rápida' },
+    },
+    hashfile: {
+      algorithm: { hint: 'SHA-256 para uso geral; MD5/CRC-32 só p/ checagem rápida' },
+    },
     qrcode: {
       placeholder: 'Cole o link ou texto aqui…',
       hint: 'O QR atualiza sozinho enquanto você digita',
+    },
+    barcode: {
+      placeholder: 'Digite o código…',
+      hint: 'EAN-13 exige 12–13 dígitos numéricos',
+    },
+    baseconvert: {
+      placeholder: 'Ex.: 255 ou ff',
+    },
+    epoch: {
+      placeholder: 'Ex.: 1750000000',
+      placeholder2: 'Ex.: 2026-09-08T11:00:00',
+    },
+    slug: {
+      placeholder: 'Ex.: Meu Artigo Incrível!',
+    },
+    columnize: {
+      text: { label: 'Texto' },
+      textplaceholder: 'Ou cole o texto aqui…',
+      placeholder: 'Ex.: | ou ;',
+    },
+    escape: {
+      placeholder: 'Cole o texto aqui…',
     },
     pdf: {
       splitmode: { label: 'Modo de divisão' },
