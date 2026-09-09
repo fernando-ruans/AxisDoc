@@ -6,6 +6,10 @@ export const ptBR = {
     theme: 'Alternar tema',
     noTools: 'Nenhuma ferramenta encontrada',
   },
+  home: {
+    popular: 'Mais usadas',
+    recent: 'Recentes',
+  },
   category: {
     security: 'Segurança',
     pdf: 'PDF',
@@ -455,6 +459,7 @@ export const ptBR = {
     title: 'Pré-visualização',
     rows: 'linhas',
     cols: 'colunas',
+    compare: 'Antes × depois — arraste para comparar',
   },
   pdfeditor: {
     apply: 'Aplicar edições',

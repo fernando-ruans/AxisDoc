@@ -156,6 +156,10 @@ export class MockBackend implements Backend {
     return 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
   }
 
+  async previewTransform(_toolId: string, _path: string, _params: Record<string, unknown>): Promise<string> {
+    return 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=='
+  }
+
   async saveRenderedPage(outputDir: string, baseName: string, page: number, ext: string, _base64: string): Promise<string> {
     return `${outputDir}/${baseName}_p${String(page).padStart(2, '0')}.${ext}`
   }

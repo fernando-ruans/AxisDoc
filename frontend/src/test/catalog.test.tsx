@@ -1,19 +1,23 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen, cleanup, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import App from '../App'
 import { setBackend } from '../bindings/backend'
-import type { Backend, ToolInfo } from '../bindings/backend'
+import type { Backend, Job, ToolInfo } from '../bindings/backend'
 import { MockBackend } from '../bindings/mockBackend'
 import { CANONICAL_CATALOG, VALID_ICONS } from './catalog'
 import { GenericToolForm } from '../components/tools/GenericToolForm'
 import '../i18n'
 import i18n from '../i18n'
 
-function backendWith(tools: ToolInfo[]): Backend {
+function backendWith(tools: ToolInfo[], overrides: Partial<Backend> = {}): Backend {
   const base = new MockBackend() as unknown as Record<string, unknown>
   const obj = Object.create(Object.getPrototypeOf(base)) as Record<string, unknown>
   Object.assign(obj, base)
   obj.listTools = async () => tools
+  for (const [k, v] of Object.entries(overrides)) {
+    if (v !== undefined) obj[k] = v
+  }
   return obj as unknown as Backend
 }
 
@@ -118,7 +122,40 @@ describe('formulário de cada tool (golden por tool)', () => {
           },
           { timeout: 3000 },
         )
-      })
+  it('transform com imagem mostra live preview ao mudar opção', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'img.transform')
+    if (!tool) throw new Error('transform ausente')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    await user.click(screen.getByTestId('pick-files'))
+    // live preview do 1º arquivo aparece (mock retorna PNG 1x1)
+    await waitFor(() => expect(screen.getByTestId('live-transform-image')).toBeInTheDocument(), { timeout: 3000 })
+    // trocar a opção atualiza (debounce dispara de novo, sem erro)
+    await user.click(screen.getByTestId('param-op-flipH'))
+    await waitFor(() => expect(screen.getByTestId('live-transform-image')).toBeInTheDocument(), { timeout: 3000 })
+  })
+
+  it('resultado com imagem mostra before/after', async () => {
+    const fakeJobs: Job[] = [
+      {
+        id: 'j2',
+        toolId: 'img.convert',
+        status: 'done',
+        input: { paths: ['C:/in/a.png'] },
+        output: { message: 'ok', paths: ['C:/out/a.jpg'] },
+        progress: 100,
+        createdAt: '',
+        updatedAt: '',
+      },
+    ]
+    setBackend(backendWith(CANONICAL_CATALOG, { listJobs: async () => fakeJobs }))
+    const user = userEvent.setup()
+    render(<App />)
+    await user.click(await screen.findByTestId('toggle-jobs'))
+    expect(await screen.findByTestId('job-paths-j2')).toBeInTheDocument()
+  })
+})
     }
   }
 
@@ -296,6 +333,19 @@ describe('formulário de cada tool (golden por tool)', () => {
     await user.click(screen.getByTestId('param-mode-toEpoch'))
     await waitFor(() => expect(screen.queryByTestId('param-value')).not.toBeInTheDocument())
     expect(screen.getByTestId('param-value2')).toBeInTheDocument()
+  })
+
+  it('img.crop monta o VisualCropper ao selecionar imagem', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'img.crop')
+    if (!tool) throw new Error('crop ausente')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    await user.click(screen.getByTestId('pick-files'))
+    // o cropper monta após registrar o preview (mock) + timeout do jsdom
+    expect(await screen.findByTestId('visual-cropper', undefined, { timeout: 3000 })).toBeInTheDocument()
+    expect(await screen.findByTestId('crop-rect', undefined, { timeout: 3000 })).toBeInTheDocument()
+    expect(await screen.findByTestId('crop-dims', undefined, { timeout: 3000 })).toBeInTheDocument()
   })
 
   it('pdf.editor: monta o grid ao selecionar um PDF', async () => {

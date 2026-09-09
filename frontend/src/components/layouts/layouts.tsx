@@ -8,6 +8,19 @@ import { useJobs } from '../../stores/jobs'
 import { ParamField, OutputDirField, splitParams } from '../fields/fields'
 import { FilePreview } from '../FilePreview'
 import { InlineJobResult } from '../tools/InlineJobResult'
+import { LiveTransformPreview } from '../tools/LiveTransformPreview'
+import { VisualCropper } from '../tools/VisualCropper'
+import { BeforeAfter } from '../BeforeAfter'
+
+// Tools cujo Transform mostra live preview do 1º arquivo (clicar = ver na hora).
+const LIVE_TOOLS = new Set([
+  'img.transform', 'img.filters', 'img.resize', 'img.convert', 'img.watermark',
+  'img.watermarkpos', 'img.crop', 'img.icon', 'img.palette',
+  'pdf.rotate', 'pdf.watermark', 'pdf.nup', 'pdf.overlay', 'pdf.pagenumbers',
+])
+
+// Tools Generator com live preview (além de qrcode/barcode que já têm o próprio).
+const LIVE_GENERATORS = new Set(['img.icon'])
 
 interface Ctx {
   tool: ToolInfo
@@ -161,7 +174,7 @@ function LastResult({ ctx }: { ctx: CtxFull }): React.JSX.Element | null {
   const jobs = useJobs((s) => s.jobs)
   const job = ctx.lastJobId != null ? (jobs.find((j) => j.id === ctx.lastJobId) ?? null) : null
   if (!job || job.status === 'queued' || job.status === 'running') return null
-  return <InlineJobResult job={job} />
+  return <InlineJobResult job={job} beforePath={ctx.paths[0]} />
 }
 
 /** Layout Transform: N arquivos → N arquivos, opções visuais + destino único. */
@@ -172,11 +185,29 @@ export function TransformLayout({ tool, initial }: { tool: ToolInfo; initial: Re
   const needFiles = ctx.paths.length === 0
   const missing = visible.find((p) => p.required && (ctx.params[p.key] === undefined || ctx.params[p.key] === ''))
   const reason = needFiles ? t('common.pickFiles') : missing ? t(missing.label, { defaultValue: missing.key }) : null
+  const live = LIVE_TOOLS.has(tool.id) ? ctx.paths[0] ?? null : null
+  const isCrop = tool.id === 'img.crop'
   return (
     <div className="space-y-4" data-testid={`layout-transform-${tool.id}`}>
       <PickFiles ctx={ctx} multiple accept={toolAccept(tool)} />
       <SortableList ctx={ctx} />
-      <FilePreview paths={ctx.paths} toolId={tool.id} params={ctx.params} />
+      {isCrop && ctx.paths[0] != null ? (
+        <VisualCropper
+          path={ctx.paths[0]}
+          ratio={String(ctx.params.ratio ?? 'free')}
+          onCrop={(r) => {
+            ctx.setParam('x', r.x)
+            ctx.setParam('y', r.y)
+            ctx.setParam('w', r.w)
+            ctx.setParam('h', r.h)
+          }}
+        />
+      ) : (
+        <FilePreview paths={ctx.paths} toolId={tool.id} params={ctx.params} />
+      )}
+      {live != null && !isCrop && (
+        <LiveTransformPreview toolId={tool.id} path={live} params={ctx.params} />
+      )}
       {visible.map((p) => (
         <ParamField key={p.key} param={p} value={ctx.params[p.key]} onChange={(v) => ctx.setParam(p.key, v)} optionLabel={(opt) => ctx.optionLabel(p.key, opt)} />
       ))}

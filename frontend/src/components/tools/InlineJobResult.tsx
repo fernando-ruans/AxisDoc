@@ -1,14 +1,42 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import type React from 'react'
 import { useTranslation } from 'react-i18next'
 import { ExternalLink, FolderOpen, Copy, Check } from 'lucide-react'
 import { getBackend } from '../../bindings/backend'
 import type { Job } from '../../bindings/backend'
+import { BeforeAfter } from '../BeforeAfter'
 
 // InlineJobResult mostra o resultado do último job executado na própria aba.
-export function InlineJobResult({ job }: { job: Job | null }): React.JSX.Element | null {
+export function InlineJobResult({ job, beforePath }: { job: Job | null; beforePath?: string }): React.JSX.Element | null {
   const { t } = useTranslation()
   const [copied, setCopied] = useState<string | null>(null)
+  const [beforeToken, setBeforeToken] = useState<string | null>(null)
+  const [afterToken, setAfterToken] = useState<string | null>(null)
+
+  const rawPaths = job?.output?.paths
+  const paths: string[] = Array.isArray(rawPaths)
+    ? rawPaths.filter((x): x is string => typeof x === 'string')
+    : []
+  const firstImage = paths.find((p) => /\.(png|jpg|jpeg|gif|bmp|webp)$/i.test(p)) ?? null
+
+  useEffect(() => {
+    setBeforeToken(null)
+    setAfterToken(null)
+    if (job == null || job.status !== 'done') return
+    if (beforePath == null || firstImage == null) return
+    let cancelled = false
+    void getBackend()
+      .registerPreviewFiles([beforePath, firstImage])
+      .then((refs) => {
+        if (cancelled || refs.length < 2) return
+        setBeforeToken(refs[0].token)
+        setAfterToken(refs[1].token)
+      })
+      .catch(() => undefined)
+    return () => {
+      cancelled = true
+    }
+  }, [job?.id, beforePath, firstImage])
 
   if (job == null) return null
   if (job.status === 'queued' || job.status === 'running') return null
@@ -22,11 +50,6 @@ export function InlineJobResult({ job }: { job: Job | null }): React.JSX.Element
       setCopied(null)
     }
   }
-
-  const rawPaths = job.output?.paths
-  const paths: string[] = Array.isArray(rawPaths)
-    ? rawPaths.filter((x): x is string => typeof x === 'string')
-    : []
 
   return (
     <div
@@ -80,6 +103,15 @@ export function InlineJobResult({ job }: { job: Job | null }): React.JSX.Element
                 </li>
               ))}
             </ul>
+          )}
+          {beforeToken != null && afterToken != null && (
+            <div className="mt-2">
+              <BeforeAfter
+                before={`/preview/${beforeToken}`}
+                after={`/preview/${afterToken}`}
+                label={t('preview.compare')}
+              />
+            </div>
           )}
           {paths.length === 0 && (job.output?.message == null || job.output.message === '') && (
             <p className="text-xs text-text-muted">{t('job.done')}</p>

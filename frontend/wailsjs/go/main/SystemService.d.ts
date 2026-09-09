@@ -18,6 +18,8 @@ export function PreviewSummary(arg1:string):Promise<main.PreviewSummary>;
 
 export function PreviewText(arg1:string,arg2:number):Promise<string>;
 
+export function PreviewTransform(arg1:string,arg2:string,arg3:Record<string, any>):Promise<string>;
+
 export function RegisterPreviewFiles(arg1:Array<string>):Promise<Array<main.PreviewRef>>;
 
 export function RevealInFolder(arg1:string):Promise<void>;

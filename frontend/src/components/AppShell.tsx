@@ -2,76 +2,22 @@ import type React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Fingerprint, Moon, Sun, History, FileSearch, Wrench, Download,
-  FileText, FilePlus2, Scissors, RotateCw, Stamp, Minimize2,
-  Repeat, Scaling, Table2, GitCompare, Braces, Code2, FileJson,
-  Pencil, List, QrCode, ScanBarcode, Database, ScanText, FileImage,
-  Search as SearchIcon, Workflow, FolderClock, DatabaseZap,
-  FileSpreadsheet, Table, AlignLeft, Binary, Clock, Link, Columns3, Code,
-  Crop, FlipHorizontal, Wand2, Shapes, Film, Palette, ListOrdered, Lock, LockOpen, Layers,
-  PencilRuler,
+  Moon, Sun, History, FileSearch, Download,
+  Search as SearchIcon, Workflow, FolderClock,
 } from 'lucide-react'
 import { useCatalog } from '../stores/catalog'
 import { useTheme } from '../stores/theme'
 import { CommandPalette } from './CommandPalette'
 import { GenericToolForm } from './tools/GenericToolForm'
+import { ToolHeader } from './ToolHeader'
+import { HomeDashboard } from './HomeDashboard'
 import { JobList } from './JobList'
 import { SearchPage } from './SearchPage'
 import { PipelinesPage } from './PipelinesPage'
 import { WatchPage } from './WatchPage'
 import { getBackend } from '../bindings/backend'
+import { iconFor } from './icons'
 import { cn } from '../lib/utils'
-
-type IconComponent = typeof Fingerprint
-
-const ICONS: Record<string, IconComponent> = {
-  fingerprint: Fingerprint,
-  'file-info': FileText,
-  'file-plus-2': FilePlus2,
-  scissors: Scissors,
-  'rotate-cw': RotateCw,
-  stamp: Stamp,
-  'minimize-2': Minimize2,
-  'file-text': FileText,
-  repeat: Repeat,
-  scaling: Scaling,
-  'table-2': Table2,
-  'git-compare': GitCompare,
-  braces: Braces,
-  code: Code2,
-  'file-json': FileJson,
-  'file-image': FileImage,
-  pencil: Pencil,
-  list: List,
-  'qr-code': QrCode,
-  'scan-barcode': ScanBarcode,
-  database: Database,
-  'scan-text': ScanText,
-  'database-zap': DatabaseZap,
-  'file-spreadsheet': FileSpreadsheet,
-  table: Table,
-  'align-left': AlignLeft,
-  binary: Binary,
-  clock: Clock,
-  link: Link,
-  'columns-3': Columns3,
-  'code-2': Code,
-  crop: Crop,
-  'flip-horizontal': FlipHorizontal,
-  wand: Wand2,
-  shapes: Shapes,
-  film: Film,
-  palette: Palette,
-  'list-ordered': ListOrdered,
-  lock: Lock,
-  'lock-open': LockOpen,
-  layers: Layers,
-  'pencil-ruler': PencilRuler,
-}
-
-function iconFor(name: string): IconComponent {
-  return ICONS[name] ?? Wrench
-}
 
 export function AppShell(): React.JSX.Element {
   const { t } = useTranslation()
@@ -249,17 +195,17 @@ export function AppShell(): React.JSX.Element {
           <WatchPage />
         ) : selectedTool ? (
           <div className="mx-auto max-w-2xl" data-testid="tool-page">
-            <h2 className="mb-1 text-xl font-semibold">{t(selectedTool.titleKey)}</h2>
-            <p className="mb-6 text-sm text-zinc-500">{t(selectedTool.descKey)}</p>
+            <ToolHeader tool={selectedTool} />
             <GenericToolForm tool={selectedTool} />
           </div>
         ) : (
-          <div className="flex h-full items-center justify-center">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold">{t('app.name')}</h2>
-              <p className="mt-2 text-sm text-zinc-500">{t('app.tagline')}</p>
-            </div>
-          </div>
+          <HomeDashboard
+            tools={tools}
+            onSelect={(id) => {
+              setView('tool')
+              setSelected(id)
+            }}
+          />
         )}
       </main>
 

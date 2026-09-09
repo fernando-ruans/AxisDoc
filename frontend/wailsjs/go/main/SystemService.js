@@ -34,6 +34,10 @@ export function PreviewText(arg1, arg2) {
   return window['go']['main']['SystemService']['PreviewText'](arg1, arg2);
 }
 
+export function PreviewTransform(arg1, arg2, arg3) {
+  return window['go']['main']['SystemService']['PreviewTransform'](arg1, arg2, arg3);
+}
+
 export function RegisterPreviewFiles(arg1) {
   return window['go']['main']['SystemService']['RegisterPreviewFiles'](arg1);
 }

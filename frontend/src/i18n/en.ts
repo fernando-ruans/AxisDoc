@@ -8,6 +8,10 @@ export const en: Dict = {
     theme: 'Toggle theme',
     noTools: 'No tools found',
   },
+  home: {
+    popular: 'Most used',
+    recent: 'Recent',
+  },
   category: {
     security: 'Security',
     pdf: 'PDF',
@@ -457,6 +461,7 @@ export const en: Dict = {
     title: 'Preview',
     rows: 'rows',
     cols: 'columns',
+    compare: 'Before × after — drag to compare',
   },
   pdfeditor: {
     apply: 'Apply edits',

@@ -126,6 +126,21 @@ describe('GenericToolForm (hashfile)', () => {
     expect(screen.getByTestId('preview-text')).toBeInTheDocument()
   })
 
+  it('dashboard inicial mostra cards por categoria', async () => {
+    render(<App />)
+    expect(await screen.findByTestId('home-dashboard')).toBeInTheDocument()
+    // mock tem só security.hashfile no catálogo
+    expect(screen.getByTestId('home-tool-security.hashfile')).toBeInTheDocument()
+  })
+
+  it('cabeçalho da tool mostra ícone + título + categoria', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await waitFor(() => expect(screen.getByTestId('tool-security.hashfile')).toBeInTheDocument())
+    await user.click(screen.getByTestId('tool-security.hashfile'))
+    expect(screen.getByTestId('tool-header')).toBeInTheDocument()
+  })
+
   it('exibe os arquivos de saída com botões abrir/pasta/copiar', async () => {
     const fakeJobs: Job[] = [
       {

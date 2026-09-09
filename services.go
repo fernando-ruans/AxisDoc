@@ -361,6 +361,10 @@ func summarizePDF(path string) (PreviewSummary, error) {
 // PreviewFor gera preview em memória (base64 PNG) para tools geradoras
 // (QR/barcode) sem gravar arquivo — o job real grava.
 func (s *SystemService) PreviewFor(toolID string, params map[string]any) (string, error) {
+	return previewForTool(toolID, params)
+}
+
+func previewForTool(toolID string, params map[string]any) (string, error) {
 	switch toolID {
 	case "text.qrcode":
 		text, _ := params["text"].(string)
@@ -390,6 +394,38 @@ func (s *SystemService) PreviewFor(toolID string, params map[string]any) (string
 	default:
 		return "", fmt.Errorf("preview não suportado para %s", toolID)
 	}
+}
+
+// PreviewTransform aplica a transformação da tool sobre UMA imagem e retorna
+// base64 PNG (sem gravar). Usado pelo live preview: clicar na opção mostra
+// o resultado na hora. Suporta img.* transformadoras + pdf.* visuais.
+func (s *SystemService) PreviewTransform(toolID, path string, params map[string]any) (string, error) {
+	return previewTransform(toolID, path, params)
+}
+
+func previewTransform(toolID, path string, params map[string]any) (string, error) {
+	t, err := toolByID(toolID)
+	if err != nil {
+		return "", err
+	}
+	out, err := t.Steps()[0].Run(context.Background(), tool.Input{Paths: []string{path}, Params: params}, nil)
+	if err != nil {
+		return "", err
+	}
+	if len(out.Paths) == 0 {
+		return "", fmt.Errorf("sem saída")
+	}
+	defer os.Remove(out.Paths[0])
+	raw, err := os.ReadFile(out.Paths[0])
+	if err != nil {
+		return "", err
+	}
+	return base64.StdEncoding.EncodeToString(raw), nil
+}
+
+// toolByID resolve a tool no registry global (mesmo usado pelo app/CLI).
+func toolByID(id string) (tool.Tool, error) {
+	return NewRegistry().Get(id)
 }
 
 func paramFloat(params map[string]any, key string, def float64) float64 {
