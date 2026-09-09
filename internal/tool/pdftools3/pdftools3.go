@@ -61,8 +61,8 @@ func NewRearrange() *Rearrange {
 
 func (t *Rearrange) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "order", Label: "param.pdf.order.label", Type: tool.ParamText, Required: true, Default: ""},
-		outputDirParam(),
+		{Key: "order", Label: "param.pdf.order.label", Type: tool.ParamText, Required: true, Default: "",
+			Placeholder: "param.pdf.order.placeholder", Hint: "param.pdf.order.hint"},
 	}
 }
 
@@ -133,11 +133,12 @@ func NewProtect() *Protect {
 
 func (t *Protect) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "userPassword", Label: "param.pdf.userpw.label", Type: tool.ParamPassword, Required: true, Default: ""},
-		{Key: "ownerPassword", Label: "param.pdf.ownerpw.label", Type: tool.ParamPassword, Default: ""},
+		{Key: "userPassword", Label: "param.pdf.userpw.label", Type: tool.ParamPassword, Required: true, Default: "",
+			Hint: "param.pdf.userpw.hint"},
+		{Key: "ownerPassword", Label: "param.pdf.ownerpw.label", Type: tool.ParamPassword, Default: "",
+			Placeholder: "param.pdf.ownerpw.placeholder"},
 		{Key: "keyLength", Label: "param.pdf.keylen.label", Type: tool.ParamSelect,
-			Options: []string{"40", "128", "256"}, Default: "256"},
-		outputDirParam(),
+			Options: []string{"40", "128", "256"}, Default: "256", Widget: tool.WidgetSegmented},
 	}
 }
 
@@ -188,7 +189,6 @@ func NewUnlock() *Unlock {
 func (t *Unlock) Params() []tool.Param {
 	return []tool.Param{
 		{Key: "password", Label: "param.pdf.password.label", Type: tool.ParamPassword, Required: true, Default: ""},
-		outputDirParam(),
 	}
 }
 
@@ -228,9 +228,10 @@ func NewOverlay() *Overlay {
 
 func (t *Overlay) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "overlay", Label: "param.pdf.overlay.label", Type: tool.ParamText, Required: true, Default: ""},
-		{Key: "onTop", Label: "param.pdf.ontop.label", Type: tool.ParamBool, Default: true},
-		outputDirParam(),
+		{Key: "overlay", Label: "param.pdf.overlay.label", Type: tool.ParamFile, Required: true, Default: "",
+			Accept: []string{".pdf"}, Hint: "param.pdf.overlay.hint"},
+		{Key: "onTop", Label: "param.pdf.ontop.label", Type: tool.ParamBool, Default: true,
+			Widget: tool.WidgetSwitch},
 	}
 }
 
@@ -281,11 +282,13 @@ func NewPageNumbers() *PageNumbers {
 
 func (t *PageNumbers) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "format", Label: "param.pdf.numformat.label", Type: tool.ParamText, Required: true, Default: "Página %p de %P"},
+		{Key: "format", Label: "param.pdf.numformat.label", Type: tool.ParamText, Required: true, Default: "Página %p de %P",
+			Hint: "param.pdf.numformat.hint"},
 		{Key: "position", Label: "param.img.position.label", Type: tool.ParamSelect,
-			Options: []string{"bottomCenter", "topCenter", "bottomRight", "bottomLeft"}, Default: "bottomCenter"},
-		{Key: "fontSize", Label: "param.pdf.fontsize.label", Type: tool.ParamNumber, Default: 10, Min: 6, Max: 48},
-		outputDirParam(),
+			Options: []string{"bottomCenter", "topCenter", "bottomRight", "bottomLeft"}, Default: "bottomCenter",
+			Widget: tool.WidgetSegmented},
+		{Key: "fontSize", Label: "param.pdf.fontsize.label", Type: tool.ParamNumber, Default: 10, Min: 6, Max: 48,
+			Widget: tool.WidgetSlider},
 	}
 }
 

@@ -271,6 +271,24 @@ export const es: Dict = {
     output: { label: 'Archivo de salida' },
     outputDir: { label: 'Carpeta de destino' },
     outputPath: { label: 'Archivo de destino' },
+    order: {
+      placeholder: 'Ej.: 3,1,2',
+      hint: 'Números e intervalos, cualquier orden; repita para duplicar',
+    },
+    pages: {
+      placeholder: 'Ej.: 1-3,5',
+      hint: 'Números e intervalos separados por coma',
+      optional: 'Ej.: 1-3,5 (vacío = todas)',
+    },
+    userpw: {
+      hint: 'Quien abra el PDF la necesita',
+    },
+    ownerpw: {
+      placeholder: 'Igual a la de usuario si vacío',
+    },
+    overlay: {
+      hint: 'El PDF sello aplicado en cada página',
+    },
     hashfile: {
       algorithm: { hint: 'SHA-256 para uso general; MD5/CRC-32 solo para chequeo rápido' },
     },
@@ -307,19 +325,29 @@ export const es: Dict = {
       text: { label: 'Texto' },
       fontsize: { label: 'Tamaño de fuente' },
       pages: { label: 'Páginas (ej.: 1-3,5)' },
-      attachfiles: { label: 'Archivos (uno por línea)' },
-      doctitle: { label: 'Título' },
-      docbody: { label: 'Texto' },
+      attachfiles: { label: 'Archivo para adjuntar' },
+      doctitle: { label: 'Título', placeholder: 'param.pdf.create.doctitle.placeholder' },
+      docbody: { label: 'Texto', placeholder: 'param.pdf.create.docbody.placeholder' },
       blankpages: { label: 'Páginas en blanco extra' },
       nup: { label: 'Páginas por hoja' },
-      order: { label: 'Nuevo orden (ej.: 3,1,2)' },
-      userpw: { label: 'Contraseña de usuario' },
-      ownerpw: { label: 'Contraseña de propietario' },
+      order: { label: 'Nuevo orden', placeholder: 'param.pdf.order.placeholder', hint: 'param.pdf.order.hint' },
+      userpw: { label: 'Contraseña de usuario', hint: 'param.pdf.userpw.hint' },
+      ownerpw: { label: 'Contraseña de propietario', placeholder: 'param.pdf.ownerpw.placeholder' },
       keylen: { label: 'Clave (bits)' },
       password: { label: 'Contraseña' },
-      overlay: { label: 'PDF de superposición' },
+      overlay: { label: 'PDF de superposición', hint: 'param.pdf.overlay.hint' },
       ontop: { label: 'Sobre el contenido' },
-      numformat: { label: 'Formato (use %p y %P)' },
+      numformat: { label: 'Formato (use %p y %P)', hint: 'Ej.: Página %p de %P' },
+      compress: { label: 'Nivel', hint: 'Máximo intenta archivos más pequeños' },
+    },
+    pdfmerge: {
+      output: { hint: 'Nombre del archivo final (carpeta del 1º PDF si destino vacío)' },
+    },
+    pdffromimages: {
+      output: { hint: 'Si vacío, usa la carpeta de las imágenes' },
+    },
+    pdfwm: {
+      placeholder: 'Ej.: CONFIDENCIAL',
     },
     img: {
       format: { label: 'Formato' },

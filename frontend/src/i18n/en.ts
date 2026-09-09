@@ -271,6 +271,24 @@ export const en: Dict = {
     output: { label: 'Output file' },
     outputDir: { label: 'Output folder' },
     outputPath: { label: 'Output file' },
+    order: {
+      placeholder: 'E.g. 3,1,2',
+      hint: 'Numbers and ranges, any order; repeat to duplicate',
+    },
+    pages: {
+      placeholder: 'E.g. 1-3,5',
+      hint: 'Numbers and comma-separated ranges',
+      optional: 'E.g. 1-3,5 (empty = all)',
+    },
+    userpw: {
+      hint: 'Whoever opens the PDF needs it',
+    },
+    ownerpw: {
+      placeholder: 'Same as user if empty',
+    },
+    overlay: {
+      hint: 'The stamp PDF applied on each page',
+    },
     hashfile: {
       algorithm: { hint: 'SHA-256 for general use; MD5/CRC-32 for quick checks only' },
     },
@@ -307,19 +325,29 @@ export const en: Dict = {
       text: { label: 'Text' },
       fontsize: { label: 'Font size' },
       pages: { label: 'Pages (e.g. 1-3,5)' },
-      attachfiles: { label: 'Files (one per line)' },
-      doctitle: { label: 'Title' },
-      docbody: { label: 'Text' },
+      attachfiles: { label: 'File to attach' },
+      doctitle: { label: 'Title', placeholder: 'param.pdf.create.doctitle.placeholder' },
+      docbody: { label: 'Text', placeholder: 'param.pdf.create.docbody.placeholder' },
       blankpages: { label: 'Extra blank pages' },
       nup: { label: 'Pages per sheet' },
-      order: { label: 'New order (e.g. 3,1,2)' },
-      userpw: { label: 'User password' },
-      ownerpw: { label: 'Owner password' },
+      order: { label: 'New order', placeholder: 'param.pdf.order.placeholder', hint: 'param.pdf.order.hint' },
+      userpw: { label: 'User password', hint: 'param.pdf.userpw.hint' },
+      ownerpw: { label: 'Owner password', placeholder: 'param.pdf.ownerpw.placeholder' },
       keylen: { label: 'Key (bits)' },
       password: { label: 'Password' },
-      overlay: { label: 'Overlay PDF' },
+      overlay: { label: 'Overlay PDF', hint: 'param.pdf.overlay.hint' },
       ontop: { label: 'Over content' },
-      numformat: { label: 'Format (use %p and %P)' },
+      numformat: { label: 'Format (use %p and %P)', hint: 'E.g. Page %p of %P' },
+      compress: { label: 'Level', hint: 'Max tries smaller files' },
+    },
+    pdfmerge: {
+      output: { hint: 'Output file name (1st PDF folder if dest empty)' },
+    },
+    pdffromimages: {
+      output: { hint: 'If empty, uses the images folder' },
+    },
+    pdfwm: {
+      placeholder: 'E.g. CONFIDENTIAL',
     },
     img: {
       format: { label: 'Format' },

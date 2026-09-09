@@ -171,7 +171,12 @@ func NewExtractImages() *ExtractImages {
 	return &ExtractImages{base{"pdf.extractimages", "pdf", "tool.pdfextractimages.title", "tool.pdfextractimages.desc", "image"}}
 }
 
-func (t *ExtractImages) Params() []tool.Param { return []tool.Param{pagesParam(), outputDirParam()} }
+func (t *ExtractImages) Params() []tool.Param {
+	return []tool.Param{
+		{Key: "pages", Label: "param.pdf.pages.label", Type: tool.ParamText, Default: "",
+			Placeholder: "param.pdf.pages.optional", Hint: "param.pdf.pages.hint"},
+	}
+}
 
 func (t *ExtractImages) Steps() []tool.Step {
 	return []tool.Step{stepFunc{"step.pdf.extractimages", t.run}}
@@ -215,8 +220,8 @@ func NewExtractPages() *ExtractPages {
 
 func (t *ExtractPages) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "pages", Label: "param.pdf.pages.label", Type: tool.ParamText, Required: true, Default: ""},
-		outputDirParam(),
+		{Key: "pages", Label: "param.pdf.pages.label", Type: tool.ParamText, Required: true, Default: "",
+			Placeholder: "param.pdf.pages.placeholder", Hint: "param.pdf.pages.hint"},
 	}
 }
 
@@ -263,8 +268,8 @@ func NewRemovePages() *RemovePages {
 
 func (t *RemovePages) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "pages", Label: "param.pdf.pages.label", Type: tool.ParamText, Required: true, Default: ""},
-		outputDirParam(),
+		{Key: "pages", Label: "param.pdf.pages.label", Type: tool.ParamText, Required: true, Default: "",
+			Placeholder: "param.pdf.pages.placeholder", Hint: "param.pdf.pages.hint"},
 	}
 }
 
@@ -545,8 +550,9 @@ func NewAddAttachments() *AddAttachments {
 
 func (t *AddAttachments) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "files", Label: "param.pdf.attachfiles.label", Type: tool.ParamText, Required: true, Default: ""},
-		outputDirParam(),
+		{Key: "files", Label: "param.pdf.attachfiles.label", Type: tool.ParamFile, Required: true, Default: "",
+			Accept: []string{".pdf", ".txt", ".png", ".jpg", ".csv", ".xlsx"},
+			Hint: "param.pdf.attachfiles.hint"},
 	}
 }
 
@@ -560,20 +566,26 @@ func (t *AddAttachments) run(_ context.Context, in tool.Input, _ func(pct float6
 	}
 	filesRaw := tool.ParamString(in, "files", "")
 	var files []string
-	for _, f := range strings.Split(filesRaw, "\n") {
-		f = strings.TrimSpace(f)
-		if f != "" {
-			files = append(files, f)
-		}
+	if filesRaw != "" {
+		files = append(files, filesRaw)
 	}
 	// arquivos anexados também podem vir da seleção (não-PDFs)
-	for _, p := range in.Paths[1:] {
+	for _, p := range in.Paths {
 		if !strings.EqualFold(filepath.Ext(p), ".pdf") {
-			files = append(files, p)
+			dup := false
+			for _, f := range files {
+				if f == p {
+					dup = true
+					break
+				}
+			}
+			if !dup {
+				files = append(files, p)
+			}
 		}
 	}
 	if len(files) == 0 {
-		return tool.Output{}, fmt.Errorf("pdf.addattachments: informe os arquivos a anexar (um por linha)")
+		return tool.Output{}, fmt.Errorf("pdf.addattachments: selecione o arquivo a anexar")
 	}
 	var outs []string
 	for _, p := range in.Paths {
@@ -602,8 +614,8 @@ func NewImagesToPDF() *ImagesToPDF {
 
 func (t *ImagesToPDF) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "outputPath", Label: "param.outputPath.label", Type: tool.ParamOutput, Default: "imagens.pdf"},
-		{Key: "outputDir", Label: "param.outputDir.label", Type: tool.ParamFolder},
+		{Key: "outputPath", Label: "param.outputPath.label", Type: tool.ParamOutput, Default: "imagens.pdf",
+			Hint: "param.pdffromimages.output.hint"},
 	}
 }
 
@@ -636,9 +648,12 @@ func NewCreatePDF() *CreatePDF {
 
 func (t *CreatePDF) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "title", Label: "param.pdf.doctitle.label", Type: tool.ParamText, Required: true, Default: ""},
-		{Key: "body", Label: "param.pdf.docbody.label", Type: tool.ParamText, Required: true, Default: ""},
-		{Key: "pages", Label: "param.pdf.blankpages.label", Type: tool.ParamNumber, Default: 0, Min: 0, Max: 50},
+		{Key: "title", Label: "param.pdf.doctitle.label", Type: tool.ParamText, Required: true, Default: "",
+			Placeholder: "param.pdfcreate.title.placeholder"},
+		{Key: "body", Label: "param.pdf.docbody.label", Type: tool.ParamTextarea, Required: true, Default: "",
+			Placeholder: "param.pdfcreate.body.placeholder"},
+		{Key: "pages", Label: "param.pdf.blankpages.label", Type: tool.ParamNumber, Default: 0, Min: 0, Max: 50,
+			Widget: tool.WidgetSlider, VisibleIf: &tool.VisibleIf{Key: "title", Equals: ""}},
 		{Key: "outputPath", Label: "param.outputPath.label", Type: tool.ParamOutput, Default: "novo.pdf"},
 	}
 }
@@ -703,8 +718,7 @@ func NewNUp() *NUp {
 func (t *NUp) Params() []tool.Param {
 	return []tool.Param{
 		{Key: "n", Label: "param.pdf.nup.label", Type: tool.ParamSelect,
-			Options: []string{"2", "4", "8"}, Default: "2"},
-		outputDirParam(),
+			Options: []string{"2", "4", "8"}, Default: "2", Widget: tool.WidgetCards},
 	}
 }
 

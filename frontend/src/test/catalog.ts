@@ -35,40 +35,38 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'pdf.merge', category: 'pdf', titleKey: 'tool.pdfmerge.title',
     descKey: 'tool.pdfmerge.desc', icon: 'file-plus-2', stepNames: ['step.pdf.merge'],
     params: [
-      param('outputPath', 'param.outputPath.label', 'output', { default: 'merged.pdf' }),
-      outputDir(),
+      param('outputPath', 'param.outputPath.label', 'output', { default: 'merged.pdf', hint: 'param.pdfmerge.output.hint' }),
     ],
   },
   {
     id: 'pdf.split', category: 'pdf', titleKey: 'tool.pdfsplit.title',
     descKey: 'tool.pdfsplit.desc', icon: 'scissors', stepNames: ['step.pdf.split'],
     params: [
-      param('mode', 'param.pdf.splitmode.label', 'select', { options: ['pages', 'everyN'], default: 'everyN' }),
-      param('n', 'param.pdf.n.label', 'number', { default: 1, min: 1, max: 1000 }),
-      outputDir(),
+      param('mode', 'param.pdf.splitmode.label', 'select', { options: ['pages', 'everyN'], default: 'everyN', widget: 'segmented' }),
+      param('n', 'param.pdf.n.label', 'number', { default: 1, min: 1, max: 1000, visibleIf: { key: 'mode', equals: 'everyN' } }),
     ],
   },
   {
     id: 'pdf.rotate', category: 'pdf', titleKey: 'tool.pdfrotate.title',
     descKey: 'tool.pdfrotate.desc', icon: 'rotate-cw', stepNames: ['step.pdf.rotate'],
     params: [
-      param('angle', 'param.pdf.angle.label', 'select', { options: ['90', '180', '270'], default: '90' }),
-      outputDir(),
+      param('angle', 'param.pdf.angle.label', 'select', { options: ['90', '180', '270'], default: '90', widget: 'segmented' }),
     ],
   },
   {
     id: 'pdf.watermark', category: 'pdf', titleKey: 'tool.pdfwm.title',
     descKey: 'tool.pdfwm.desc', icon: 'stamp', stepNames: ['step.pdf.watermark'],
     params: [
-      param('text', 'param.pdf.text.label', 'text', { required: true, default: 'CONFIDENCIAL' }),
-      param('fontSize', 'param.pdf.fontsize.label', 'number', { default: 48, min: 6, max: 200 }),
-      outputDir(),
+      param('text', 'param.pdf.text.label', 'text', { required: true, default: 'CONFIDENCIAL', placeholder: 'param.pdfwm.placeholder' }),
+      param('fontSize', 'param.pdf.fontsize.label', 'number', { default: 48, min: 6, max: 200, widget: 'slider' }),
     ],
   },
   {
     id: 'pdf.compress', category: 'pdf', titleKey: 'tool.pdfcompress.title',
     descKey: 'tool.pdfcompress.desc', icon: 'minimize-2', stepNames: ['step.pdf.compress'],
-    params: [outputDir()],
+    params: [
+      param('level', 'param.pdf.compress.label', 'select', { options: ['balanced', 'max'], default: 'balanced', widget: 'segmented', hint: 'param.pdf.compress.hint' }),
+    ],
   },
   {
     id: 'pdf.extracttext', category: 'pdf', titleKey: 'tool.pdfextract.title',
@@ -78,38 +76,33 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'pdf.extractimages', category: 'pdf', titleKey: 'tool.pdfextractimages.title',
     descKey: 'tool.pdfextractimages.desc', icon: 'image', stepNames: ['step.pdf.extractimages'],
     params: [
-      param('pages', 'param.pdf.pages.label', 'text', { default: '' }),
-      outputDir(),
+      param('pages', 'param.pdf.pages.label', 'text', { default: '', placeholder: 'param.pdf.pages.optional', hint: 'param.pdf.pages.hint' }),
     ],
   },
   {
     id: 'pdf.extractpages', category: 'pdf', titleKey: 'tool.pdfextractpages.title',
     descKey: 'tool.pdfextractpages.desc', icon: 'file-output', stepNames: ['step.pdf.extractpages'],
     params: [
-      param('pages', 'param.pdf.pages.label', 'text', { required: true, default: '' }),
-      outputDir(),
+      param('pages', 'param.pdf.pages.label', 'text', { required: true, default: '', placeholder: 'param.pdf.pages.placeholder', hint: 'param.pdf.pages.hint' }),
     ],
   },
   {
     id: 'pdf.removepages', category: 'pdf', titleKey: 'tool.pdfremovepages.title',
     descKey: 'tool.pdfremovepages.desc', icon: 'file-x', stepNames: ['step.pdf.removepages'],
     params: [
-      param('pages', 'param.pdf.pages.label', 'text', { required: true, default: '' }),
-      outputDir(),
+      param('pages', 'param.pdf.pages.label', 'text', { required: true, default: '', placeholder: 'param.pdf.pages.placeholder', hint: 'param.pdf.pages.hint' }),
     ],
   },
   {
     id: 'pdf.extractfonts', category: 'pdf', titleKey: 'tool.pdfextractfonts.title',
     descKey: 'tool.pdfextractfonts.desc', icon: 'type', stepNames: ['step.pdf.extractfonts'],
     params: [
-      param('pages', 'param.pdf.pages.label', 'text', { default: '' }),
-      outputDir(),
+      param('pages', 'param.pdf.pages.label', 'text', { default: '', placeholder: 'param.pdf.pages.optional', hint: 'param.pdf.pages.hint' }),
     ],
   },
   {
     id: 'pdf.extractattachments', category: 'pdf', titleKey: 'tool.pdfextractattachments.title',
     descKey: 'tool.pdfextractattachments.desc', icon: 'paperclip', stepNames: ['step.pdf.extractattachments'],
-    params: [outputDir()],
   },
   {
     id: 'pdf.extractmetadata', category: 'pdf', titleKey: 'tool.pdfextractmetadata.title',
@@ -127,25 +120,23 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'pdf.addattachments', category: 'pdf', titleKey: 'tool.pdfaddattachments.title',
     descKey: 'tool.pdfaddattachments.desc', icon: 'paperclip', stepNames: ['step.pdf.addattachments'],
     params: [
-      param('files', 'param.pdf.attachfiles.label', 'text', { required: true, default: '' }),
-      outputDir(),
+      param('files', 'param.pdf.attachfiles.label', 'file', { required: true, accept: ['.pdf', '.txt', '.png', '.jpg', '.csv', '.xlsx'], hint: 'param.pdf.attachfiles.hint' }),
     ],
   },
   {
     id: 'pdf.fromimages', category: 'pdf', titleKey: 'tool.pdffromimages.title',
     descKey: 'tool.pdffromimages.desc', icon: 'images', stepNames: ['step.pdf.fromimages'],
     params: [
-      param('outputPath', 'param.outputPath.label', 'output', { default: 'imagens.pdf' }),
-      outputDir(),
+      param('outputPath', 'param.outputPath.label', 'output', { default: 'imagens.pdf', hint: 'param.pdffromimages.output.hint' }),
     ],
   },
   {
     id: 'pdf.create', category: 'pdf', titleKey: 'tool.pdfcreate.title',
     descKey: 'tool.pdfcreate.desc', icon: 'file-plus', stepNames: ['step.pdf.create'],
     params: [
-      param('title', 'param.pdf.doctitle.label', 'text', { required: true, default: '' }),
-      param('body', 'param.pdf.docbody.label', 'text', { required: true, default: '' }),
-      param('pages', 'param.pdf.blankpages.label', 'number', { default: 0, min: 0, max: 50 }),
+      param('title', 'param.pdf.doctitle.label', 'text', { required: true, default: '', placeholder: 'param.pdf.create.title.placeholder' }),
+      param('body', 'param.pdf.docbody.label', 'textarea', { required: true, default: '', placeholder: 'param.pdf.create.body.placeholder' }),
+      param('pages', 'param.pdf.blankpages.label', 'number', { default: 0, min: 0, max: 50, widget: 'slider', visibleIf: { key: 'title', equals: '' } }),
       param('outputPath', 'param.outputPath.label', 'output', { default: 'novo.pdf' }),
     ],
   },
@@ -153,26 +144,23 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'pdf.nup', category: 'pdf', titleKey: 'tool.pdfnup.title',
     descKey: 'tool.pdfnup.desc', icon: 'layout-grid', stepNames: ['step.pdf.nup'],
     params: [
-      param('n', 'param.pdf.nup.label', 'select', { options: ['2', '4', '8'], default: '2' }),
-      outputDir(),
+      param('n', 'param.pdf.nup.label', 'select', { options: ['2', '4', '8'], default: '2', widget: 'cards' }),
     ],
   },
   {
     id: 'pdf.rearrange', category: 'pdf', titleKey: 'tool.pdfrearrange.title',
     descKey: 'tool.pdfrearrange.desc', icon: 'list-ordered', stepNames: ['step.pdf.rearrange'],
     params: [
-      param('order', 'param.pdf.order.label', 'text', { required: true, default: '' }),
-      outputDir(),
+      param('order', 'param.pdf.order.label', 'text', { required: true, default: '', placeholder: 'param.pdf.order.placeholder', hint: 'param.pdf.order.hint' }),
     ],
   },
   {
     id: 'pdf.protect', category: 'pdf', titleKey: 'tool.pdfprotect.title',
     descKey: 'tool.pdfprotect.desc', icon: 'lock', stepNames: ['step.pdf.protect'],
     params: [
-      param('userPassword', 'param.pdf.userpw.label', 'password', { required: true, default: '' }),
-      param('ownerPassword', 'param.pdf.ownerpw.label', 'password', { default: '' }),
-      param('keyLength', 'param.pdf.keylen.label', 'select', { options: ['40', '128', '256'], default: '256' }),
-      outputDir(),
+      param('userPassword', 'param.pdf.userpw.label', 'password', { required: true, default: '', hint: 'param.pdf.userpw.hint' }),
+      param('ownerPassword', 'param.pdf.ownerpw.label', 'password', { default: '', placeholder: 'param.pdf.ownerpw.placeholder' }),
+      param('keyLength', 'param.pdf.keylen.label', 'select', { options: ['40', '128', '256'], default: '256', widget: 'segmented' }),
     ],
   },
   {
@@ -180,26 +168,23 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     descKey: 'tool.pdfunlock.desc', icon: 'lock-open', stepNames: ['step.pdf.unlock'],
     params: [
       param('password', 'param.pdf.password.label', 'password', { required: true, default: '' }),
-      outputDir(),
     ],
   },
   {
     id: 'pdf.overlay', category: 'pdf', titleKey: 'tool.pdfoverlay.title',
     descKey: 'tool.pdfoverlay.desc', icon: 'layers', stepNames: ['step.pdf.overlay'],
     params: [
-      param('overlay', 'param.pdf.overlay.label', 'text', { required: true, default: '' }),
-      param('onTop', 'param.pdf.ontop.label', 'bool', { default: true }),
-      outputDir(),
+      param('overlay', 'param.pdf.overlay.label', 'file', { required: true, accept: ['.pdf'], hint: 'param.pdf.overlay.hint' }),
+      param('onTop', 'param.pdf.ontop.label', 'bool', { default: true, widget: 'switch' }),
     ],
   },
   {
     id: 'pdf.pagenumbers', category: 'pdf', titleKey: 'tool.pdfpagenumbers.title',
     descKey: 'tool.pdfpagenumbers.desc', icon: 'list-ordered', stepNames: ['step.pdf.pagenumbers'],
     params: [
-      param('format', 'param.pdf.numformat.label', 'text', { required: true, default: 'Página %p de %P' }),
-      param('position', 'param.img.position.label', 'select', { options: ['bottomCenter', 'topCenter', 'bottomRight', 'bottomLeft'], default: 'bottomCenter' }),
-      param('fontSize', 'param.pdf.fontsize.label', 'number', { default: 10, min: 6, max: 48 }),
-      outputDir(),
+      param('format', 'param.pdf.numformat.label', 'text', { required: true, default: 'Página %p de %P', hint: 'param.pdf.numformat.hint' }),
+      param('position', 'param.img.position.label', 'select', { options: ['bottomCenter', 'topCenter', 'bottomRight', 'bottomLeft'], default: 'bottomCenter', widget: 'segmented' }),
+      param('fontSize', 'param.pdf.fontsize.label', 'number', { default: 10, min: 6, max: 48, widget: 'slider' }),
     ],
   },
   {

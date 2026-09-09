@@ -58,7 +58,12 @@ describe('formulário de cada tool (golden por tool)', () => {
     // tools migradas para layouts dedicados têm golden próprio abaixo
     if (['text.qrcode', 'img.convert', 'pdf.info', 'text.barcode', 'text.uuid', 'text.lorem', 'text.epoch',
       'img.resize', 'img.transform', 'img.filters', 'img.icon', 'img.gifextract', 'img.gifbuild',
-      'img.watermark', 'img.watermarkpos', 'img.palette', 'img.crop'].includes(tool.id)) continue
+      'img.watermark', 'img.watermarkpos', 'img.palette', 'img.crop',
+      'pdf.merge', 'pdf.split', 'pdf.rotate', 'pdf.watermark', 'pdf.compress', 'pdf.extracttext',
+      'pdf.extractimages', 'pdf.extractpages', 'pdf.removepages', 'pdf.extractfonts', 'pdf.extractattachments',
+      'pdf.extractmetadata', 'pdf.permissions', 'pdf.diff', 'pdf.addattachments', 'pdf.fromimages',
+      'pdf.create', 'pdf.nup', 'pdf.rearrange', 'pdf.protect', 'pdf.unlock', 'pdf.overlay',
+      'pdf.pagenumbers'].includes(tool.id)) continue
     it(`${tool.id}: renderiza label + controle para cada param`, async () => {
       if (tool.id === 'ocr.image') {
         // sem backend real de OCR no teste de UI; pula
@@ -180,6 +185,29 @@ describe('formulário de cada tool (golden por tool)', () => {
     ['img.watermarkpos', 'layout-transform-img.watermarkpos'],
     ['img.palette', 'layout-inspector-img.palette'],
     ['img.crop', 'layout-transform-img.crop'],
+    ['pdf.merge', 'layout-transform-pdf.merge'],
+    ['pdf.split', 'layout-transform-pdf.split'],
+    ['pdf.rotate', 'layout-transform-pdf.rotate'],
+    ['pdf.watermark', 'layout-transform-pdf.watermark'],
+    ['pdf.compress', 'layout-transform-pdf.compress'],
+    ['pdf.extracttext', 'layout-inspector-pdf.extracttext'],
+    ['pdf.extractimages', 'layout-transform-pdf.extractimages'],
+    ['pdf.extractpages', 'layout-transform-pdf.extractpages'],
+    ['pdf.removepages', 'layout-transform-pdf.removepages'],
+    ['pdf.extractfonts', 'layout-transform-pdf.extractfonts'],
+    ['pdf.extractattachments', 'layout-transform-pdf.extractattachments'],
+    ['pdf.extractmetadata', 'layout-inspector-pdf.extractmetadata'],
+    ['pdf.permissions', 'layout-inspector-pdf.permissions'],
+    ['pdf.diff', 'layout-inspector-pdf.diff'],
+    ['pdf.addattachments', 'layout-transform-pdf.addattachments'],
+    ['pdf.fromimages', 'layout-transform-pdf.fromimages'],
+    ['pdf.create', 'layout-generator-pdf.create'],
+    ['pdf.nup', 'layout-transform-pdf.nup'],
+    ['pdf.rearrange', 'layout-transform-pdf.rearrange'],
+    ['pdf.protect', 'layout-transform-pdf.protect'],
+    ['pdf.unlock', 'layout-transform-pdf.unlock'],
+    ['pdf.overlay', 'layout-transform-pdf.overlay'],
+    ['pdf.pagenumbers', 'layout-transform-pdf.pagenumbers'],
   ])('%s usa o layout %s', async (id, layoutId) => {
     const tool = CANONICAL_CATALOG.find((t) => t.id === id)
     if (!tool) throw new Error(`${id} ausente`)
@@ -199,6 +227,27 @@ describe('formulário de cada tool (golden por tool)', () => {
     expect(screen.queryByTestId('param-width')).not.toBeInTheDocument()
     await user.click(screen.getByTestId('param-preset-custom'))
     expect(await screen.findByTestId('param-width')).toBeInTheDocument()
+  })
+
+  it('pdf.split mostra N só no modo blocos', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.split')
+    if (!tool) throw new Error('split ausente')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    expect(screen.getByTestId('layout-transform-pdf.split')).toBeInTheDocument()
+    // default everyN: N visível
+    expect(screen.getByTestId('param-n')).toBeInTheDocument()
+    await user.click(screen.getByTestId('param-mode-pages'))
+    await waitFor(() => expect(screen.queryByTestId('param-n')).not.toBeInTheDocument())
+  })
+
+  it('pdf.create usa GeneratorLayout com textarea e slider condicional', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.create')
+    if (!tool) throw new Error('create ausente')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    render(<GenericToolForm tool={tool} />)
+    expect(screen.getByTestId('layout-generator-pdf.create')).toBeInTheDocument()
   })
 
   it('img.watermark alterna texto/imagem por kind', async () => {

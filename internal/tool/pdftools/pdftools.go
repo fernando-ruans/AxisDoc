@@ -11,6 +11,7 @@ import (
 
 	"github.com/ledongthuc/pdf"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
 	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/types"
 
 	"github.com/ferna/axisdoc/internal/output"
@@ -101,8 +102,8 @@ func NewMergePDF() *MergePDF {
 
 func (t *MergePDF) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "outputPath", Label: "param.outputPath.label", Type: tool.ParamOutput, Default: "merged.pdf"},
-		{Key: "outputDir", Label: "param.outputDir.label", Type: tool.ParamFolder},
+		{Key: "outputPath", Label: "param.outputPath.label", Type: tool.ParamOutput, Default: "merged.pdf",
+			Hint: "param.pdfmerge.output.hint"},
 	}
 }
 
@@ -138,9 +139,9 @@ func NewSplitPDF() *SplitPDF {
 func (t *SplitPDF) Params() []tool.Param {
 	return []tool.Param{
 		{Key: "mode", Label: "param.pdf.splitmode.label", Type: tool.ParamSelect,
-			Options: []string{"pages", "everyN"}, Default: "everyN"},
-		{Key: "n", Label: "param.pdf.n.label", Type: tool.ParamNumber, Default: 1, Min: 1, Max: 1000},
-		{Key: "outputDir", Label: "param.outputDir.label", Type: tool.ParamFolder},
+			Options: []string{"pages", "everyN"}, Default: "everyN", Widget: tool.WidgetSegmented},
+		{Key: "n", Label: "param.pdf.n.label", Type: tool.ParamNumber, Default: 1, Min: 1, Max: 1000,
+			VisibleIf: &tool.VisibleIf{Key: "mode", Equals: "everyN"}},
 	}
 }
 
@@ -218,8 +219,8 @@ func NewRotatePDF() *RotatePDF {
 
 func (t *RotatePDF) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "angle", Label: "param.pdf.angle.label", Type: tool.ParamSelect, Options: []string{"90", "180", "270"}, Default: "90"},
-		{Key: "outputDir", Label: "param.outputDir.label", Type: tool.ParamFolder},
+		{Key: "angle", Label: "param.pdf.angle.label", Type: tool.ParamSelect, Options: []string{"90", "180", "270"}, Default: "90",
+			Widget: tool.WidgetSegmented},
 	}
 }
 
@@ -252,9 +253,10 @@ func NewWatermarkPDF() *WatermarkPDF {
 
 func (t *WatermarkPDF) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "text", Label: "param.pdf.text.label", Type: tool.ParamText, Required: true, Default: "CONFIDENCIAL"},
-		{Key: "fontSize", Label: "param.pdf.fontsize.label", Type: tool.ParamNumber, Default: 48, Min: 6, Max: 200},
-		{Key: "outputDir", Label: "param.outputDir.label", Type: tool.ParamFolder},
+		{Key: "text", Label: "param.pdf.text.label", Type: tool.ParamText, Required: true, Default: "CONFIDENCIAL",
+			Placeholder: "param.pdfwm.placeholder"},
+		{Key: "fontSize", Label: "param.pdf.fontsize.label", Type: tool.ParamNumber, Default: 48, Min: 6, Max: 200,
+			Widget: tool.WidgetSlider},
 	}
 }
 
@@ -294,7 +296,9 @@ func NewCompressPDF() *CompressPDF {
 
 func (t *CompressPDF) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "outputDir", Label: "param.outputDir.label", Type: tool.ParamFolder},
+		{Key: "level", Label: "param.pdf.compress.label", Type: tool.ParamSelect,
+			Options: []string{"balanced", "max"}, Default: "balanced",
+			Widget: tool.WidgetSegmented, Hint: "param.pdf.compress.hint"},
 	}
 }
 
@@ -311,7 +315,12 @@ func (t *CompressPDF) run(_ context.Context, in tool.Input, _ func(pct float64))
 	for _, p := range in.Paths {
 		dest := output.NextAvailablePath(filepath.Join(tool.OutputDir(in), fmt.Sprintf("%s_compact.pdf", fileStem(p))))
 		before := fileSize(p)
-		if err := api.OptimizeFile(p, dest, nil); err != nil {
+		conf := model.NewDefaultConfiguration()
+		if tool.ParamString(in, "level", "balanced") == "max" {
+			// modo máximo: validação relaxada foca em tamanho
+			conf.ValidationMode = model.ValidationRelaxed
+		}
+		if err := api.OptimizeFile(p, dest, conf); err != nil {
 			return tool.Output{}, fmt.Errorf("pdf.compress: %w", err)
 		}
 		after := fileSize(dest)
