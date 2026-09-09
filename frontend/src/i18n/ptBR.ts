@@ -269,6 +269,10 @@ export const ptBR = {
     output: { label: 'Arquivo de saída' },
     outputDir: { label: 'Pasta de destino' },
     outputPath: { label: 'Arquivo de destino' },
+    qrcode: {
+      placeholder: 'Cole o link ou texto aqui…',
+      hint: 'O QR atualiza sozinho enquanto você digita',
+    },
     pdf: {
       splitmode: { label: 'Modo de divisão' },
       n: { label: 'Páginas por bloco' },
@@ -292,7 +296,7 @@ export const ptBR = {
     },
     img: {
       format: { label: 'Formato' },
-      quality: { label: 'Qualidade' },
+      quality: { label: 'Qualidade', hint: 'Só vale para JPG' },
       width: { label: 'Largura' },
       height: { label: 'Altura' },
       keepaspect: { label: 'Manter proporção' },
@@ -374,6 +378,7 @@ export const ptBR = {
     openFolder: 'Abrir pasta',
     copyPath: 'Copiar caminho',
     outputDir: 'Pasta de destino',
+    outputDirHint: 'Vazio = mesma pasta do arquivo',
     clear: 'Limpar',
     remove: 'remover',
     pages: 'páginas',

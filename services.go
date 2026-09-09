@@ -62,12 +62,19 @@ type SearchService struct {
 	svc  *search.Service
 }
 
-// Query busca no índice global.
+// Query busca no índice global. Nunca retorna null.
 func (s *SearchService) Query(q string, limit int) ([]store.SearchHit, error) {
 	if s.repo == nil {
-		return nil, nil
+		return []store.SearchHit{}, nil
 	}
-	return s.repo.Query(context.Background(), q, limit)
+	hits, err := s.repo.Query(context.Background(), q, limit)
+	if err != nil {
+		return nil, err
+	}
+	if hits == nil {
+		return []store.SearchHit{}, nil
+	}
+	return hits, nil
 }
 
 // Count documentos indexados.
@@ -100,12 +107,19 @@ func (s *PipelineService) Save(p pipeline.Pipeline) error {
 	return s.repo.Save(context.Background(), p)
 }
 
-// List lista macros salvas.
+// List lista macros salvas. Nunca retorna null (frontend faz .map direto).
 func (s *PipelineService) List() ([]pipeline.Pipeline, error) {
 	if s.repo == nil {
-		return nil, nil
+		return []pipeline.Pipeline{}, nil
 	}
-	return s.repo.List(context.Background())
+	list, err := s.repo.List(context.Background())
+	if err != nil {
+		return nil, err
+	}
+	if list == nil {
+		return []pipeline.Pipeline{}, nil
+	}
+	return list, nil
 }
 
 // Delete remove uma macro.

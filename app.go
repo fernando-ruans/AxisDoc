@@ -149,7 +149,12 @@ func (a *App) startup(ctx context.Context) {
 	}
 	st, err := store.Open(dbPath)
 	if err != nil {
-		slog.Error("abrir banco", "err", err)
+		// sem panic: cai para banco em memória para o app continuar abrindo
+		slog.Error("abrir banco, usando memória", "err", err)
+		if st, err = store.Open(":memory:"); err != nil {
+			slog.Error("banco em memória indisponível", "err", err)
+			return
+		}
 	}
 	a.store = st
 	_ = st.Jobs().ResetRunning(ctx)
@@ -336,7 +341,8 @@ type ToolInfo struct {
 	Params    []tool.Param `json:"params"`
 }
 
-// ListTools lista as ferramentas registradas.
+// ListTools lista as ferramentas registradas. Nunca retorna null;
+// Params nil vira [] para o frontend iterar sem guard.
 func (s *ToolService) ListTools() []ToolInfo {
 	tools := s.reg.List()
 	out := make([]ToolInfo, 0, len(tools))
@@ -346,10 +352,14 @@ func (s *ToolService) ListTools() []ToolInfo {
 		for _, st := range steps {
 			names = append(names, st.Name())
 		}
+		params := t.Params()
+		if params == nil {
+			params = []tool.Param{}
+		}
 		out = append(out, ToolInfo{
 			ID: t.ID(), Category: t.Category(), TitleKey: t.Title(),
 			DescKey: t.Description(), Icon: t.Icon(), StepNames: names,
-			Params: t.Params(),
+			Params: params,
 		})
 	}
 	return out
@@ -372,9 +382,16 @@ func (s *JobService) Cancel(id string) error {
 	return s.manager.Cancel(id)
 }
 
-// ListJobs lista jobs recentes.
+// ListJobs lista jobs recentes. Nunca retorna null.
 func (s *JobService) ListJobs(limit int) ([]*store.Job, error) {
-	return s.repo.List(s.ctx, limit)
+	list, err := s.repo.List(s.ctx, limit)
+	if err != nil {
+		return nil, err
+	}
+	if list == nil {
+		return []*store.Job{}, nil
+	}
+	return list, nil
 }
 
 // DeleteJob remove um job do histórico.

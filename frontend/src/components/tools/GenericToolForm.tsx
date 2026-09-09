@@ -11,6 +11,14 @@ import { InlineJobResult } from './InlineJobResult'
 import { QrLivePreview } from './QrLivePreview'
 import { BarcodeLivePreview } from './BarcodeLivePreview'
 import { PdfPageEditor } from './PdfPageEditor'
+import { TransformLayout, GeneratorLayout, InspectorLayout } from '../layouts/layouts'
+
+// Layout por tool (L0): 3 pilotos migrados; resto cai no LegacyForm abaixo.
+const LAYOUTS: Record<string, 'transform' | 'generator' | 'inspector'> = {
+  'text.qrcode': 'generator',
+  'img.convert': 'transform',
+  'pdf.info': 'inspector',
+}
 
 // Valores iniciais dos params a partir dos defaults.
 function initialParams(tool: ToolInfo): Record<string, unknown> {
@@ -32,9 +40,32 @@ function PdfEditorRunner({ paths, params }: { paths: string[]; params: Record<st
 }
 
 export function GenericToolForm({ tool }: { tool: ToolInfo }): React.JSX.Element {
+  const initial = initialParams(tool)
+  const layout = LAYOUTS[tool.id]
+  if (layout === 'generator' && tool.id === 'text.qrcode') {
+    return (
+      <GeneratorLayout
+        tool={tool}
+        initial={initial}
+        preview={(params) => (
+          <QrLivePreview text={String(params.text ?? '')} size={Number(params.size ?? 256)} />
+        )}
+      />
+    )
+  }
+  if (layout === 'transform' && tool.id === 'img.convert') {
+    return <TransformLayout tool={tool} initial={initial} />
+  }
+  if (layout === 'inspector' && tool.id === 'pdf.info') {
+    return <InspectorLayout tool={tool} initial={initial} />
+  }
+  return <LegacyForm tool={tool} initial={initial} />
+}
+
+function LegacyForm({ tool, initial }: { tool: ToolInfo; initial: Record<string, unknown> }): React.JSX.Element {
   const { t } = useTranslation()
   const [paths, setPaths] = useState<string[]>([])
-  const [params, setParams] = useState<Record<string, unknown>>(() => initialParams(tool))
+  const [params, setParams] = useState<Record<string, unknown>>(initial)
   const [lastJobId, setLastJobId] = useState<string | null>(null)
   const jobs = useJobs((s) => s.jobs)
   const busy = jobs.some((j) => j.toolId === tool.id && (j.status === 'queued' || j.status === 'running'))

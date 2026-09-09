@@ -217,8 +217,11 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'img.convert', category: 'image', titleKey: 'tool.imgconvert.title',
     descKey: 'tool.imgconvert.desc', icon: 'repeat', stepNames: ['step.img.convert'],
     params: [
-      param('format', 'param.img.format.label', 'select', { options: ['jpg', 'png', 'gif', 'bmp', 'tiff'], default: 'png', required: true }),
-      param('quality', 'param.img.quality.label', 'number', { default: 85, min: 1, max: 100 }),
+      param('format', 'param.img.format.label', 'select', { options: ['jpg', 'png', 'gif', 'bmp', 'tiff'], default: 'png', required: true, widget: 'cards' }),
+      param('quality', 'param.img.quality.label', 'number', {
+        default: 85, min: 1, max: 100, widget: 'slider',
+        hint: 'param.img.quality.hint', visibleIf: { key: 'format', equals: 'jpg' },
+      }),
       outputDir(),
     ],
   },
@@ -358,9 +361,10 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'text.qrcode', category: 'text', titleKey: 'tool.qrcode.title',
     descKey: 'tool.qrcode.desc', icon: 'qr-code', stepNames: ['step.text.qrcode'],
     params: [
-      param('text', 'param.pdf.text.label', 'text', { required: true }),
-      param('size', 'param.img.qrsize.label', 'number', { default: 256, min: 64, max: 2000 }),
-      outputDir(),
+      param('text', 'param.pdf.text.label', 'textarea', {
+        required: true, placeholder: 'param.qrcode.placeholder', hint: 'param.qrcode.hint',
+      }),
+      param('size', 'param.img.qrsize.label', 'number', { default: 256, min: 64, max: 2000, widget: 'slider' }),
     ],
   },
   {

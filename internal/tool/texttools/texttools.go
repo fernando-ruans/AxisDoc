@@ -264,9 +264,10 @@ func NewQRCode() *QRCode {
 
 func (t *QRCode) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "text", Label: "param.pdf.text.label", Type: tool.ParamText, Required: true},
-		{Key: "size", Label: "param.img.qrsize.label", Type: tool.ParamNumber, Default: 256, Min: 64, Max: 2000},
-		{Key: "outputDir", Label: "param.outputDir.label", Type: tool.ParamFolder},
+		{Key: "text", Label: "param.pdf.text.label", Type: tool.ParamTextarea, Required: true,
+			Placeholder: "param.qrcode.placeholder", Hint: "param.qrcode.hint"},
+		{Key: "size", Label: "param.img.qrsize.label", Type: tool.ParamNumber, Default: 256, Min: 64, Max: 2000,
+			Widget: tool.WidgetSlider},
 	}
 }
 

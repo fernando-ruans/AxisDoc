@@ -50,7 +50,7 @@ type Tool interface {
 	Steps() []Step
 }
 
-// Tipos de parâmetro suportados pela UI genérica.
+// Tipos de parâmetro suportados pela UI.
 const (
 	ParamSelect   = "select"
 	ParamNumber   = "number"
@@ -59,18 +59,40 @@ const (
 	ParamOutput   = "output"   // diálogo de salvar arquivo
 	ParamFolder   = "folder"   // diálogo de escolher pasta (destino)
 	ParamPassword = "password" // texto com máscara (senhas)
+	ParamFile     = "file"     // seletor de arquivo único (filtro por Accept)
+	ParamTextarea = "textarea" // texto multilinha
 )
+
+// Widgets sugeridos para renderização (default deriva do Type).
+const (
+	WidgetAuto      = ""
+	WidgetSlider    = "slider"    // number com Min/Max
+	WidgetSegmented = "segmented" // select compacto
+	WidgetCards     = "cards"     // select com cartões visuais
+	WidgetSwitch    = "switch"    // bool
+)
+
+// VisibleIf condiciona a exibição do param a outro param (condicional simples).
+type VisibleIf struct {
+	Key    string `json:"key"`
+	Equals any    `json:"equals"`
+}
 
 // Param descreve um campo do formulário da ferramenta.
 type Param struct {
-	Key      string   `json:"key"`
-	Label    string   `json:"label"` // chave i18n
-	Type     string   `json:"type"`
-	Options  []string `json:"options,omitempty"` // para select
-	Default  any      `json:"default,omitempty"`
-	Required bool     `json:"required,omitempty"`
-	Min      float64  `json:"min,omitempty"` // para number
-	Max      float64  `json:"max,omitempty"` // para number
+	Key         string     `json:"key"`
+	Label       string     `json:"label"` // chave i18n
+	Type        string     `json:"type"`
+	Options     []string   `json:"options,omitempty"` // para select
+	Default     any        `json:"default,omitempty"`
+	Required    bool       `json:"required,omitempty"`
+	Min         float64    `json:"min,omitempty"`         // para number
+	Max         float64    `json:"max,omitempty"`         // para number
+	Placeholder string     `json:"placeholder,omitempty"` // chave i18n ou texto
+	Hint        string     `json:"hint,omitempty"`        // chave i18n de ajuda
+	VisibleIf   *VisibleIf `json:"visibleIf,omitempty"`
+	Accept      []string   `json:"accept,omitempty"` // extensões p/ ParamFile (ex.: [".pdf"])
+	Widget      string     `json:"widget,omitempty"`
 }
 
 // Validate verifica a consistência do param (fail-fast no registro).
@@ -113,14 +135,41 @@ func (p Param) Validate() error {
 				return fmt.Errorf("param %q: default de bool deve ser booleano", p.Key)
 			}
 		}
-	case ParamText, ParamOutput, ParamFolder, ParamPassword:
+	case ParamText, ParamOutput, ParamFolder, ParamPassword, ParamFile, ParamTextarea:
 		if p.Default != nil {
 			if _, ok := p.Default.(string); !ok {
 				return fmt.Errorf("param %q: default de %s deve ser string", p.Key, p.Type)
 			}
 		}
+		if p.Type == ParamFile && len(p.Accept) == 0 {
+			return fmt.Errorf("param %q: file exige Accept não-vazio (ex.: [\".pdf\"])", p.Key)
+		}
 	default:
 		return fmt.Errorf("param %q: type inválido %q", p.Key, p.Type)
+	}
+	if p.Widget != "" {
+		switch p.Widget {
+		case WidgetSlider:
+			if p.Type != ParamNumber {
+				return fmt.Errorf("param %q: widget slider exige type number", p.Key)
+			}
+			if p.Max <= p.Min {
+				return fmt.Errorf("param %q: slider exige Max > Min", p.Key)
+			}
+		case WidgetSegmented, WidgetCards:
+			if p.Type != ParamSelect {
+				return fmt.Errorf("param %q: widget %s exige type select", p.Key, p.Widget)
+			}
+		case WidgetSwitch:
+			if p.Type != ParamBool {
+				return fmt.Errorf("param %q: widget switch exige type bool", p.Key)
+			}
+		default:
+			return fmt.Errorf("param %q: widget inválido %q", p.Key, p.Widget)
+		}
+	}
+	if p.VisibleIf != nil && p.VisibleIf.Key == "" {
+		return fmt.Errorf("param %q: visibleIf exige key", p.Key)
 	}
 	return nil
 }

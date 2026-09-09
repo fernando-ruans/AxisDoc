@@ -101,9 +101,11 @@ func NewConvertImage() *ConvertImage {
 
 func (t *ConvertImage) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "format", Label: "param.img.format.label", Type: tool.ParamSelect, Options: Formats, Default: "png", Required: true},
-		{Key: "quality", Label: "param.img.quality.label", Type: tool.ParamNumber, Default: 85, Min: 1, Max: 100},
-		{Key: "outputDir", Label: "param.outputDir.label", Type: tool.ParamFolder},
+		{Key: "format", Label: "param.img.format.label", Type: tool.ParamSelect, Options: Formats, Default: "png", Required: true,
+			Widget: tool.WidgetCards},
+		{Key: "quality", Label: "param.img.quality.label", Type: tool.ParamNumber, Default: 85, Min: 1, Max: 100,
+			Widget: tool.WidgetSlider, Hint: "param.img.quality.hint",
+			VisibleIf: &tool.VisibleIf{Key: "format", Equals: "jpg"}},
 	}
 }
 

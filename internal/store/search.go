@@ -74,7 +74,7 @@ func (r *SearchRepo) Query(ctx context.Context, q string, limit int) ([]SearchHi
 		return nil, fmt.Errorf("search: query: %w", err)
 	}
 	defer rows.Close()
-	var out []SearchHit
+	out := []SearchHit{}
 	for rows.Next() {
 		var h SearchHit
 		if err := rows.Scan(&h.DocID, &h.Path, &h.Title, &h.Snippet, &h.Rank); err != nil {

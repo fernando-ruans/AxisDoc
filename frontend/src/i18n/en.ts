@@ -271,6 +271,10 @@ export const en: Dict = {
     output: { label: 'Output file' },
     outputDir: { label: 'Output folder' },
     outputPath: { label: 'Output file' },
+    qrcode: {
+      placeholder: 'Paste the link or text here…',
+      hint: 'The QR updates itself as you type',
+    },
     pdf: {
       splitmode: { label: 'Split mode' },
       n: { label: 'Pages per chunk' },
@@ -294,7 +298,7 @@ export const en: Dict = {
     },
     img: {
       format: { label: 'Format' },
-      quality: { label: 'Quality' },
+      quality: { label: 'Quality', hint: 'Only applies to JPG' },
       width: { label: 'Width' },
       height: { label: 'Height' },
       keepaspect: { label: 'Keep aspect ratio' },
@@ -376,6 +380,7 @@ export const en: Dict = {
     openFolder: 'Open folder',
     copyPath: 'Copy path',
     outputDir: 'Output folder',
+    outputDirHint: 'Empty = same folder as the file',
     clear: 'Clear',
     remove: 'remove',
     pages: 'pages',

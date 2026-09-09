@@ -59,7 +59,7 @@ func (r *Repo) List(ctx context.Context) ([]Pipeline, error) {
 			return nil, err
 		}
 	}
-	var out []Pipeline
+	out := []Pipeline{}
 	for _, id := range ids {
 		data, err := r.repo.Get(ctx, "pipeline:"+id)
 		if err != nil || data == "" {

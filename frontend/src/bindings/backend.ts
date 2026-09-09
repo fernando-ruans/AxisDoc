@@ -1,12 +1,17 @@
 export interface ToolParam {
   key: string
   label: string
-  type: 'select' | 'number' | 'bool' | 'text' | 'output' | 'folder' | 'password'
+  type: 'select' | 'number' | 'bool' | 'text' | 'output' | 'folder' | 'password' | 'file' | 'textarea'
   options?: string[]
   default?: unknown
   required?: boolean
   min?: number
   max?: number
+  placeholder?: string
+  hint?: string
+  visibleIf?: { key: string; equals: unknown }
+  accept?: string[]
+  widget?: '' | 'slider' | 'segmented' | 'cards' | 'switch'
 }
 
 export interface ToolInfo {

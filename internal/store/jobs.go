@@ -136,7 +136,7 @@ func (r *JobRepo) List(ctx context.Context, limit int) ([]*Job, error) {
 		return nil, fmt.Errorf("jobs: listar: %w", err)
 	}
 	defer rows.Close()
-	var out []*Job
+	out := []*Job{}
 	for rows.Next() {
 		j, err := scanJob(rows)
 		if err != nil {

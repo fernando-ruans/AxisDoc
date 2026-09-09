@@ -41,7 +41,7 @@ describe('catálogo canônico', () => {
       for (const p of t.params ?? []) {
         if (!p.key) bad.push(`${t.id}: key vazia`)
         if (!p.label) bad.push(`${t.id}.${p.key}: label vazio`)
-        if (!['select', 'number', 'bool', 'text', 'output', 'folder', 'password'].includes(p.type)) {
+        if (!['select', 'number', 'bool', 'text', 'output', 'folder', 'password', 'file', 'textarea'].includes(p.type)) {
           bad.push(`${t.id}.${p.key}: type ${p.type}`)
         }
         if (p.type === 'select' && (!p.options || p.options.length === 0)) {
@@ -55,6 +55,8 @@ describe('catálogo canônico', () => {
 
 describe('formulário de cada tool (golden por tool)', () => {
   for (const tool of CANONICAL_CATALOG) {
+    // tools migradas para layouts dedicados têm golden próprio abaixo
+    if (['text.qrcode', 'img.convert', 'pdf.info'].includes(tool.id)) continue
     it(`${tool.id}: renderiza label + controle para cada param`, async () => {
       if (tool.id === 'ocr.image') {
         // sem backend real de OCR no teste de UI; pula
@@ -107,6 +109,52 @@ describe('formulário de cada tool (golden por tool)', () => {
       })
     }
   }
+
+  it('text.qrcode usa GeneratorLayout com textarea + slider + preview', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'text.qrcode')
+    if (!tool) throw new Error('qrcode ausente')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    expect(screen.getByTestId('layout-generator-text.qrcode')).toBeInTheDocument()
+    // sem botões de arquivo: generator não pede entrada
+    expect(screen.queryByTestId('pick-files')).not.toBeInTheDocument()
+    // textarea com placeholder + slider com valor
+    expect(screen.getByPlaceholderText(/Cole o link/i)).toBeInTheDocument()
+    expect(screen.getByTestId('param-size-value')).toHaveTextContent('256')
+    await user.type(screen.getByTestId('param-text'), 'https://exemplo.com')
+    await waitFor(() => expect(screen.getByTestId('qr-live-image')).toBeInTheDocument(), { timeout: 3000 })
+  })
+
+  it('img.convert usa TransformLayout com cards + quality condicional + destino único', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'img.convert')
+    if (!tool) throw new Error('convert ausente')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    expect(screen.getByTestId('layout-transform-img.convert')).toBeInTheDocument()
+    // cards de formato
+    await user.click(screen.getByTestId('param-format-jpg'))
+    // quality aparece só para jpg
+    expect(await screen.findByTestId('param-quality')).toBeInTheDocument()
+    await user.click(screen.getByTestId('param-format-png'))
+    await waitFor(() => expect(screen.queryByTestId('param-quality')).not.toBeInTheDocument())
+    // destino único
+    expect(screen.getByTestId('output-dir')).toBeInTheDocument()
+    // lista ordenável
+    await user.click(screen.getByTestId('pick-files'))
+    expect(await screen.findByTestId('selected-files')).toBeInTheDocument()
+  })
+
+  it('pdf.info usa InspectorLayout sem destino e sem outputDir', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.info')
+    if (!tool) throw new Error('info ausente')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    render(<GenericToolForm tool={tool} />)
+    expect(screen.getByTestId('layout-inspector-pdf.info')).toBeInTheDocument()
+    expect(screen.queryByTestId('output-dir')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('param-outputDir')).not.toBeInTheDocument()
+  })
 
   it('pdf.editor: monta o grid ao selecionar um PDF', async () => {
     const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.editor')

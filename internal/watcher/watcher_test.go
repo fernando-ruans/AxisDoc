@@ -49,6 +49,37 @@ func (s logStep) Run(ctx context.Context, in tool.Input, report func(pct float64
 	return tool.Output{Message: "logged"}, nil
 }
 
+func TestWatcherListAndRemove(t *testing.T) {
+	dir := t.TempDir()
+	logFile := filepath.Join(t.TempDir(), "calls.log")
+	w, err := New(makeRunner(t, logFile))
+	require.NoError(t, err)
+	defer w.Close()
+
+	p := pipeline.Pipeline{ID: "w1", Name: "a", Steps: []pipeline.PipelineStep{{ToolID: "test.log"}}}
+	require.NoError(t, w.AddRule(Rule{ID: "r1", Folder: dir, Pattern: ".txt", Pipeline: p}))
+	require.NoError(t, w.AddRule(Rule{ID: "r2", Folder: dir, Pattern: ".pdf", Pipeline: p}))
+
+	rules := w.ListRules()
+	require.Len(t, rules, 2)
+
+	require.NoError(t, w.RemoveRule("r1"))
+	require.Len(t, w.ListRules(), 1)
+
+	require.ErrorContains(t, w.RemoveRule("nope"), "não encontrada")
+
+	w.Clear()
+	require.Empty(t, w.ListRules())
+}
+
+func TestWatcherInvalidFolder(t *testing.T) {
+	w, err := New(makeRunner(t, filepath.Join(t.TempDir(), "x.log")))
+	require.NoError(t, err)
+	defer w.Close()
+	p := pipeline.Pipeline{ID: "w9", Name: "x"}
+	require.Error(t, w.AddRule(Rule{ID: "bad", Folder: filepath.Join(t.TempDir(), "nope"), Pipeline: p}))
+}
+
 func TestWatcherTriggersPipeline(t *testing.T) {
 	dir := t.TempDir()
 	logFile := filepath.Join(t.TempDir(), "calls.log")

@@ -84,8 +84,35 @@ func TestRegistryContractValidation(t *testing.T) {
 		"default bool invalido": func(f *fakeTool) {
 			f.params = []Param{{Key: "k", Label: "l", Type: ParamBool, Default: "x"}}
 		},
+		"default text invalido": func(f *fakeTool) {
+			f.params = []Param{{Key: "k", Label: "l", Type: ParamText, Default: 1}}
+		},
+		"default select nao-string": func(f *fakeTool) {
+			f.params = []Param{{Key: "k", Label: "l", Type: ParamSelect, Options: []string{"a"}, Default: 1}}
+		},
 		"max menor que min": func(f *fakeTool) {
 			f.params = []Param{{Key: "k", Label: "l", Type: ParamNumber, Min: 10, Max: 1}}
+		},
+		"file sem accept": func(f *fakeTool) {
+			f.params = []Param{{Key: "k", Label: "l", Type: ParamFile}}
+		},
+		"slider sem number": func(f *fakeTool) {
+			f.params = []Param{{Key: "k", Label: "l", Type: ParamText, Widget: WidgetSlider}}
+		},
+		"slider sem max>min": func(f *fakeTool) {
+			f.params = []Param{{Key: "k", Label: "l", Type: ParamNumber, Widget: WidgetSlider, Min: 5, Max: 5}}
+		},
+		"segmented sem select": func(f *fakeTool) {
+			f.params = []Param{{Key: "k", Label: "l", Type: ParamBool, Widget: WidgetSegmented}}
+		},
+		"switch sem bool": func(f *fakeTool) {
+			f.params = []Param{{Key: "k", Label: "l", Type: ParamText, Widget: WidgetSwitch}}
+		},
+		"widget inválido": func(f *fakeTool) {
+			f.params = []Param{{Key: "k", Label: "l", Type: ParamText, Widget: "dial"}}
+		},
+		"visibleIf sem key": func(f *fakeTool) {
+			f.params = []Param{{Key: "k", Label: "l", Type: ParamText, VisibleIf: &VisibleIf{}}}
 		},
 	}
 	for name, mutate := range cases {
@@ -96,6 +123,18 @@ func TestRegistryContractValidation(t *testing.T) {
 			require.Error(t, r.Register(f), "deveria rejeitar: %s", name)
 		})
 	}
+}
+
+func TestRegistryAcceptsNewFields(t *testing.T) {
+	r := NewRegistry()
+	f := validTool("ok")
+	f.params = []Param{
+		{Key: "a", Label: "l", Type: ParamNumber, Default: 1, Min: 0, Max: 10, Widget: WidgetSlider, Hint: "h", Placeholder: "p"},
+		{Key: "b", Label: "l", Type: ParamFile, Accept: []string{".pdf"}},
+		{Key: "c", Label: "l", Type: ParamTextarea},
+		{Key: "d", Label: "l", Type: ParamBool, Widget: WidgetSwitch, VisibleIf: &VisibleIf{Key: "b", Equals: true}},
+	}
+	require.NoError(t, r.Register(f))
 }
 
 func TestRegistryGet(t *testing.T) {

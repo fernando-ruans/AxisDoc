@@ -206,5 +206,24 @@ func TestJobCancelBeforeStart(t *testing.T) {
 	waitForStatus(t, st.Jobs(), j1.ID, store.StatusDone)
 }
 
+func TestJobCancelUnknown(t *testing.T) {
+	mgr, _, _, _ := setupEnv(t, okStep{"s0"})
+	require.ErrorIs(t, mgr.Cancel("inexistente"), store.ErrNotFound)
+}
+
+func TestJobFailWithoutRepo(t *testing.T) {
+	// manager com repo apontando para store fechado: fail() não deve travar
+	st, err := store.Open(t.TempDir() + "/test.db")
+	require.NoError(t, err)
+	em := &fakeEmitter{}
+	reg := tool.NewRegistry()
+	mgr := NewManager(reg, st.Jobs(), em, 2)
+	require.NoError(t, st.Close())
+	_, err = mgr.Enqueue(context.Background(), "nao.existe", nil)
+	require.Error(t, err) // tool desconhecida falha antes do repo
+	done := em.of(EventDone)
+	require.Empty(t, done)
+}
+
 // store2Event evita colisão de nome com store.Status* no teste.
 func store2Event(name string) string { return name }
