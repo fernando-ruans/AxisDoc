@@ -56,7 +56,9 @@ describe('catálogo canônico', () => {
 describe('formulário de cada tool (golden por tool)', () => {
   for (const tool of CANONICAL_CATALOG) {
     // tools migradas para layouts dedicados têm golden próprio abaixo
-    if (['text.qrcode', 'img.convert', 'pdf.info', 'text.barcode', 'text.uuid', 'text.lorem', 'text.epoch'].includes(tool.id)) continue
+    if (['text.qrcode', 'img.convert', 'pdf.info', 'text.barcode', 'text.uuid', 'text.lorem', 'text.epoch',
+      'img.resize', 'img.transform', 'img.filters', 'img.icon', 'img.gifextract', 'img.gifbuild',
+      'img.watermark', 'img.watermarkpos', 'img.palette', 'img.crop'].includes(tool.id)) continue
     it(`${tool.id}: renderiza label + controle para cada param`, async () => {
       if (tool.id === 'ocr.image') {
         // sem backend real de OCR no teste de UI; pula
@@ -168,12 +170,49 @@ describe('formulário de cada tool (golden por tool)', () => {
     ['text.stats', 'layout-inspector-text.stats'],
     ['text.columnize', 'layout-inspector-text.columnize'],
     ['security.hashfile', 'layout-inspector-security.hashfile'],
+    ['img.resize', 'layout-transform-img.resize'],
+    ['img.transform', 'layout-transform-img.transform'],
+    ['img.filters', 'layout-transform-img.filters'],
+    ['img.icon', 'layout-generator-img.icon'],
+    ['img.gifextract', 'layout-transform-img.gifextract'],
+    ['img.gifbuild', 'layout-generator-img.gifbuild'],
+    ['img.watermark', 'layout-transform-img.watermark'],
+    ['img.watermarkpos', 'layout-transform-img.watermarkpos'],
+    ['img.palette', 'layout-inspector-img.palette'],
+    ['img.crop', 'layout-transform-img.crop'],
   ])('%s usa o layout %s', async (id, layoutId) => {
     const tool = CANONICAL_CATALOG.find((t) => t.id === id)
     if (!tool) throw new Error(`${id} ausente`)
     setBackend(backendWith(CANONICAL_CATALOG))
     render(<GenericToolForm tool={tool} />)
     expect(screen.getByTestId(layoutId)).toBeInTheDocument()
+  })
+
+  it('img.resize mostra width só no preset custom', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'img.resize')
+    if (!tool) throw new Error('resize ausente')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    expect(screen.getByTestId('layout-transform-img.resize')).toBeInTheDocument()
+    // default 800: width oculto
+    expect(screen.queryByTestId('param-width')).not.toBeInTheDocument()
+    await user.click(screen.getByTestId('param-preset-custom'))
+    expect(await screen.findByTestId('param-width')).toBeInTheDocument()
+  })
+
+  it('img.watermark alterna texto/imagem por kind', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'img.watermark')
+    if (!tool) throw new Error('watermark ausente')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    // modo texto: text visível, image oculto
+    expect(screen.getByTestId('param-text')).toBeInTheDocument()
+    expect(screen.queryByTestId('param-image')).not.toBeInTheDocument()
+    await user.click(screen.getByTestId('param-kind-image'))
+    await waitFor(() => expect(screen.getByTestId('param-image')).toBeInTheDocument())
+    expect(screen.queryByTestId('param-text')).not.toBeInTheDocument()
   })
 
   it('text.epoch mostra value condicional ao modo', async () => {

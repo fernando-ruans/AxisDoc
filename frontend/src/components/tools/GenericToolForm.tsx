@@ -30,6 +30,17 @@ const LAYOUTS: Record<string, 'transform' | 'generator' | 'inspector'> = {
   'text.stats': 'inspector',
   'text.columnize': 'inspector',
   'security.hashfile': 'inspector',
+  // L2 — imagem
+  'img.resize': 'transform',
+  'img.transform': 'transform',
+  'img.filters': 'transform',
+  'img.icon': 'generator',
+  'img.gifextract': 'transform',
+  'img.gifbuild': 'generator',
+  'img.watermark': 'transform',
+  'img.watermarkpos': 'transform',
+  'img.palette': 'inspector',
+  'img.crop': 'transform',
 }
 
 // Valores iniciais dos params a partir dos defaults.

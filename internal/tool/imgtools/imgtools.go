@@ -138,10 +138,11 @@ func NewResizeImage() *ResizeImage {
 
 func (t *ResizeImage) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "width", Label: "param.img.width.label", Type: tool.ParamNumber, Default: 800, Min: 1, Max: 20000},
-		{Key: "height", Label: "param.img.height.label", Type: tool.ParamNumber, Default: 0, Min: 0, Max: 20000},
-		{Key: "keepAspect", Label: "param.img.keepaspect.label", Type: tool.ParamBool, Default: true},
-		{Key: "outputDir", Label: "param.outputDir.label", Type: tool.ParamFolder},
+		{Key: "preset", Label: "param.img.preset.label", Type: tool.ParamSelect,
+			Options: []string{"custom", "320", "800", "1920", "original"}, Default: "800",
+			Widget: tool.WidgetSegmented, Hint: "param.img.preset.hint"},
+		{Key: "width", Label: "param.img.maxwidth.label", Type: tool.ParamNumber, Default: 800, Min: 1, Max: 20000,
+			VisibleIf: &tool.VisibleIf{Key: "preset", Equals: "custom"}},
 	}
 }
 
@@ -151,20 +152,28 @@ func (t *ResizeImage) Steps() []tool.Step {
 
 func (t *ResizeImage) run(ctx context.Context, in tool.Input, report func(pct float64)) (tool.Output, error) {
 	return batchProcess(ctx, in, report, func(p string) (string, error) {
+		preset := tool.ParamString(in, "preset", "800")
 		w := int(tool.ParamFloat(in, "width", 800))
-		h := int(tool.ParamFloat(in, "height", 0))
-		keep := tool.ParamBoolValue(in, "keepAspect", true)
+		if preset != "custom" && preset != "original" {
+			var v float64
+			fmt.Sscanf(preset, "%g", &v)
+			if v > 0 {
+				w = int(v)
+			}
+		}
 		img, err := decodeImage(p)
 		if err != nil {
 			return "", err
 		}
 		var resized image.Image
-		if keep {
-			resized = imaging.Fit(img, w, orDefault(h, 100000), imaging.Lanczos)
+		if preset == "original" {
+			// só reconverte sem redimensionar
+			resized = img
 		} else {
-			resized = imaging.Resize(img, w, h, imaging.Lanczos)
+			resized = imaging.Fit(img, w, 100000, imaging.Lanczos)
 		}
-		dest := output.NextAvailablePath(filepath.Join(tool.OutputDir(in), fmt.Sprintf("%s_%dx%d%s", fileStem(p), w, resized.Bounds().Dy(), filepath.Ext(p))))
+		b := resized.Bounds()
+		dest := output.NextAvailablePath(filepath.Join(tool.OutputDir(in), fmt.Sprintf("%s_%dx%d%s", fileStem(p), b.Dx(), b.Dy(), filepath.Ext(p))))
 		if err := encodeImage(resized, dest, 90); err != nil {
 			return "", err
 		}
@@ -179,7 +188,8 @@ func orDefault(v, def int) int {
 	return v
 }
 
-// WatermarkImage aplica marca d'água de texto em lote.
+// WatermarkImage aplica marca d'água (texto OU imagem) em lote.
+// Unificada com a antiga watermarkpos: kind seleciona o modo.
 type WatermarkImage struct{ base }
 
 func NewWatermarkImage() *WatermarkImage {
@@ -188,9 +198,19 @@ func NewWatermarkImage() *WatermarkImage {
 
 func (t *WatermarkImage) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "text", Label: "param.pdf.text.label", Type: tool.ParamText, Required: true, Default: "© AxisDoc"},
-		{Key: "opacity", Label: "param.img.opacity.label", Type: tool.ParamNumber, Default: 0.3, Min: 0.05, Max: 1},
-		{Key: "outputDir", Label: "param.outputDir.label", Type: tool.ParamFolder},
+		{Key: "kind", Label: "param.img.wmkind.label", Type: tool.ParamSelect,
+			Options: []string{"text", "image"}, Default: "text", Widget: tool.WidgetSegmented},
+		{Key: "text", Label: "param.pdf.text.label", Type: tool.ParamText, Required: true, Default: "© AxisDoc",
+			VisibleIf: &tool.VisibleIf{Key: "kind", Equals: "text"}},
+		{Key: "opacity", Label: "param.img.opacity.label", Type: tool.ParamNumber, Default: 0.3, Min: 0.05, Max: 1,
+			Widget: tool.WidgetSlider, VisibleIf: &tool.VisibleIf{Key: "kind", Equals: "text"}},
+		{Key: "image", Label: "param.img.wmimage.label", Type: tool.ParamFile, Accept: []string{".png", ".jpg", ".jpeg"},
+			VisibleIf: &tool.VisibleIf{Key: "kind", Equals: "image"}},
+		{Key: "position", Label: "param.img.position.label", Type: tool.ParamSelect,
+			Options: []string{"topLeft", "topRight", "center", "bottomLeft", "bottomRight"}, Default: "bottomRight",
+			Widget: tool.WidgetSegmented, VisibleIf: &tool.VisibleIf{Key: "kind", Equals: "image"}},
+		{Key: "scale", Label: "param.img.wmscale.label", Type: tool.ParamNumber, Default: 20, Min: 5, Max: 90,
+			Widget: tool.WidgetSlider, VisibleIf: &tool.VisibleIf{Key: "kind", Equals: "image"}},
 	}
 }
 
@@ -199,6 +219,10 @@ func (t *WatermarkImage) Steps() []tool.Step {
 }
 
 func (t *WatermarkImage) run(ctx context.Context, in tool.Input, report func(pct float64)) (tool.Output, error) {
+	kind := tool.ParamString(in, "kind", "text")
+	if kind == "image" {
+		return t.runImage(ctx, in, report)
+	}
 	return batchProcess(ctx, in, report, func(p string) (string, error) {
 		text := tool.ParamString(in, "text", "© AxisDoc")
 		opacity := tool.ParamFloat(in, "opacity", 0.3)
@@ -209,6 +233,49 @@ func (t *WatermarkImage) run(ctx context.Context, in tool.Input, report func(pct
 		marked := drawTextWatermark(img, text, opacity)
 		dest := output.NextAvailablePath(filepath.Join(tool.OutputDir(in), fmt.Sprintf("%s_wm%s", fileStem(p), filepath.Ext(p))))
 		if err := encodeImage(marked, dest, 90); err != nil {
+			return "", err
+		}
+		return dest, nil
+	})
+}
+
+// runImage aplica marca d'água por imagem (posicional, migrado da watermarkpos).
+func (t *WatermarkImage) runImage(ctx context.Context, in tool.Input, report func(pct float64)) (tool.Output, error) {
+	wmPath := tool.ParamString(in, "image", "")
+	if wmPath == "" {
+		return tool.Output{}, fmt.Errorf("img.watermark: informe a imagem de marca d'água")
+	}
+	wm, err := decodeImage(wmPath)
+	if err != nil {
+		return tool.Output{}, fmt.Errorf("img.watermark: %w", err)
+	}
+	position := tool.ParamString(in, "position", "bottomRight")
+	scale := tool.ParamFloat(in, "scale", 20)
+	const margin = 20
+	return batchProcess(ctx, in, report, func(p string) (string, error) {
+		img, err := decodeImage(p)
+		if err != nil {
+			return "", err
+		}
+		b := img.Bounds()
+		target := int(float64(b.Dx()) * scale / 100)
+		scaled := imaging.Resize(wm, target, 0, imaging.Lanczos)
+		var pos image.Point
+		switch position {
+		case "topRight":
+			pos = image.Pt(b.Dx()-scaled.Bounds().Dx()-margin, margin)
+		case "center":
+			pos = image.Pt((b.Dx()-scaled.Bounds().Dx())/2, (b.Dy()-scaled.Bounds().Dy())/2)
+		case "bottomLeft":
+			pos = image.Pt(margin, b.Dy()-scaled.Bounds().Dy()-margin)
+		case "bottomRight":
+			pos = image.Pt(b.Dx()-scaled.Bounds().Dx()-margin, b.Dy()-scaled.Bounds().Dy()-margin)
+		default:
+			pos = image.Pt(margin, margin)
+		}
+		composed := imaging.Paste(imaging.Clone(img), scaled, pos)
+		dest := output.NextAvailablePath(filepath.Join(tool.OutputDir(in), fmt.Sprintf("%s_wm%s", fileStem(p), filepath.Ext(p))))
+		if err := encodeImage(composed, dest, 92); err != nil {
 			return "", err
 		}
 		return dest, nil

@@ -69,7 +69,7 @@ func TestResizeImage(t *testing.T) {
 
 	out, err := runTool(t, NewResizeImage(), tool.Input{
 		Paths:  []string{p},
-		Params: map[string]any{"width": 100.0, "height": 0.0, "keepAspect": true},
+		Params: map[string]any{"preset": "custom", "width": 100.0},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -99,7 +99,7 @@ func TestWatermarkImage(t *testing.T) {
 
 	out, err := runTool(t, NewWatermarkImage(), tool.Input{
 		Paths:  []string{p},
-		Params: map[string]any{"text": "TESTE", "opacity": 0.5},
+		Params: map[string]any{"kind": "text", "text": "TESTE", "opacity": 0.5},
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -109,6 +109,19 @@ func TestWatermarkImage(t *testing.T) {
 	}
 	if !strings.Contains(out.Paths[0], "_wm") {
 		t.Fatalf("nome sem sufixo wm: %s", out.Paths[0])
+	}
+	// modo imagem: usa logo como marca
+	wm := filepath.Join(dir, "logo.png")
+	createTestImage(t, wm, 40, 20)
+	out, err = runTool(t, NewWatermarkImage(), tool.Input{
+		Paths:  []string{p},
+		Params: map[string]any{"kind": "image", "image": wm, "position": "center", "scale": 20.0},
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(out.Paths) != 1 {
+		t.Fatalf("modo imagem: esperado 1 saída, obtido %d", len(out.Paths))
 	}
 }
 

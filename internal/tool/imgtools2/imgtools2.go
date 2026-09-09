@@ -121,13 +121,14 @@ func NewCrop() *Crop {
 
 func (t *Crop) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "x", Label: "param.img.x.label", Type: tool.ParamNumber, Default: 0, Min: 0},
+		{Key: "ratio", Label: "param.img.ratio.label", Type: tool.ParamSelect,
+			Options: []string{"free", "1:1", "4:3", "16:9"}, Default: "free", Widget: tool.WidgetSegmented,
+			Hint: "param.img.ratio.hint"},
+		{Key: "x", Label: "param.img.x.label", Type: tool.ParamNumber, Default: 0, Min: 0,
+			Hint: "param.img.coords.hint"},
 		{Key: "y", Label: "param.img.y.label", Type: tool.ParamNumber, Default: 0, Min: 0},
 		{Key: "w", Label: "param.img.width.label", Type: tool.ParamNumber, Default: 100, Min: 1},
 		{Key: "h", Label: "param.img.height.label", Type: tool.ParamNumber, Default: 100, Min: 1},
-		{Key: "anchor", Label: "param.img.anchor.label", Type: tool.ParamSelect,
-			Options: []string{"topLeft", "center", "topRight", "bottomLeft", "bottomRight"}, Default: "topLeft"},
-		outputDirParam(),
 	}
 }
 
@@ -153,7 +154,7 @@ func anchorFrom(s string) imaging.Anchor {
 func (t *Crop) run(ctx context.Context, in tool.Input, report func(pct float64)) (tool.Output, error) {
 	w := int(tool.ParamFloat(in, "w", 100))
 	h := int(tool.ParamFloat(in, "h", 100))
-	anchor := anchorFrom(tool.ParamString(in, "anchor", "topLeft"))
+	ratio := tool.ParamString(in, "ratio", "free")
 	return batch(ctx, in, report, func(p string) (string, error) {
 		img, err := openImage(p)
 		if err != nil {
@@ -165,13 +166,16 @@ func (t *Crop) run(ctx context.Context, in tool.Input, report func(pct float64))
 		if x > b.Dx() || y > b.Dy() {
 			return "", fmt.Errorf("coordenada fora da imagem")
 		}
-		rect := image.Rect(b.Min.X+x, b.Min.Y+y, b.Min.X+x+w, b.Min.Y+y+h)
-		if anchor != imaging.TopLeft {
-			rect = b.Intersect(image.Rect(
-				b.Min.X+b.Dx()/2-w/2-(b.Max.X-b.Min.X-x-w)/2, b.Min.Y+y,
-				b.Min.X+b.Dx()/2-w/2-(b.Max.X-b.Min.X-x-w)/2+w, b.Min.Y+y+h,
-			))
+		if ratio != "free" {
+			// proporção trava h a partir de w
+			var rw, rh float64 = 1, 1
+			fmt.Sscanf(ratio, "%g:%g", &rw, &rh)
+			if rw > 0 && rh > 0 {
+				h = int(float64(w) * rh / rw)
+			}
 		}
+		rect := image.Rect(b.Min.X+x, b.Min.Y+y, b.Min.X+x+w, b.Min.Y+y+h)
+		rect = b.Intersect(rect)
 		if rect.Dx() <= 0 || rect.Dy() <= 0 {
 			return "", fmt.Errorf("área de recorte vazia")
 		}
@@ -195,8 +199,8 @@ func NewTransform() *Transform {
 func (t *Transform) Params() []tool.Param {
 	return []tool.Param{
 		{Key: "op", Label: "param.img.transform.label", Type: tool.ParamSelect,
-			Options: []string{"rotate90", "rotate180", "rotate270", "flipH", "flipV"}, Default: "rotate90"},
-		outputDirParam(),
+			Options: []string{"rotate90", "rotate180", "rotate270", "flipH", "flipV"}, Default: "rotate90",
+			Widget: tool.WidgetCards},
 	}
 }
 
@@ -250,9 +254,9 @@ func (t *Filters) Params() []tool.Param {
 	return []tool.Param{
 		{Key: "filter", Label: "param.img.filter.label", Type: tool.ParamSelect,
 			Options: []string{"grayscale", "invert", "blur", "sharpen", "sepia", "contrast", "brightness"},
-			Default: "grayscale"},
-		{Key: "strength", Label: "param.img.opacity.label", Type: tool.ParamNumber, Default: 5, Min: 0, Max: 10},
-		outputDirParam(),
+			Default: "grayscale", Widget: tool.WidgetCards},
+		{Key: "strength", Label: "param.img.strength.label", Type: tool.ParamNumber, Default: 5, Min: 0, Max: 10,
+			Widget: tool.WidgetSlider, Hint: "param.img.strength.hint"},
 	}
 }
 
@@ -483,7 +487,8 @@ func NewGIFBuild() *GIFBuild {
 
 func (t *GIFBuild) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "delay", Label: "param.gif.delay.label", Type: tool.ParamNumber, Default: 100, Min: 20, Max: 5000},
+		{Key: "delay", Label: "param.gif.delay.label", Type: tool.ParamNumber, Default: 100, Min: 20, Max: 5000,
+			Widget: tool.WidgetSlider},
 		{Key: "outputPath", Label: "param.outputPath.label", Type: tool.ParamOutput, Default: "animacao.gif"},
 	}
 }
@@ -559,7 +564,8 @@ func palette256(img image.Image) color.Palette {
 }
 
 // ---- 7. Marca d'água posicional ----
-
+// NOTA: fundida na tool img.watermark (kind=image). Mantida aqui como alias
+// legado para macros salvas antigas; delega para o mesmo comportamento.
 type WatermarkPos struct{ base }
 
 func NewWatermarkPos() *WatermarkPos {
@@ -568,13 +574,13 @@ func NewWatermarkPos() *WatermarkPos {
 
 func (t *WatermarkPos) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "image", Label: "param.img.wmimage.label", Type: tool.ParamText, Required: true, Default: ""},
+		{Key: "image", Label: "param.img.wmimage.label", Type: tool.ParamFile, Required: true, Default: "",
+			Accept: []string{".png", ".jpg", ".jpeg"}},
 		{Key: "position", Label: "param.img.position.label", Type: tool.ParamSelect,
 			Options: []string{"topLeft", "topRight", "center", "bottomLeft", "bottomRight"},
-			Default: "bottomRight"},
-		{Key: "scale", Label: "param.img.wmscale.label", Type: tool.ParamNumber, Default: 20, Min: 5, Max: 90},
-		{Key: "margin", Label: "param.img.margin.label", Type: tool.ParamNumber, Default: 20, Min: 0, Max: 500},
-		outputDirParam(),
+			Default: "bottomRight", Widget: tool.WidgetSegmented},
+		{Key: "scale", Label: "param.img.wmscale.label", Type: tool.ParamNumber, Default: 20, Min: 5, Max: 90,
+			Widget: tool.WidgetSlider},
 	}
 }
 
@@ -608,7 +614,7 @@ func (t *WatermarkPos) run(ctx context.Context, in tool.Input, report func(pct f
 	}
 	position := tool.ParamString(in, "position", "bottomRight")
 	scale := tool.ParamFloat(in, "scale", 20)
-	margin := int(tool.ParamFloat(in, "margin", 20))
+	const margin = 20
 	return batch(ctx, in, report, func(p string) (string, error) {
 		img, err := openImage(p)
 		if err != nil {
