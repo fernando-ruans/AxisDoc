@@ -2,7 +2,7 @@ import type React from 'react'
 import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
-  Moon, Sun, History, FileSearch, Download, ChevronDown,
+  Moon, Sun, History, FileSearch, Download, ChevronDown, PanelLeftClose, PanelLeftOpen, House,
   Search as SearchIcon, Workflow, FolderClock,
 } from 'lucide-react'
 import { useCatalog } from '../stores/catalog'
@@ -32,8 +32,15 @@ export function AppShell(): React.JSX.Element {
   const [selected, setSelected] = useState<string | null>(null)
   // view única: 'tool' | 'search' | 'pipelines' | 'watch' | 'jobs' — Jobs virou
   // view como as demais (antes era toggle sobreposto, que escondia a seleção).
-  const [view, setView] = useState<'tool' | 'search' | 'pipelines' | 'watch' | 'jobs'>('tool')
+  const [view, setView] = useState<'tool' | 'search' | 'pipelines' | 'watch' | 'jobs' | 'home'>('home')
   const [updateTag, setUpdateTag] = useState<string | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem('axisdoc.sidebar') !== 'closed'
+    } catch {
+      return true
+    }
+  })
   // seções colapsáveis da sidebar (lembra do localStorage)
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>(() => {
     try {
@@ -51,6 +58,20 @@ export function AppShell(): React.JSX.Element {
   const goTool = (id: string): void => {
     setSelected(id)
     setView('tool')
+  }
+  const goHome = (): void => {
+    setSelected(null)
+    setView('home')
+  }
+  const toggleSidebar = (): void => {
+    setSidebarOpen((prev) => {
+      try {
+        localStorage.setItem('axisdoc.sidebar', prev ? 'closed' : 'open')
+      } catch {
+        // storage indisponível: mantém só em memória
+      }
+      return !prev
+    })
   }
   const toggleSection = (cat: string): void => {
     setCollapsed((prev) => {
@@ -99,6 +120,7 @@ export function AppShell(): React.JSX.Element {
 
   // tools visíveis no menu de navegação rápida (rodapé)
   const navItems = [
+    { view: 'home' as const, icon: House, label: t('home.title'), testid: 'nav-home' },
     { view: 'search' as const, icon: SearchIcon, label: t('search.title'), testid: 'nav-search' },
     { view: 'pipelines' as const, icon: Workflow, label: t('pipelines.title'), testid: 'nav-pipelines' },
     { view: 'watch' as const, icon: FolderClock, label: t('watch.title'), testid: 'nav-watch' },
@@ -107,19 +129,22 @@ export function AppShell(): React.JSX.Element {
 
   return (
     <div className="flex h-screen bg-bg text-text">
-      <aside className="flex w-64 flex-col border-r border-border bg-surface" data-testid="sidebar">
-        <div className="border-b border-border px-4 py-4">
+      {sidebarOpen && (
+      <aside className="flex w-64 shrink-0 flex-col border-r border-border bg-surface" data-testid="sidebar">
+        <div className="border-b border-border px-4 py-3">
           <div className="flex items-center gap-2.5">
             <img
               src="logo.png"
               alt=""
-              className="h-9 w-9"
+              className="h-11 w-11"
               draggable={false}
               data-testid="app-logo"
             />
-            <h1 className="text-lg font-bold tracking-tight">{t('app.name')}</h1>
+            <div className="min-w-0 leading-tight">
+              <h1 className="text-lg font-bold tracking-tight">{t('app.name')}</h1>
+              <p className="truncate text-[11px] text-text-muted" title={t('app.tagline')}>{t('app.tagline')}</p>
+            </div>
           </div>
-          <p className="mt-1 text-xs text-text-muted">{t('app.tagline')}</p>
         </div>
 
         <button
@@ -216,6 +241,16 @@ export function AppShell(): React.JSX.Element {
             )
           })}
           <button
+            onClick={toggleSidebar}
+            className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-2"
+            data-testid="toggle-sidebar"
+            aria-label={t('app.hideSidebar')}
+            title={t('app.hideSidebar')}
+          >
+            <PanelLeftClose className="h-4 w-4 shrink-0" />
+            <span className="flex-1 text-left">{t('app.hideSidebar')}</span>
+          </button>
+          <button
             onClick={toggleTheme}
             className="flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm text-text hover:bg-surface-2"
             data-testid="toggle-theme"
@@ -232,6 +267,18 @@ export function AppShell(): React.JSX.Element {
           )}
         </div>
       </aside>
+      )}
+      {!sidebarOpen && (
+        <button
+          type="button"
+          onClick={toggleSidebar}
+          title={t('app.showSidebar')}
+          data-testid="show-sidebar"
+          className="absolute left-2 top-2 z-40 rounded-md border border-border bg-surface p-2 text-text-muted hover:text-text"
+        >
+          <PanelLeftOpen className="h-4 w-4" />
+        </button>
+      )}
 
       <main className="flex-1 overflow-y-auto p-8" data-testid="main">
         {view === 'jobs' ? (
@@ -245,12 +292,7 @@ export function AppShell(): React.JSX.Element {
           <PipelinesPage />
         ) : view === 'watch' ? (
           <WatchPage />
-        ) : selectedTool ? (
-          <div className="mx-auto max-w-2xl" data-testid="tool-page">
-            <ToolHeader tool={selectedTool} />
-            <GenericToolForm tool={selectedTool} />
-          </div>
-        ) : (
+        ) : view === 'home' || selectedTool == null ? (
           <HomeDashboard
             tools={tools}
             onSelect={(id) => {
@@ -258,6 +300,11 @@ export function AppShell(): React.JSX.Element {
               setSelected(id)
             }}
           />
+        ) : (
+          <div className="mx-auto max-w-2xl" data-testid="tool-page">
+            <ToolHeader tool={selectedTool} />
+            <GenericToolForm tool={selectedTool} />
+          </div>
         )}
       </main>
 

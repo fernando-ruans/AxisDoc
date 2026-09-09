@@ -6,9 +6,12 @@ export const en: Dict = {
     tagline: 'Office toolkit — 100% offline',
     search: 'Search tools… (Ctrl+K)',
     theme: 'Toggle theme',
+    hideSidebar: 'Hide sidebar',
+    showSidebar: 'Show sidebar',
     noTools: 'No tools found',
   },
   home: {
+    title: 'Home',
     popular: 'Most used',
     recent: 'Recent',
   },

@@ -36,14 +36,6 @@ export function HomeDashboard({ tools, onSelect }: { tools: ToolInfo[]; onSelect
 
   return (
     <div className="mx-auto max-w-3xl space-y-8" data-testid="home-dashboard">
-      <div className="flex items-center gap-4">
-        <img src="logo.png" alt="" className="h-14 w-14" draggable={false} />
-        <div>
-          <h2 className="text-2xl font-bold text-text">{t('app.name')}</h2>
-          <p className="text-sm text-text-muted">{t('app.tagline')}</p>
-        </div>
-      </div>
-
       {popular.length > 0 && (
         <section>
           <h3 className="mb-2 text-sm font-semibold uppercase tracking-wide text-text-muted">

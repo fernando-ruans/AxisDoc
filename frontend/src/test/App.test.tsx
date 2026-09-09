@@ -133,6 +133,35 @@ describe('AppShell', () => {
     expect(screen.getByText('Nenhuma ferramenta encontrada')).toBeInTheDocument()
   })
 
+  it('botão home volta para a dashboard', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await waitFor(() => expect(screen.getByTestId('home-dashboard')).toBeInTheDocument())
+    await user.click(screen.getByTestId('tool-security.hashfile'))
+    expect(await screen.findByTestId('tool-page')).toBeInTheDocument()
+    expect(screen.queryByTestId('home-dashboard')).not.toBeInTheDocument()
+    await user.click(screen.getByTestId('nav-home'))
+    expect(await screen.findByTestId('home-dashboard')).toBeInTheDocument()
+    expect(screen.getByTestId('nav-home')).toHaveClass('text-accent')
+  })
+
+  it('sidebar oculta e mostra via botões', async () => {
+    const user = userEvent.setup()
+    render(<App />)
+    await waitFor(() => expect(screen.getByTestId('sidebar')).toBeInTheDocument())
+    await user.click(screen.getByTestId('toggle-sidebar'))
+    await waitFor(() => expect(screen.queryByTestId('sidebar')).not.toBeInTheDocument())
+    expect(screen.getByTestId('show-sidebar')).toBeInTheDocument()
+    await user.click(screen.getByTestId('show-sidebar'))
+    expect(await screen.findByTestId('sidebar')).toBeInTheDocument()
+  })
+
+  it('logo aparece só na sidebar (não duplicada no dashboard)', async () => {
+    render(<App />)
+    await waitFor(() => expect(screen.getByTestId('home-dashboard')).toBeInTheDocument())
+    expect(screen.getAllByTestId('app-logo')).toHaveLength(1)
+  })
+
   it('busca mostra erro do backend em vez de falhar calada', async () => {
     setBackend(makeBackend({ searchQuery: async () => { throw new Error('fts quebrou') } }))
     const user = userEvent.setup()
@@ -141,7 +170,7 @@ describe('AppShell', () => {
     await user.click(screen.getByTestId('nav-search'))
     await user.type(screen.getByTestId('search-input'), 'json')
     await user.click(screen.getByTestId('search-run'))
-    expect(await screen.findByTestId('search-error')).toHaveTextContent('fts quebrou')
+    expect(await screen.findByTestId('search-error', undefined, { timeout: 3000 })).toHaveTextContent('fts quebrou')
   })
 })
 

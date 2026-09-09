@@ -5,8 +5,11 @@ export const ptBR = {
     search: 'Buscar ferramentas… (Ctrl+K)',
     theme: 'Alternar tema',
     noTools: 'Nenhuma ferramenta encontrada',
+    hideSidebar: 'Ocultar barra lateral',
+    showSidebar: 'Mostrar barra lateral',
   },
   home: {
+    title: 'Início',
     popular: 'Mais usadas',
     recent: 'Recentes',
   },

@@ -6,9 +6,12 @@ export const es: Dict = {
     tagline: 'Kit de herramientas de oficina — 100% offline',
     search: 'Buscar herramientas… (Ctrl+K)',
     theme: 'Cambiar tema',
+    hideSidebar: 'Ocultar barra lateral',
+    showSidebar: 'Mostrar barra lateral',
     noTools: 'No se encontraron herramientas',
   },
   home: {
+    title: 'Inicio',
     popular: 'Más usadas',
     recent: 'Recientes',
   },
