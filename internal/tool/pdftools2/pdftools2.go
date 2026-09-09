@@ -4,14 +4,19 @@
 package pdftools2
 
 import (
+	"bytes"
 	"context"
 	"fmt"
+	"image"
+	"image/png"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/go-pdf/fpdf"
 	"github.com/pdfcpu/pdfcpu/pkg/api"
+	"github.com/pdfcpu/pdfcpu/pkg/pdfcpu/model"
 	"github.com/sergi/go-diff/diffmatchpatch"
 
 	"github.com/ferna/axisdoc/internal/output"
@@ -73,14 +78,66 @@ func extractPagesToDir(p string, pages []string, outDir string) error {
 }
 
 // extractImagesToDir extrai imagens via API com Reader.
+// Digest próprio: lê img.Reader (stream já decodificado pelo pdfcpu quando
+// possível), decodifica e grava PNG. Evita o WriteImageToDisk, cujo staged
+// file (rename via fileutil) se perde neste fluxo.
 func extractImagesToDir(p string, pages []string, outDir string) error {
+	if err := os.MkdirAll(outDir, 0o755); err != nil {
+		return err
+	}
 	f, err := os.Open(p)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	fnBase := strings.TrimSuffix(filepath.Base(p), filepath.Ext(p))
-	return api.ExtractImages(f, pages, api.WriteImageToDisk(outDir, fnBase), nil)
+	return api.ExtractImages(f, pages, writeImagePNG(outDir, fileStem(p)), nil)
+}
+
+// writeImagePNG decodifica o stream da imagem e grava PNG com nome estável.
+func writeImagePNG(outDir, fnBase string) func(model.Image, bool, int) error {
+	return func(img model.Image, singleImgPerPage bool, maxPageDigits int) error {
+		if img.Reader == nil {
+			return fmt.Errorf("image obj#%d: sem dados", img.ObjNr)
+		}
+		raw, err := io.ReadAll(img.Reader)
+		if err != nil {
+			return fmt.Errorf("image obj#%d: ler: %w", img.ObjNr, err)
+		}
+		decoded, _, err := image.Decode(bytes.NewReader(raw))
+		if err != nil {
+			return fmt.Errorf("image obj#%d: decodificar (%s): %w", img.ObjNr, img.FileType, err)
+		}
+		out := filepath.Join(outDir, fmt.Sprintf("%s_p%d.%s", fnBase, img.PageNr, imgExt(img.FileType)))
+		dest := output.NextAvailablePath(out)
+		data, err := encodePNG(decoded)
+		if err != nil {
+			return err
+		}
+		return output.WriteFile(dest, data)
+	}
+}
+
+func imgExt(fileType string) string {
+	switch strings.ToLower(strings.TrimSpace(fileType)) {
+	case "jpg", "jpeg":
+		return "jpg"
+	case "png":
+		return "png"
+	case "tif", "tiff":
+		return "tiff"
+	case "jp2", "jpx":
+		return "jp2"
+	default:
+		return "png"
+	}
+}
+
+func encodePNG(img image.Image) ([]byte, error) {
+	var buf bytes.Buffer
+	if err := png.Encode(&buf, img); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
 }
 
 // extractFontsToDir extrai fontes via API com Reader.
@@ -197,13 +254,17 @@ func (t *ExtractImages) run(_ context.Context, in tool.Input, report func(pct fl
 			return tool.Output{}, fmt.Errorf("pdf.extractimages: %w", err)
 		}
 		files, err := collectFiles(work)
+		if err != nil {
+			os.RemoveAll(work)
+			return tool.Output{}, err
+		}
+		moved, err := copyOut(files, in)
 		os.RemoveAll(work)
 		if err != nil {
 			return tool.Output{}, err
 		}
-		moved, err := copyOut(files, in)
-		if err != nil {
-			return tool.Output{}, err
+		if len(files) == 0 {
+			return tool.Output{Message: "nenhuma imagem embutida encontrada"}, nil
 		}
 		outs = append(outs, moved...)
 	}

@@ -1097,12 +1097,27 @@
     ],
     "params": [
       {
+        "key": "kind",
+        "label": "param.img.wmkind.label",
+        "type": "select",
+        "options": [
+          "text",
+          "image"
+        ],
+        "default": "text",
+        "widget": "segmented"
+      },
+      {
         "key": "text",
         "label": "param.pdf.text.label",
         "type": "text",
         "default": "CONFIDENCIAL",
         "required": true,
-        "placeholder": "param.pdfwm.placeholder"
+        "placeholder": "param.pdfwm.placeholder",
+        "visibleIf": {
+          "key": "kind",
+          "equals": "text"
+        }
       },
       {
         "key": "fontSize",
@@ -1111,6 +1126,55 @@
         "default": 48,
         "min": 6,
         "max": 200,
+        "visibleIf": {
+          "key": "kind",
+          "equals": "text"
+        },
+        "widget": "slider"
+      },
+      {
+        "key": "image",
+        "label": "param.img.wmimage.label",
+        "type": "file",
+        "visibleIf": {
+          "key": "kind",
+          "equals": "image"
+        },
+        "accept": [
+          ".png",
+          ".jpg",
+          ".jpeg"
+        ]
+      },
+      {
+        "key": "position",
+        "label": "param.img.position.label",
+        "type": "select",
+        "options": [
+          "topLeft",
+          "topRight",
+          "center",
+          "bottomLeft",
+          "bottomRight"
+        ],
+        "default": "bottomRight",
+        "visibleIf": {
+          "key": "kind",
+          "equals": "image"
+        },
+        "widget": "segmented"
+      },
+      {
+        "key": "scale",
+        "label": "param.img.wmscale.label",
+        "type": "number",
+        "default": 20,
+        "min": 5,
+        "max": 90,
+        "visibleIf": {
+          "key": "kind",
+          "equals": "image"
+        },
         "widget": "slider"
       }
     ]

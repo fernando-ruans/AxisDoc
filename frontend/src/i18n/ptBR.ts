@@ -505,6 +505,7 @@ export const ptBR = {
     rows: 'linhas',
     cols: 'colunas',
     compare: 'Antes × depois — arraste para comparar',
+    batchNote: 'Lote: o preview ao vivo usa o 1º arquivo; o Executar processa todos',
   },
   pdfeditor: {
     apply: 'Aplicar edições',

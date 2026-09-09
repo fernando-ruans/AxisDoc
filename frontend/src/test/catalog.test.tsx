@@ -386,6 +386,46 @@ describe('formulário de cada tool (golden por tool)', () => {
     expect(screen.queryByTestId('param-text')).not.toBeInTheDocument()
   })
 
+  it('pdf.watermark alterna texto/imagem por kind', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.watermark')
+    if (!tool) throw new Error('pdf watermark ausente')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    expect(screen.getByTestId('layout-transform-pdf.watermark')).toBeInTheDocument()
+    expect(screen.getByTestId('param-text')).toBeInTheDocument()
+    expect(screen.queryByTestId('param-image')).not.toBeInTheDocument()
+    await user.click(screen.getByTestId('param-kind-image'))
+    await waitFor(() => expect(screen.getByTestId('param-image')).toBeInTheDocument())
+    expect(screen.queryByTestId('param-text')).not.toBeInTheDocument()
+  })
+
+  it('live preview aparece para 1 arquivo e some a nota de lote', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'img.transform')
+    if (!tool) throw new Error('transform ausente')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    // mock retorna 2 arquivos → nota de lote, sem live de arquivo único
+    await user.click(screen.getByTestId('pick-files'))
+    expect(await screen.findByTestId('live-batch-note')).toBeInTheDocument()
+    expect(screen.queryByTestId('live-transform')).not.toBeInTheDocument()
+  })
+
+  it('transform com imagem mostra live preview ao mudar opção', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'img.transform')
+    if (!tool) throw new Error('transform ausente')
+    setBackend(backendWith(CANONICAL_CATALOG, { pickFiles: async () => ['C:/fixtures/foto.png'] }))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    await user.click(screen.getByTestId('pick-files'))
+    // live preview do 1º arquivo aparece (mock retorna PNG 1x1)
+    await waitFor(() => expect(screen.getByTestId('live-transform-image')).toBeInTheDocument(), { timeout: 3000 })
+    // trocar a opção atualiza (debounce dispara de novo, sem erro)
+    await user.click(screen.getByTestId('param-op-flipH'))
+    await waitFor(() => expect(screen.getByTestId('live-transform-image')).toBeInTheDocument(), { timeout: 3000 })
+  })
+
   it('text.epoch mostra value condicional ao modo', async () => {
     const tool = CANONICAL_CATALOG.find((t) => t.id === 'text.epoch')
     if (!tool) throw new Error('epoch ausente')

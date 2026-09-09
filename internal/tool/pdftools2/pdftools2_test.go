@@ -46,6 +46,19 @@ func itoa2(n int) string {
 	return string(b[i:])
 }
 
+// makePDFWithImage gera um PDF com uma imagem embutida (via fpdf + arquivo PNG).
+func makePDFWithImage(t *testing.T, path, imgPath string) {
+	t.Helper()
+	doc := fpdf.New("P", "mm", "A4", "")
+	doc.AddPage()
+	doc.SetFont("Helvetica", "", 14)
+	doc.MultiCell(0, 8, "PDF com imagem embutida para teste de extração.", "", "L", false)
+	doc.Image(imgPath, 10, 40, 100, 0, false, "", 0, "")
+	if err := doc.OutputFileAndClose(path); err != nil {
+		t.Fatalf("criar PDF com imagem: %v", err)
+	}
+}
+
 func runOne(t *testing.T, tl tool.Tool, in tool.Input) tool.Output {
 	t.Helper()
 	out, err := tl.Steps()[0].Run(context.Background(), in, nil)
@@ -63,12 +76,28 @@ func runOneRaw(t *testing.T, tl tool.Tool, in tool.Input) (tool.Output, error) {
 
 func TestExtractImagesRoundTrip(t *testing.T) {
 	dir := t.TempDir()
-	// PDF com imagem embutida: gera via fpdf? fpdf não embute PNG facilmente sem arquivo.
-	// Usa PDF de texto: extração retorna 0 imagens, mas não pode falhar.
+	// PDF com imagem real embutida via fpdf (PNG gerado em disco).
+	img := filepath.Join(dir, "foto.png")
+	writePNG1x1(t, img)
 	p := filepath.Join(dir, "doc.pdf")
-	makePDF(t, p, 2)
+	makePDFWithImage(t, p, img)
 	out := runOne(t, NewExtractImages(), tool.Input{Paths: []string{p}})
-	t.Logf("imagens: %s", out.Message)
+	if len(out.Paths) == 0 {
+		t.Fatalf("esperado ≥1 imagem, obtido: %s", out.Message)
+	}
+	for _, f := range out.Paths {
+		if st, err := os.Stat(f); err != nil || st.Size() == 0 {
+			t.Fatalf("imagem extraída inválida: %s (%v)", f, err)
+		}
+	}
+
+	// PDF só de texto: mensagem clara, sem falha e sem paths
+	p2 := filepath.Join(dir, "texto.pdf")
+	makePDF(t, p2, 1)
+	out = runOne(t, NewExtractImages(), tool.Input{Paths: []string{p2}})
+	if len(out.Paths) != 0 || !strings.Contains(out.Message, "nenhuma imagem") {
+		t.Fatalf("texto puro deveria reportar ausência: %+v", out)
+	}
 }
 
 func TestExtractPagesAndRemove(t *testing.T) {

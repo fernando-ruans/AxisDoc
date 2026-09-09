@@ -507,6 +507,7 @@ export const en: Dict = {
     rows: 'rows',
     cols: 'columns',
     compare: 'Before × after — drag to compare',
+    batchNote: 'Batch: live preview uses the 1st file; Run processes all',
   },
   pdfeditor: {
     apply: 'Apply edits',

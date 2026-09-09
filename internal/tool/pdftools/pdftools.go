@@ -253,10 +253,23 @@ func NewWatermarkPDF() *WatermarkPDF {
 
 func (t *WatermarkPDF) Params() []tool.Param {
 	return []tool.Param{
+		{Key: "kind", Label: "param.img.wmkind.label", Type: tool.ParamSelect,
+			Options: []string{"text", "image"}, Default: "text", Widget: tool.WidgetSegmented},
 		{Key: "text", Label: "param.pdf.text.label", Type: tool.ParamText, Required: true, Default: "CONFIDENCIAL",
-			Placeholder: "param.pdfwm.placeholder"},
+			Placeholder: "param.pdfwm.placeholder",
+			VisibleIf: &tool.VisibleIf{Key: "kind", Equals: "text"}},
 		{Key: "fontSize", Label: "param.pdf.fontsize.label", Type: tool.ParamNumber, Default: 48, Min: 6, Max: 200,
-			Widget: tool.WidgetSlider},
+			Widget: tool.WidgetSlider,
+			VisibleIf: &tool.VisibleIf{Key: "kind", Equals: "text"}},
+		{Key: "image", Label: "param.img.wmimage.label", Type: tool.ParamFile, Accept: []string{".png", ".jpg", ".jpeg"},
+			VisibleIf: &tool.VisibleIf{Key: "kind", Equals: "image"}},
+		{Key: "position", Label: "param.img.position.label", Type: tool.ParamSelect,
+			Options: []string{"topLeft", "topRight", "center", "bottomLeft", "bottomRight"}, Default: "bottomRight",
+			Widget: tool.WidgetSegmented,
+			VisibleIf: &tool.VisibleIf{Key: "kind", Equals: "image"}},
+		{Key: "scale", Label: "param.img.wmscale.label", Type: tool.ParamNumber, Default: 20, Min: 5, Max: 90,
+			Widget: tool.WidgetSlider,
+			VisibleIf: &tool.VisibleIf{Key: "kind", Equals: "image"}},
 	}
 }
 
@@ -267,6 +280,9 @@ func (t *WatermarkPDF) Steps() []tool.Step {
 func (t *WatermarkPDF) run(_ context.Context, in tool.Input, _ func(pct float64)) (tool.Output, error) {
 	if len(in.Paths) == 0 {
 		return tool.Output{}, fmt.Errorf("pdf.watermark: nenhum arquivo")
+	}
+	if tool.ParamString(in, "kind", "text") == "image" {
+		return t.runImage(in)
 	}
 	text := tool.ParamString(in, "text", "CONFIDENCIAL")
 	fontSize := int(tool.ParamFloat(in, "fontSize", 48))
@@ -285,6 +301,52 @@ func (t *WatermarkPDF) run(_ context.Context, in tool.Input, _ func(pct float64)
 		outs = append(outs, dest)
 	}
 	return tool.Output{Paths: outs, Message: fmt.Sprintf("marca d'água aplicada em %d arquivo(s)", len(outs))}, nil
+}
+
+// runImage aplica marca d'água por imagem com posição e escala
+// (espelha a img.watermark unificada; via stamp de imagem do pdfcpu).
+func (t *WatermarkPDF) runImage(in tool.Input) (tool.Output, error) {
+	imgPath := tool.ParamString(in, "image", "")
+	if imgPath == "" {
+		return tool.Output{}, fmt.Errorf("pdf.watermark: informe a imagem de marca d'água")
+	}
+	if _, err := os.Stat(imgPath); err != nil {
+		return tool.Output{}, fmt.Errorf("pdf.watermark: imagem não encontrada: %w", err)
+	}
+	position := tool.ParamString(in, "position", "bottomRight")
+	scale := tool.ParamFloat(in, "scale", 20)
+	desc := fmt.Sprintf("pos:%s, scalefactor:%.2f rel", wmPos(position), scale/100)
+	wm, err := api.ImageWatermark(imgPath, desc, true, false, types.POINTS)
+	if err != nil {
+		return tool.Output{}, fmt.Errorf("pdf.watermark: %w", err)
+	}
+	var outs []string
+	for _, p := range in.Paths {
+		dest := output.NextAvailablePath(filepath.Join(tool.OutputDir(in), fmt.Sprintf("%s_wm.pdf", fileStem(p))))
+		if err := api.AddWatermarksFile(p, dest, nil, wm, nil); err != nil {
+			return tool.Output{}, fmt.Errorf("pdf.watermark: %w", err)
+		}
+		outs = append(outs, dest)
+	}
+	return tool.Output{Paths: outs, Message: fmt.Sprintf("marca d'água (imagem) aplicada em %d arquivo(s)", len(outs))}, nil
+}
+
+// wmPos mapeia posição da UI para âncora do stamp pdfcpu.
+func wmPos(position string) string {
+	switch position {
+	case "topLeft":
+		return "tl"
+	case "topRight":
+		return "tr"
+	case "center":
+		return "c"
+	case "bottomLeft":
+		return "bl"
+	case "bottomRight":
+		return "br"
+	default:
+		return "br"
+	}
 }
 
 // CompressPDF otimiza/comprime um PDF.

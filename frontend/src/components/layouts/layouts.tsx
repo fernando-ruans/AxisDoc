@@ -13,13 +13,14 @@ import { VisualCropper } from '../tools/VisualCropper'
 import { BeforeAfter } from '../BeforeAfter'
 
 // Tools cujo Transform mostra live preview do 1º arquivo (clicar = ver na hora).
-// Só tools com saída em IMAGEM entram aqui: o live preview renderiza <img>.
-// Tools com saída PDF (rotate/watermark/nup/overlay/pagenumbers) já mostram
-// o PDF de entrada no FilePreview (PDF.js) — o resultado aparece no
-// InlineJobResult após Executar (FilePreview registra o output).
+// Só tools com saída em IMAGEM entram aqui (o LiveTransformPreview monta <img>).
+// Tools PDF mostram o PDF de entrada no FilePreview (PDF.js); o resultado em
+// PDF aparece no InlineJobResult (PdfViewer) após Executar.
 const LIVE_TOOLS = new Set([
   'img.transform', 'img.filters', 'img.resize', 'img.convert', 'img.watermark',
   'img.watermarkpos', 'img.crop', 'img.icon', 'img.palette',
+  // PDF com saída em IMAGEM: o resultado é imagem, live funciona.
+  'pdf.toimage', 'pdf.extractimages',
 ])
 
 // Tools Generator com live preview (além de qrcode/barcode que já têm o próprio).
@@ -212,6 +213,8 @@ export function TransformLayout({ tool, initial }: { tool: ToolInfo; initial: Re
   const reason = needFiles ? t('common.pickFiles') : missing ? t(missing.label, { defaultValue: missing.key }) : null
   const live = LIVE_TOOLS.has(tool.id) ? ctx.paths[0] ?? null : null
   const isCrop = tool.id === 'img.crop'
+  // Live preview só faz sentido com 1 arquivo de entrada (multi vira lote).
+  const liveSingle = ctx.paths.length === 1 ? live : null
   return (
     <div className="space-y-4" data-testid={`layout-transform-${tool.id}`}>
       <PickFiles ctx={ctx} multiple accept={toolAccept(tool)} />
@@ -230,8 +233,11 @@ export function TransformLayout({ tool, initial }: { tool: ToolInfo; initial: Re
       ) : (
         <FilePreview paths={ctx.paths} toolId={tool.id} params={ctx.params} />
       )}
-      {live != null && !isCrop && (
-        <LiveTransformPreview toolId={tool.id} path={live} params={ctx.params} />
+      {liveSingle != null && !isCrop && (
+        <LiveTransformPreview toolId={tool.id} path={liveSingle} params={ctx.params} />
+      )}
+      {ctx.paths.length > 1 && LIVE_TOOLS.has(tool.id) && (
+        <p className="text-xs text-text-muted" data-testid="live-batch-note">{t('preview.batchNote')}</p>
       )}
       {visible.map((p) => (
         <ParamField key={p.key} param={p} value={ctx.params[p.key]} onChange={(v) => ctx.setParam(p.key, v)} optionLabel={(opt) => ctx.optionLabel(p.key, opt)} />

@@ -800,12 +800,27 @@ export const BACKEND_SNAPSHOT = [
   "id": "pdf.watermark",
   "params": [
    {
+    "key": "kind",
+    "label": "param.img.wmkind.label",
+    "type": "select",
+    "options": [
+     "text",
+     "image"
+    ],
+    "def": "text",
+    "w": "segmented"
+   },
+   {
     "key": "text",
     "label": "param.pdf.text.label",
     "type": "text",
     "def": "CONFIDENCIAL",
     "req": true,
-    "ph": "param.pdfwm.placeholder"
+    "ph": "param.pdfwm.placeholder",
+    "vis": {
+     "key": "kind",
+     "equals": "text"
+    }
    },
    {
     "key": "fontSize",
@@ -814,6 +829,55 @@ export const BACKEND_SNAPSHOT = [
     "def": 48,
     "min": 6,
     "max": 200,
+    "vis": {
+     "key": "kind",
+     "equals": "text"
+    },
+    "w": "slider"
+   },
+   {
+    "key": "image",
+    "label": "param.img.wmimage.label",
+    "type": "file",
+    "vis": {
+     "key": "kind",
+     "equals": "image"
+    },
+    "acc": [
+     ".png",
+     ".jpg",
+     ".jpeg"
+    ]
+   },
+   {
+    "key": "position",
+    "label": "param.img.position.label",
+    "type": "select",
+    "options": [
+     "topLeft",
+     "topRight",
+     "center",
+     "bottomLeft",
+     "bottomRight"
+    ],
+    "def": "bottomRight",
+    "vis": {
+     "key": "kind",
+     "equals": "image"
+    },
+    "w": "segmented"
+   },
+   {
+    "key": "scale",
+    "label": "param.img.wmscale.label",
+    "type": "number",
+    "def": 20,
+    "min": 5,
+    "max": 90,
+    "vis": {
+     "key": "kind",
+     "equals": "image"
+    },
     "w": "slider"
    }
   ]

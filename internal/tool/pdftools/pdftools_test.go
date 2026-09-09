@@ -2,6 +2,9 @@ package pdftools
 
 import (
 	"context"
+	"image"
+	"image/color"
+	"image/png"
 	"os"
 	"path/filepath"
 	"strings"
@@ -12,6 +15,25 @@ import (
 
 	"github.com/ferna/axisdoc/internal/tool"
 )
+
+// writeTestPNG gera um PNG válido para testes de marca d'água por imagem.
+func writeTestPNG(t *testing.T, path string) {
+	t.Helper()
+	img := image.NewRGBA(image.Rect(0, 0, 64, 32))
+	for y := 0; y < 32; y++ {
+		for x := 0; x < 64; x++ {
+			img.Set(x, y, color.RGBA{R: 30, G: 120, B: 220, A: 255})
+		}
+	}
+	f, err := os.Create(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer f.Close()
+	if err := png.Encode(f, img); err != nil {
+		t.Fatal(err)
+	}
+}
 
 // runTool executa o primeiro step de uma ferramenta.
 func runTool(t *testing.T, tl tool.Tool, in tool.Input) (tool.Output, error) {
@@ -106,10 +128,31 @@ func TestRotateAndWatermarkAndCompress(t *testing.T) {
 
 	out, err = runTool(t, NewWatermarkPDF(), tool.Input{
 		Paths:  []string{p},
-		Params: map[string]any{"text": "SECRETO", "fontSize": 48.0},
+		Params: map[string]any{"kind": "text", "text": "SECRETO", "fontSize": 48.0},
 	})
 	requireNoErr(t, err)
 	requireLen(t, out.Paths, 1)
+
+	// modo imagem: precisa de PNG válido
+	imgPath := filepath.Join(dir, "logo.png")
+	writeTestPNG(t, imgPath)
+	out, err = runTool(t, NewWatermarkPDF(), tool.Input{
+		Paths:  []string{p},
+		Params: map[string]any{"kind": "image", "image": imgPath, "position": "center", "scale": 30.0},
+	})
+	requireNoErr(t, err)
+	requireLen(t, out.Paths, 1)
+	if st, err := os.Stat(out.Paths[0]); err != nil || st.Size() == 0 {
+		t.Fatalf("PDF com marca-imagem inválido: %v", err)
+	}
+
+	// modo imagem sem arquivo falha
+	if _, err := runTool(t, NewWatermarkPDF(), tool.Input{
+		Paths:  []string{p},
+		Params: map[string]any{"kind": "image"},
+	}); err == nil {
+		t.Fatal("marca-imagem sem arquivo deveria falhar")
+	}
 
 	out, err = runTool(t, NewCompressPDF(), tool.Input{Paths: []string{p}})
 	requireNoErr(t, err)

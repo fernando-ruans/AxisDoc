@@ -70,8 +70,12 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'pdf.watermark', category: 'pdf', titleKey: 'tool.pdfwm.title',
     descKey: 'tool.pdfwm.desc', icon: 'stamp', stepNames: ['step.pdf.watermark'],
     params: [
-      param('text', 'param.pdf.text.label', 'text', { required: true, default: 'CONFIDENCIAL', placeholder: 'param.pdfwm.placeholder' }),
-      param('fontSize', 'param.pdf.fontsize.label', 'number', { default: 48, min: 6, max: 200, widget: 'slider' }),
+      param('kind', 'param.img.wmkind.label', 'select', { options: ['text', 'image'], default: 'text', widget: 'segmented' }),
+      param('text', 'param.pdf.text.label', 'text', { required: true, default: 'CONFIDENCIAL', placeholder: 'param.pdfwm.placeholder', visibleIf: { key: 'kind', equals: 'text' } }),
+      param('fontSize', 'param.pdf.fontsize.label', 'number', { default: 48, min: 6, max: 200, widget: 'slider', visibleIf: { key: 'kind', equals: 'text' } }),
+      param('image', 'param.img.wmimage.label', 'file', { accept: ['.png', '.jpg', '.jpeg'], visibleIf: { key: 'kind', equals: 'image' } }),
+      param('position', 'param.img.position.label', 'select', { options: ['topLeft', 'topRight', 'center', 'bottomLeft', 'bottomRight'], default: 'bottomRight', widget: 'segmented', visibleIf: { key: 'kind', equals: 'image' } }),
+      param('scale', 'param.img.wmscale.label', 'number', { default: 20, min: 5, max: 90, widget: 'slider', visibleIf: { key: 'kind', equals: 'image' } }),
     ],
   },
   {
