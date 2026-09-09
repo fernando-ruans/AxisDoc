@@ -51,6 +51,7 @@ function createWailsBackend(): Backend {
     previewSummary: (token) => call('SystemService', 'PreviewSummary', token),
     previewFor: (toolId, params) => call('SystemService', 'PreviewFor', toolId, params),
     previewTransform: (toolId, path, params) => call('SystemService', 'PreviewTransform', toolId, path, params),
+    previewRender: (toolId, path, params, page) => call('SystemService', 'PreviewRender', toolId, path, params, page),
     saveRenderedPage: (outputDir, baseName, page, ext, base64) =>
       call('SystemService', 'SaveRenderedPage', outputDir, baseName, page, ext, base64),
     searchQuery: (q, limit) => call('SearchService', 'Query', q, limit),

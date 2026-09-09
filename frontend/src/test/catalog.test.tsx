@@ -457,6 +457,25 @@ describe('formulário de cada tool (golden por tool)', () => {
     expect(await screen.findByTestId('crop-dims', undefined, { timeout: 3000 })).toBeInTheDocument()
   })
 
+  it('pdf.rotate mostra PdfLivePreview ao selecionar PDF', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.rotate')
+    if (!tool) throw new Error('rotate ausente')
+    setBackend(backendWith(CANONICAL_CATALOG, { pickFiles: async () => ['C:/fixtures/doc.pdf'] }))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    expect(screen.getByTestId('layout-transform-pdf.rotate')).toBeInTheDocument()
+    await user.click(screen.getByTestId('pick-files'))
+    // PdfLivePreview monta com navegação de páginas (mock retorna PNG 1x1)
+    expect(await screen.findByTestId('pdf-live', undefined, { timeout: 3000 })).toBeInTheDocument()
+    expect(screen.getByTestId('pdf-live-page')).toHaveTextContent('1')
+    // trocar o ângulo mantém o preview (debounce dispara de novo)
+    await user.click(screen.getByTestId('param-angle-180'))
+    await waitFor(() => expect(screen.getByTestId('pdf-live-image')).toBeInTheDocument(), { timeout: 3000 })
+    // navegar páginas não quebra
+    await user.click(screen.getByTestId('pdf-live-next'))
+    expect(screen.getByTestId('pdf-live-page')).toHaveTextContent('2')
+  })
+
   it('pdf.editor: monta o grid ao selecionar um PDF', async () => {
     const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.editor')
     if (!tool) throw new Error('pdf.editor ausente do catálogo')

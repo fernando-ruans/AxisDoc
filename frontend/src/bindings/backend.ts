@@ -106,6 +106,7 @@ export interface Backend {
   previewSummary(token: string): Promise<StructuredSummary>
   previewFor(toolId: string, params: Record<string, unknown>): Promise<string>
   previewTransform(toolId: string, path: string, params: Record<string, unknown>): Promise<string>
+  previewRender(toolId: string, path: string, params: Record<string, unknown>, page: number): Promise<string>
   saveRenderedPage(outputDir: string, baseName: string, page: number, ext: string, base64: string): Promise<string>
   searchQuery(q: string, limit: number): Promise<SearchHit[]>
   searchCount(): Promise<number>

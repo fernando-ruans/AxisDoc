@@ -26,6 +26,10 @@ export function PreviewFor(arg1, arg2) {
   return window['go']['main']['SystemService']['PreviewFor'](arg1, arg2);
 }
 
+export function PreviewRender(arg1, arg2, arg3, arg4) {
+  return window['go']['main']['SystemService']['PreviewRender'](arg1, arg2, arg3, arg4);
+}
+
 export function PreviewSummary(arg1) {
   return window['go']['main']['SystemService']['PreviewSummary'](arg1);
 }

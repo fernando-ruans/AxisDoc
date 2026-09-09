@@ -4,8 +4,10 @@ import (
 	"bytes"
 	"context"
 	"crypto/rand"
+	"crypto/sha256"
 	"encoding/base64"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"image/png"
 	"net/http"
@@ -397,13 +399,77 @@ func previewForTool(toolID string, params map[string]any) (string, error) {
 }
 
 // PreviewTransform aplica a transformação da tool sobre UM arquivo e retorna
-// base64 (sem gravar). Se a saída for PDF, renderiza a 1ª página em PNG via
-// pdfium (go-pdfium) para o live preview funcionar em tools PDF.
+// base64 (sem gravar). Mantido para compatibilidade (chamadas legadas sem
+// página): equivale a PreviewRender com page=0. Prefira PreviewRender.
 func (s *SystemService) PreviewTransform(toolID, path string, params map[string]any) (string, error) {
-	return previewTransform(toolID, path, params)
+	return s.PreviewRender(toolID, path, params, 0)
 }
 
-func previewTransform(toolID, path string, params map[string]any) (string, error) {
+// previewRenderCache guarda previews já calculados por hash(tool+path+params+page).
+// O hash inclui mtime+tamanho do arquivo, então edição externa invalida sozinha.
+var previewRenderCache = struct {
+	sync.Mutex
+	entries map[string]previewCacheEntry
+}{entries: map[string]previewCacheEntry{}}
+
+type previewCacheEntry struct {
+	b64     string
+	expires time.Time
+}
+
+const previewRenderTTL = 10 * time.Minute
+
+func previewRenderKey(toolID, path string, params map[string]any, page int) (string, error) {
+	st, err := os.Stat(path)
+	if err != nil {
+		return "", err
+	}
+	canonical, err := json.Marshal(map[string]any{
+		"tool": toolID, "path": path, "params": params, "page": page,
+		"mtime": st.ModTime().UnixNano(), "size": st.Size(),
+	})
+	if err != nil {
+		return "", err
+	}
+	sum := sha256.Sum256(canonical)
+	return hex.EncodeToString(sum[:]), nil
+}
+
+// PreviewRender aplica a tool sobre o PDF de entrada e retorna a página
+// renderizada (base64 PNG) — preview ANTES de executar. Não grava nada:
+// roda a tool num temp e apaga. Cache por hash evita recomputar a cada tecla.
+func (s *SystemService) PreviewRender(toolID, path string, params map[string]any, page int) (string, error) {
+	key, err := previewRenderKey(toolID, path, params, page)
+	if err != nil {
+		return "", err
+	}
+	previewRenderCache.Lock()
+	if e, ok := previewRenderCache.entries[key]; ok && time.Now().Before(e.expires) {
+		b64 := e.b64
+		previewRenderCache.Unlock()
+		return b64, nil
+	}
+	previewRenderCache.Unlock()
+
+	b64, err := previewRenderUncached(toolID, path, params, page)
+	if err != nil {
+		return "", err
+	}
+	previewRenderCache.Lock()
+	previewRenderCache.entries[key] = previewCacheEntry{b64: b64, expires: time.Now().Add(previewRenderTTL)}
+	// poda simples para não crescer sem limite
+	if len(previewRenderCache.entries) > 64 {
+		for k, e := range previewRenderCache.entries {
+			if time.Now().After(e.expires) {
+				delete(previewRenderCache.entries, k)
+			}
+		}
+	}
+	previewRenderCache.Unlock()
+	return b64, nil
+}
+
+func previewRenderUncached(toolID, path string, params map[string]any, page int) (string, error) {
 	t, err := toolByID(toolID)
 	if err != nil {
 		return "", err
@@ -416,20 +482,19 @@ func previewTransform(toolID, path string, params map[string]any) (string, error
 		return "", fmt.Errorf("sem saída")
 	}
 	defer os.Remove(out.Paths[0])
-	raw, err := previewBytes(out.Paths[0])
+	raw, err := previewBytesPage(out.Paths[0], page)
 	if err != nil {
 		return "", err
 	}
 	return base64.StdEncoding.EncodeToString(raw), nil
 }
 
-// previewBytes lê o arquivo de saída; se for PDF, tenta rasterizar a 1ª
-// página (requer lib pdfium do sistema via CGO — ver pdfrender_*.go).
-func previewBytes(path string) ([]byte, error) {
+// previewBytesPage lê o arquivo de saída; se for PDF, rasteriza a página pedida.
+func previewBytesPage(path string, page int) ([]byte, error) {
 	if !strings.EqualFold(filepath.Ext(path), ".pdf") {
 		return os.ReadFile(path)
 	}
-	return renderPDFPage(path, 0, 600)
+	return renderPDFPage(path, page, 600)
 }
 
 // toolByID resolve a tool no registry global (mesmo usado pelo app/CLI).

@@ -14,6 +14,8 @@ export function Ping():Promise<string>;
 
 export function PreviewFor(arg1:string,arg2:Record<string, any>):Promise<string>;
 
+export function PreviewRender(arg1:string,arg2:string,arg3:Record<string, any>,arg4:number):Promise<string>;
+
 export function PreviewSummary(arg1:string):Promise<main.PreviewSummary>;
 
 export function PreviewText(arg1:string,arg2:number):Promise<string>;

@@ -9,18 +9,23 @@ import { ParamField, OutputDirField, splitParams } from '../fields/fields'
 import { FilePreview } from '../FilePreview'
 import { InlineJobResult } from '../tools/InlineJobResult'
 import { LiveTransformPreview } from '../tools/LiveTransformPreview'
+import { PdfLivePreview } from '../tools/PdfLivePreview'
 import { VisualCropper } from '../tools/VisualCropper'
 import { BeforeAfter } from '../BeforeAfter'
 
 // Tools cujo Transform mostra live preview do 1º arquivo (clicar = ver na hora).
-// Só tools com saída em IMAGEM entram aqui (o LiveTransformPreview monta <img>).
-// Tools PDF mostram o PDF de entrada no FilePreview (PDF.js); o resultado em
-// PDF aparece no InlineJobResult (PdfViewer) após Executar.
-const LIVE_TOOLS = new Set([
+// Saída em IMAGEM → LiveTransformPreview (<img>). Saída em PDF → PdfLivePreview
+// (render da página, com navegação). Só arquivo único; lote mostra nota.
+const LIVE_IMAGE_TOOLS = new Set([
   'img.transform', 'img.filters', 'img.resize', 'img.convert', 'img.watermark',
   'img.watermarkpos', 'img.crop', 'img.icon', 'img.palette',
   // PDF com saída em IMAGEM: o resultado é imagem, live funciona.
   'pdf.toimage', 'pdf.extractimages',
+])
+const LIVE_PDF_TOOLS = new Set([
+  'pdf.rotate', 'pdf.watermark', 'pdf.nup', 'pdf.overlay', 'pdf.pagenumbers',
+  'pdf.compress', 'pdf.merge', 'pdf.split', 'pdf.rearrange', 'pdf.removepages',
+  'pdf.protect', 'pdf.permissions',
 ])
 
 // Tools Generator com live preview (além de qrcode/barcode que já têm o próprio).
@@ -211,10 +216,12 @@ export function TransformLayout({ tool, initial }: { tool: ToolInfo; initial: Re
   const needFiles = ctx.paths.length === 0
   const missing = visible.find((p) => p.required && (ctx.params[p.key] === undefined || ctx.params[p.key] === ''))
   const reason = needFiles ? t('common.pickFiles') : missing ? t(missing.label, { defaultValue: missing.key }) : null
-  const live = LIVE_TOOLS.has(tool.id) ? ctx.paths[0] ?? null : null
   const isCrop = tool.id === 'img.crop'
-  // Live preview só faz sentido com 1 arquivo de entrada (multi vira lote).
-  const liveSingle = ctx.paths.length === 1 ? live : null
+  // Live preview só com 1 arquivo (multi vira lote): imagem ou PDF conforme a saída.
+  const single = ctx.paths.length === 1 ? ctx.paths[0] ?? null : null
+  const liveImg = single != null && LIVE_IMAGE_TOOLS.has(tool.id) && !isCrop ? single : null
+  const livePdf = single != null && LIVE_PDF_TOOLS.has(tool.id) ? single : null
+  const showBatchNote = ctx.paths.length > 1 && (LIVE_IMAGE_TOOLS.has(tool.id) || LIVE_PDF_TOOLS.has(tool.id))
   return (
     <div className="space-y-4" data-testid={`layout-transform-${tool.id}`}>
       <PickFiles ctx={ctx} multiple accept={toolAccept(tool)} />
@@ -233,10 +240,13 @@ export function TransformLayout({ tool, initial }: { tool: ToolInfo; initial: Re
       ) : (
         <FilePreview paths={ctx.paths} toolId={tool.id} params={ctx.params} />
       )}
-      {liveSingle != null && !isCrop && (
-        <LiveTransformPreview toolId={tool.id} path={liveSingle} params={ctx.params} />
+      {liveImg != null && (
+        <LiveTransformPreview toolId={tool.id} path={liveImg} params={ctx.params} />
       )}
-      {ctx.paths.length > 1 && LIVE_TOOLS.has(tool.id) && (
+      {livePdf != null && (
+        <PdfLivePreview toolId={tool.id} path={livePdf} params={ctx.params} />
+      )}
+      {showBatchNote && (
         <p className="text-xs text-text-muted" data-testid="live-batch-note">{t('preview.batchNote')}</p>
       )}
       {visible.map((p) => (
