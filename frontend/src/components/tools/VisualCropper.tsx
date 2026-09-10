@@ -17,9 +17,32 @@ const RATIOS: Record<string, number | null> = {
   '16:9': 16 / 9,
 }
 
-// VisualCropper: mostra a imagem e permite arrastar o retângulo de recorte.
-// Emite onCrop({x,y,w,h} em pixels da imagem original) com debounce.
-// Ratio trava a proporção ao arrastar pelo canto.
+type Mode = 'draw' | 'move' | 'se'
+
+const MIN = 0.05
+const clamp01 = (v: number): number => Math.min(1, Math.max(0, v))
+
+// aplica a trava de proporção ancorada no canto superior esquerdo
+function applyRatio(r: Rect, ratio: string): Rect {
+  const k = RATIOS[ratio]
+  if (k == null) return r
+  let w = r.w
+  let h = w / k
+  if (r.y + h > 1) {
+    h = 1 - r.y
+    w = h * k
+  }
+  if (r.x + w > 1) {
+    w = 1 - r.x
+    h = w / k
+  }
+  return { ...r, w, h }
+}
+
+// VisualCropper: a área de seleção cobre EXATAMENTE a imagem renderizada
+// (container shrink-wrap) — sem divergência entre o que se vê e o que se
+// corta. Arraste no vazio desenha um novo retângulo; dentro, move; pela
+// alça, redimensiona. Emite onCrop({x,y,w,h} em pixels da imagem original).
 export function VisualCropper({
   path,
   ratio,
@@ -34,7 +57,7 @@ export function VisualCropper({
   const [nat, setNat] = useState({ w: 0, h: 0 })
   const [rect, setRect] = useState<Rect | null>(null)
   const boxRef = useRef<HTMLDivElement>(null)
-  const dragRef = useRef<{ mode: 'move' | 'se'; dx: number; dy: number } | null>(null)
+  const dragRef = useRef<{ mode: Mode; dx: number; dy: number } | null>(null)
   const onCropRef = useRef(onCrop)
   onCropRef.current = onCrop
 
@@ -45,7 +68,7 @@ export function VisualCropper({
     void getBackend()
       .registerPreviewFiles([path])
       .then((refs) => {
-        if (!cancelled && refs.length > 0) setToken(refs[0].token)
+        if (!cancelled && refs.length > 0) setToken(refs[0]?.token ?? null)
       })
       .catch(() => undefined)
     return () => {
@@ -53,60 +76,64 @@ export function VisualCropper({
     }
   }, [path])
 
+  const emit = (r: Rect, nw = nat.w, nh = nat.h): void => {
+    onCropRef.current({
+      x: Math.round(r.x * nw),
+      y: Math.round(r.y * nh),
+      w: Math.max(1, Math.round(r.w * nw)),
+      h: Math.max(1, Math.round(r.h * nh)),
+    })
+  }
+
   // jsdom não dispara onLoad de <img>: garante o retângulo inicial por timeout
   useEffect(() => {
     if (!token || rect) return
     const id = setTimeout(() => {
       setRect((prev) => {
         if (prev) return prev
-        const init = { x: 0.2, y: 0.2, w: 0.6, h: 0.6 }
-        emitCrop(init, nat.w || 100, nat.h || 100)
+        const init = applyRatio({ x: 0.2, y: 0.2, w: 0.6, h: 0.6 }, ratio)
+        emit(init, nat.w || 100, nat.h || 100)
         return init
       })
     }, 50)
     return () => clearTimeout(id)
-  }, [token, rect, nat.w, nat.h])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [token, rect, nat.w, nat.h, ratio])
 
-  // retângulo inicial: 60% centralizado quando a imagem carrega
   const onImgLoad = (e: React.SyntheticEvent<HTMLImageElement>): void => {
     const el = e.currentTarget
     setNat({ w: el.naturalWidth || 100, h: el.naturalHeight || 100 })
     setRect((prev) => {
       if (prev) return prev
-      const init = { x: 0.2, y: 0.2, w: 0.6, h: 0.6 }
-      const nw = el.naturalWidth || 100
-      const nh = el.naturalHeight || 100
-      emitCrop(init, nw, nh)
+      const init = applyRatio({ x: 0.2, y: 0.2, w: 0.6, h: 0.6 }, ratio)
+      emit(init, el.naturalWidth || 100, el.naturalHeight || 100)
       return init
-    })
-  }
-
-  const emitCrop = (r: { x: number; y: number; w: number; h: number }, nw: number, nh: number): void => {
-    onCropRef.current({
-      x: Math.round(r.x * nw),
-      y: Math.round(r.y * nh),
-      w: Math.round(r.w * nw),
-      h: Math.round(r.h * nh),
     })
   }
 
   const boxPos = (e: React.PointerEvent): { x: number; y: number } => {
     const box = boxRef.current?.getBoundingClientRect()
-    if (!box) return { x: 0, y: 0 }
+    if (!box || box.width === 0 || box.height === 0) return { x: 0, y: 0 }
     return {
-      x: Math.min(1, Math.max(0, (e.clientX - box.left) / box.width)),
-      y: Math.min(1, Math.max(0, (e.clientY - box.top) / box.height)),
+      x: clamp01((e.clientX - box.left) / box.width),
+      y: clamp01((e.clientY - box.top) / box.height),
     }
   }
 
-  const onPointerDown = (e: React.PointerEvent, mode: 'move' | 'se'): void => {
-    if (!rect) return
+  const onPointerDown = (e: React.PointerEvent, mode: Mode): void => {
     e.preventDefault()
     ;(e.target as HTMLElement).setPointerCapture?.(e.pointerId)
     const p = boxPos(e)
+    if (mode === 'draw') {
+      const start = applyRatio({ x: p.x, y: p.y, w: MIN, h: MIN }, ratio)
+      setRect(start)
+      emit(start)
+      dragRef.current = { mode: 'draw', dx: p.x, dy: p.y }
+      return
+    }
+    if (!rect) return
     dragRef.current = { mode, dx: p.x - rect.x, dy: p.y - rect.y }
   }
-
   const onPointerMove = (e: React.PointerEvent): void => {
     const drag = dragRef.current
     if (!drag || !rect) return
@@ -117,67 +144,82 @@ export function VisualCropper({
       const ny = Math.min(1 - rect.h, Math.max(0, p.y - drag.dy))
       next = { ...rect, x: nx, y: ny }
     } else {
-      let nw = Math.min(1 - rect.x, Math.max(0.05, p.x - rect.x))
-      let nh = Math.min(1 - rect.y, Math.max(0.05, p.y - rect.y))
-      const r = RATIOS[ratio] ?? null
-      if (r != null) {
-        // trava proporção ajustando pela maior dimensão
-        if (nw / nh > r) nw = nh * r
-        else nh = nw / r
+      // draw e se redimensionam pelo canto inferior direito
+      const isDraw = drag.mode === 'draw'
+      let w = Math.min(1 - rect.x, Math.max(isDraw ? 0 : MIN, p.x - rect.x))
+      let h = Math.min(1 - rect.y, Math.max(isDraw ? 0 : MIN, p.y - rect.y))
+      const k = RATIOS[ratio]
+      if (k != null && drag.mode === 'se') {
+        if (w / h > k) w = h * k
+        else h = w / k
       }
-      next = { ...rect, w: nw, h: nh }
+      next = { ...rect, w, h }
     }
     setRect(next)
-    if (nat.w > 0) emitCrop(next, nat.w, nat.h)
+    emit(next)
   }
 
   const onPointerUp = (): void => {
     dragRef.current = null
+    setRect((cur) => {
+      if (cur && cur.w < MIN && cur.h < MIN) {
+        const fixed = applyRatio({ ...cur, w: Math.max(cur.w, MIN), h: Math.max(cur.h, MIN) }, ratio)
+        emit(fixed)
+        return fixed
+      }
+      return cur
+    })
   }
 
   if (!token) return null
   return (
     <div className="overflow-hidden rounded-md border border-border" data-testid="visual-cropper">
       <p className="bg-surface-2 px-2 py-1 text-xs text-text-muted">{t('preview.title')}</p>
-      <div
-        ref={boxRef}
-        className="relative mx-auto max-h-72 w-full touch-none select-none overflow-hidden bg-checker"
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-      >
-        <img
-          src={`/preview/${token}`}
-          alt=""
-          draggable={false}
-          onLoad={onImgLoad}
-          className="pointer-events-none mx-auto max-h-72 object-contain"
-          data-testid="crop-image"
-        />
-        {rect && (
-          <div
-            className="absolute cursor-move border-2 border-accent bg-accent/10"
-            style={{
-              left: `${rect.x * 100}%`,
-              top: `${rect.y * 100}%`,
-              width: `${rect.w * 100}%`,
-              height: `${rect.h * 100}%`,
-            }}
-            onPointerDown={(e) => onPointerDown(e, 'move')}
-            data-testid="crop-rect"
-          >
+      <div className="flex justify-center bg-checker p-2">
+        <div
+          ref={boxRef}
+          className="relative touch-none select-none"
+          onPointerDown={(e) => onPointerDown(e, 'draw')}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+        >
+          <img
+            src={`/preview/${token}`}
+            alt=""
+            draggable={false}
+            onLoad={onImgLoad}
+            className="pointer-events-none block max-h-72"
+            data-testid="crop-image"
+          />
+          {rect && (
             <div
-              className="absolute -bottom-1.5 -right-1.5 h-4 w-4 cursor-se-resize rounded-sm bg-accent"
+              className="absolute cursor-move border-2 border-accent bg-accent/10"
+              style={{
+                left: `${rect.x * 100}%`,
+                top: `${rect.y * 100}%`,
+                width: `${rect.w * 100}%`,
+                height: `${rect.h * 100}%`,
+              }}
               onPointerDown={(e) => {
                 e.stopPropagation()
-                onPointerDown(e, 'se')
+                onPointerDown(e, 'move')
               }}
-              data-testid="crop-handle"
-            />
-          </div>
-        )}
+              data-testid="crop-rect"
+            >
+              <div
+                className="absolute -bottom-1.5 -right-1.5 h-4 w-4 cursor-se-resize rounded-sm bg-accent"
+                onPointerDown={(e) => {
+                  e.stopPropagation()
+                  onPointerDown(e, 'se')
+                }}
+                data-testid="crop-handle"
+              />
+            </div>
+          )}
+        </div>
       </div>
       {rect && (
-        <p className="bg-surface-2 px-2 py-1 text-xs tabular-nums text-text-muted" data-testid="crop-dims">
+        <p className="bg-surface-2 px-2 py-1 text-center text-xs tabular-nums text-text-muted" data-testid="crop-dims">
           {Math.round(rect.w * (nat.w || 100))} × {Math.round(rect.h * (nat.h || 100))} px
         </p>
       )}

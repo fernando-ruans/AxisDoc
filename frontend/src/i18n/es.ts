@@ -75,7 +75,8 @@ export const es: Dict = {
     },
     imgcrop: {
       title: 'Recortar imagen',
-      desc: 'Recorta área por coordenadas o ancla',
+      desc: 'Selecciona el área en la imagen y mira el preview antes de recortar',
+      batch: 'El mismo recorte se aplicará a todas las imágenes seleccionadas',
     },
     imgtransform: {
       title: 'Rotar/voltear imagen',

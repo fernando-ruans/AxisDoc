@@ -75,7 +75,8 @@ export const en: Dict = {
     },
     imgcrop: {
       title: 'Crop image',
-      desc: 'Crop area by coordinates or anchor',
+      desc: 'Select the area on the image and preview it before cropping',
+      batch: 'The same crop will be applied to every selected image',
     },
     imgtransform: {
       title: 'Rotate/flip image',

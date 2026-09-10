@@ -73,7 +73,8 @@ export const ptBR = {
     },
     imgcrop: {
       title: 'Recortar imagem',
-      desc: 'Recorta área por coordenadas ou âncora',
+      desc: 'Selecione a área na imagem e veja o preview antes de cortar',
+      batch: 'O mesmo recorte será aplicado a todas as imagens selecionadas',
     },
     imgtransform: {
       title: 'Girar/inverter imagem',

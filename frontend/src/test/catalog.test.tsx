@@ -294,7 +294,6 @@ describe('formulário de cada tool (golden por tool)', () => {
     ['img.watermark', 'layout-transform-img.watermark'],
     ['img.watermarkpos', 'layout-transform-img.watermarkpos'],
     ['img.palette', 'layout-inspector-img.palette'],
-    ['img.crop', 'layout-transform-img.crop'],
     ['pdf.merge', 'layout-transform-pdf.merge'],
     ['pdf.split', 'layout-transform-pdf.split'],
     ['pdf.rotate', 'layout-transform-pdf.rotate'],
@@ -487,17 +486,27 @@ describe('formulário de cada tool (golden por tool)', () => {
     expect(screen.getByTestId('param-value2')).toBeInTheDocument()
   })
 
-  it('img.crop monta o VisualCropper ao selecionar imagem', async () => {
+  it('img.crop usa o runner visual (cropper + proporção + execução própria)', async () => {
     const tool = CANONICAL_CATALOG.find((t) => t.id === 'img.crop')
     if (!tool) throw new Error('crop ausente')
     setBackend(backendWith(CANONICAL_CATALOG))
     const user = userEvent.setup()
     render(<GenericToolForm tool={tool} />)
+    // runner próprio: sem params numéricos, sem botão de job duplicado
+    expect(screen.getByTestId('crop-runner')).toBeInTheDocument()
+    expect(screen.queryByTestId('param-x')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('param-w')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('run-tool')).not.toBeInTheDocument()
     await user.click(screen.getByTestId('pick-files'))
     // o cropper monta após registrar o preview (mock) + timeout do jsdom
     expect(await screen.findByTestId('visual-cropper', undefined, { timeout: 3000 })).toBeInTheDocument()
     expect(await screen.findByTestId('crop-rect', undefined, { timeout: 3000 })).toBeInTheDocument()
     expect(await screen.findByTestId('crop-dims', undefined, { timeout: 3000 })).toBeInTheDocument()
+    // proporção segmentada e botão próprio de execução
+    expect(screen.getByTestId('crop-ratio-free')).toBeInTheDocument()
+    await user.click(screen.getByTestId('crop-ratio-1:1'))
+    expect(screen.getByTestId('crop-ratio-1:1')).toHaveClass('bg-accent')
+    expect(screen.getByTestId('crop-run')).toBeInTheDocument()
   })
 
   // Guarda de ambiente: jsdom + pdf.js worker não monta o container do

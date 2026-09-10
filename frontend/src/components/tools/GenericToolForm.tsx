@@ -9,6 +9,7 @@ import { FilePreview } from '../FilePreview'
 import { PdfToImageRunner } from './PdfToImageRunner'
 import { PdfExtractPagesRunner } from './PdfExtractPagesRunner'
 import { PdfFromImagesRunner } from './PdfFromImagesRunner'
+import { ImageCropRunner } from './ImageCropRunner'
 import { InlineJobResult } from './InlineJobResult'
 import { QrLivePreview } from './QrLivePreview'
 import { BarcodeLivePreview } from './BarcodeLivePreview'
@@ -42,7 +43,6 @@ const LAYOUTS: Record<string, 'transform' | 'generator' | 'inspector'> = {
   'img.watermark': 'transform',
   'img.watermarkpos': 'transform',
   'img.palette': 'inspector',
-  'img.crop': 'transform',
   // L3 — PDF
   'pdf.merge': 'transform',
   'pdf.split': 'transform',
@@ -225,7 +225,7 @@ function LegacyForm({ tool, initial }: { tool: ToolInfo; initial: Record<string,
             ))}
           </ul>
         )}
-        {tool.id !== 'pdf.toimage' && tool.id !== 'pdf.editor' && tool.id !== 'pdf.extractpages' && tool.id !== 'pdf.fromimages' && (
+        {tool.id !== 'pdf.toimage' && tool.id !== 'pdf.editor' && tool.id !== 'pdf.extractpages' && tool.id !== 'pdf.fromimages' && tool.id !== 'img.crop' && (
           <FilePreview paths={paths} toolId={tool.id} params={params} />
         )}
         {tool.id === 'text.qrcode' && (
@@ -259,11 +259,15 @@ function LegacyForm({ tool, initial }: { tool: ToolInfo; initial: Record<string,
         />
       ) : null}
 
+      {tool.id === 'img.crop' ? (
+        <ImageCropRunner paths={paths} params={params} setParam={setParam} />
+      ) : null}
+
       {tool.id === 'pdf.editor' ? (
         <PdfEditorRunner paths={paths} params={params} />
       ) : null}
 
-      {tool.id !== 'pdf.fromimages' && (tool.params ?? []).map((p: ToolParam) => {
+      {tool.id !== 'pdf.fromimages' && tool.id !== 'img.crop' && (tool.params ?? []).map((p: ToolParam) => {
         const label = t(p.label, { defaultValue: p.key })
         if (p.type === 'select') {
           return (
@@ -352,7 +356,7 @@ function LegacyForm({ tool, initial }: { tool: ToolInfo; initial: Record<string,
         </p>
       )}
 
-      {tool.id !== 'pdf.toimage' && tool.id !== 'pdf.editor' && tool.id !== 'pdf.extractpages' && tool.id !== 'pdf.fromimages' && (
+      {tool.id !== 'pdf.toimage' && tool.id !== 'pdf.editor' && tool.id !== 'pdf.extractpages' && tool.id !== 'pdf.fromimages' && tool.id !== 'img.crop' && (
         <button
           onClick={() => void run()}
           disabled={!canRun}

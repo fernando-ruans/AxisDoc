@@ -10,7 +10,6 @@ import { FilePreview } from '../FilePreview'
 import { InlineJobResult } from '../tools/InlineJobResult'
 import { LiveTransformPreview } from '../tools/LiveTransformPreview'
 import { PdfPreviewResult } from '../tools/PdfPreviewResult'
-import { VisualCropper } from '../tools/VisualCropper'
 import { BeforeAfter } from '../BeforeAfter'
 
 // Tools cujo Transform mostra live preview do 1º arquivo (clicar = ver na hora).
@@ -217,31 +216,17 @@ export function TransformLayout({ tool, initial }: { tool: ToolInfo; initial: Re
   const needFiles = ctx.paths.length === 0
   const missing = visible.find((p) => p.required && (ctx.params[p.key] === undefined || ctx.params[p.key] === ''))
   const reason = needFiles ? t('common.pickFiles') : missing ? t(missing.label, { defaultValue: missing.key }) : null
-  const isCrop = tool.id === 'img.crop'
   // Live preview só com 1 arquivo (multi vira lote): imagem via backend,
   // PDF via render real + simulação (sem pdfium, sem erro).
   const single = ctx.paths.length === 1 ? ctx.paths[0] ?? null : null
-  const liveImg = single != null && LIVE_IMAGE_TOOLS.has(tool.id) && !isCrop ? single : null
+  const liveImg = single != null && LIVE_IMAGE_TOOLS.has(tool.id) ? single : null
   const livePdf = single != null && LIVE_PDF_TOOLS.has(tool.id) ? { path: single, key: single } : null
   const showBatchNote = ctx.paths.length > 1 && (LIVE_IMAGE_TOOLS.has(tool.id) || LIVE_PDF_TOOLS.has(tool.id))
   return (
     <div className="space-y-4" data-testid={`layout-transform-${tool.id}`}>
       <PickFiles ctx={ctx} multiple accept={toolAccept(tool)} />
       <SortableList ctx={ctx} />
-      {isCrop && ctx.paths[0] != null ? (
-        <VisualCropper
-          path={ctx.paths[0]}
-          ratio={String(ctx.params.ratio ?? 'free')}
-          onCrop={(r) => {
-            ctx.setParam('x', r.x)
-            ctx.setParam('y', r.y)
-            ctx.setParam('w', r.w)
-            ctx.setParam('h', r.h)
-          }}
-        />
-      ) : (
-        <FilePreview paths={ctx.paths} toolId={tool.id} params={ctx.params} />
-      )}
+      <FilePreview paths={ctx.paths} toolId={tool.id} params={ctx.params} />
       {liveImg != null && (
         <LiveTransformPreview toolId={tool.id} path={liveImg} params={ctx.params} />
       )}

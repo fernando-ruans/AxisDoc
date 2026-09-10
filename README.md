@@ -43,7 +43,7 @@ Juntar PDFs, converter imagens, gerar QR codes, extrair texto, renomear em lote 
 
 - **Converter** entre JPG/PNG/GIF/BMP/TIFF, **redimensionar** com presets, **girar/inverter**
 - **Filtros** (P&B, inverter, blur, nitidez, sépia, contraste, brilho) com **live preview**
-- **Recortar visual** (arrastar o retângulo sobre a imagem, presets 1:1/4:3/16:9)
+- **Recortar visual** (desenhe/mova/redimensione o recorte sobre a imagem, com **preview do resultado antes de executar**, presets 1:1/4:3/16:9 e lote com o mesmo recorte)
 - **Marca d'água** de texto (diagonal) ou imagem (5 posições + escala), **favicon .ico** multi-resolução
 - **GIF**: extrair frames e montar animação a partir de PNGs, **paleta de cores**
 
@@ -71,7 +71,7 @@ Juntar PDFs, converter imagens, gerar QR codes, extrair texto, renomear em lote 
   - Imagens (girar, filtros, resize, convert, marcas d'água, crop visual): efeito aplicado na hora
   - PDF: página real + simulação (rotação, N-up, número, marca d'água, overlay, selo de proteção)
   - Comparador **antes × depois** com slider no resultado
-- **Editor visual de PDF** (remover, reordenar, girar, inserir brancas) e **crop visual de imagem** (drag)
+- **Editor visual de PDF** (remover, reordenar, girar, inserir brancas), **crop visual de imagem com preview** (desenha/move/redimensiona) e **seleção visual de páginas** (extrair páginas como imagens, imagens para PDF com drag & drop)
 - **Temas** Dark/Light, **3 idiomas** (PT-BR, EN, ES), **modo portable** (`--portable`)
 - Verificação de atualização via GitHub Releases (silenciosa offline)
 
