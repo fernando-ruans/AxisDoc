@@ -13,7 +13,9 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     globals: true,
-    pool: 'threads',
+    // threads é instável no Windows quando pdf.js entra no bundle de teste;
+    // forks isola por processo e eliminou flakes do golden de preview.
+    pool: 'forks',
     setupFiles: ['./src/test/setup.ts'],
     exclude: ['e2e/**', 'node_modules/**', 'dist/**'],
     coverage: {

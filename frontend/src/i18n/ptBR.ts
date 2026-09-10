@@ -506,6 +506,8 @@ export const ptBR = {
     cols: 'colunas',
     compare: 'Antes × depois — arraste para comparar',
     batchNote: 'Lote: o preview ao vivo usa o 1º arquivo; o Executar processa todos',
+    resultTitle: 'Resultado (preview)',
+    pdfNote: 'Preview do original; o resultado final pode variar levemente',
   },
   pdfeditor: {
     apply: 'Aplicar edições',

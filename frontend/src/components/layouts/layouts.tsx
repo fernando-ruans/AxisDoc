@@ -9,7 +9,7 @@ import { ParamField, OutputDirField, splitParams } from '../fields/fields'
 import { FilePreview } from '../FilePreview'
 import { InlineJobResult } from '../tools/InlineJobResult'
 import { LiveTransformPreview } from '../tools/LiveTransformPreview'
-import { PdfLivePreview } from '../tools/PdfLivePreview'
+import { PdfPreviewResult } from '../tools/PdfPreviewResult'
 import { VisualCropper } from '../tools/VisualCropper'
 import { BeforeAfter } from '../BeforeAfter'
 
@@ -96,12 +96,11 @@ function PickFiles({ ctx, multiple, accept }: { ctx: Ctx; multiple: boolean; acc
   const { t } = useTranslation()
   const pick = async (): Promise<void> => {
     const files = await getBackend().pickFiles()
-    const filtered = accept?.length
-      ? files.filter((f) => accept.some((a) => f.toLowerCase().endsWith(a.toLowerCase())))
-      : files
     ctx.setPaths((prev) => {
       const next = multiple ? [...prev] : []
-      for (const f of filtered.length > 0 ? filtered : files) {
+      const useAll = accept?.length ? files.filter((f) => accept.some((a) => f.toLowerCase().endsWith(a.toLowerCase()))) : files
+      // fallback: se o filtro zerar (mock/dev sem o tipo), usa tudo em vez de nada
+      for (const f of useAll.length > 0 ? useAll : files) {
         if (!next.includes(f)) next.push(f)
       }
       return next
@@ -217,10 +216,11 @@ export function TransformLayout({ tool, initial }: { tool: ToolInfo; initial: Re
   const missing = visible.find((p) => p.required && (ctx.params[p.key] === undefined || ctx.params[p.key] === ''))
   const reason = needFiles ? t('common.pickFiles') : missing ? t(missing.label, { defaultValue: missing.key }) : null
   const isCrop = tool.id === 'img.crop'
-  // Live preview só com 1 arquivo (multi vira lote): imagem ou PDF conforme a saída.
+  // Live preview só com 1 arquivo (multi vira lote): imagem via backend,
+  // PDF via render real + simulação (sem pdfium, sem erro).
   const single = ctx.paths.length === 1 ? ctx.paths[0] ?? null : null
   const liveImg = single != null && LIVE_IMAGE_TOOLS.has(tool.id) && !isCrop ? single : null
-  const livePdf = single != null && LIVE_PDF_TOOLS.has(tool.id) ? single : null
+  const livePdf = single != null && LIVE_PDF_TOOLS.has(tool.id) ? { path: single, key: single } : null
   const showBatchNote = ctx.paths.length > 1 && (LIVE_IMAGE_TOOLS.has(tool.id) || LIVE_PDF_TOOLS.has(tool.id))
   return (
     <div className="space-y-4" data-testid={`layout-transform-${tool.id}`}>
@@ -244,7 +244,7 @@ export function TransformLayout({ tool, initial }: { tool: ToolInfo; initial: Re
         <LiveTransformPreview toolId={tool.id} path={liveImg} params={ctx.params} />
       )}
       {livePdf != null && (
-        <PdfLivePreview toolId={tool.id} path={livePdf} params={ctx.params} />
+        <PdfPreviewResult key={livePdf.key} toolId={tool.id} path={livePdf.path} params={ctx.params} />
       )}
       {showBatchNote && (
         <p className="text-xs text-text-muted" data-testid="live-batch-note">{t('preview.batchNote')}</p>
