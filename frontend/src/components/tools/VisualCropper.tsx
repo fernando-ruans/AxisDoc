@@ -56,6 +56,7 @@ export function VisualCropper({
   const [token, setToken] = useState<string | null>(null)
   const [nat, setNat] = useState({ w: 0, h: 0 })
   const [rect, setRect] = useState<Rect | null>(null)
+  const rectRef = useRef<Rect | null>(null)
   const boxRef = useRef<HTMLDivElement>(null)
   const dragRef = useRef<{ mode: Mode; dx: number; dy: number } | null>(null)
   const onCropRef = useRef(onCrop)
@@ -64,6 +65,7 @@ export function VisualCropper({
   useEffect(() => {
     let cancelled = false
     setToken(null)
+    rectRef.current = null
     setRect(null)
     void getBackend()
       .registerPreviewFiles([path])
@@ -85,16 +87,19 @@ export function VisualCropper({
     })
   }
 
+  // setRect + sync do ref + emit — NUNCA dentro de updater (setState em render)
+  const applyRect = (r: Rect, nw = nat.w, nh = nat.h, silent = false): void => {
+    rectRef.current = r
+    setRect(r)
+    if (!silent) emit(r, nw, nh)
+  }
+
   // jsdom não dispara onLoad de <img>: garante o retângulo inicial por timeout
   useEffect(() => {
     if (!token || rect) return
     const id = setTimeout(() => {
-      setRect((prev) => {
-        if (prev) return prev
-        const init = applyRatio({ x: 0.2, y: 0.2, w: 0.6, h: 0.6 }, ratio)
-        emit(init, nat.w || 100, nat.h || 100)
-        return init
-      })
+      if (rectRef.current) return
+      applyRect(applyRatio({ x: 0.2, y: 0.2, w: 0.6, h: 0.6 }, ratio), nat.w || 100, nat.h || 100)
     }, 50)
     return () => clearTimeout(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -102,13 +107,12 @@ export function VisualCropper({
 
   const onImgLoad = (e: React.SyntheticEvent<HTMLImageElement>): void => {
     const el = e.currentTarget
-    setNat({ w: el.naturalWidth || 100, h: el.naturalHeight || 100 })
-    setRect((prev) => {
-      if (prev) return prev
-      const init = applyRatio({ x: 0.2, y: 0.2, w: 0.6, h: 0.6 }, ratio)
-      emit(init, el.naturalWidth || 100, el.naturalHeight || 100)
-      return init
-    })
+    const nw = el.naturalWidth || 100
+    const nh = el.naturalHeight || 100
+    setNat({ w: nw, h: nh })
+    if (!rectRef.current) {
+      applyRect(applyRatio({ x: 0.2, y: 0.2, w: 0.6, h: 0.6 }, ratio), nw, nh)
+    }
   }
 
   const boxPos = (e: React.PointerEvent): { x: number; y: number } => {
@@ -126,8 +130,7 @@ export function VisualCropper({
     const p = boxPos(e)
     if (mode === 'draw') {
       const start = applyRatio({ x: p.x, y: p.y, w: MIN, h: MIN }, ratio)
-      setRect(start)
-      emit(start)
+      applyRect(start)
       dragRef.current = { mode: 'draw', dx: p.x, dy: p.y }
       return
     }
@@ -155,20 +158,15 @@ export function VisualCropper({
       }
       next = { ...rect, w, h }
     }
-    setRect(next)
-    emit(next)
+    applyRect(next)
   }
 
   const onPointerUp = (): void => {
     dragRef.current = null
-    setRect((cur) => {
-      if (cur && cur.w < MIN && cur.h < MIN) {
-        const fixed = applyRatio({ ...cur, w: Math.max(cur.w, MIN), h: Math.max(cur.h, MIN) }, ratio)
-        emit(fixed)
-        return fixed
-      }
-      return cur
-    })
+    const cur = rectRef.current
+    if (cur && cur.w < MIN && cur.h < MIN) {
+      applyRect(applyRatio({ ...cur, w: Math.max(cur.w, MIN), h: Math.max(cur.h, MIN) }, ratio))
+    }
   }
 
   if (!token) return null
