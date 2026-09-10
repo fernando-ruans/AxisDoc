@@ -60,5 +60,6 @@ jobs:
         with:
           files: |
             build/bin/axisdoc.exe
+            build/bin/AxisDoc-amd64-installer.exe
             build/bin/*.zip
             build/bin/axisdoc-linux-amd64.tar.gz
