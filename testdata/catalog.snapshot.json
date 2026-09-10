@@ -741,27 +741,6 @@
     "params": []
   },
   {
-    "id": "pdf.extractpages",
-    "category": "pdf",
-    "titleKey": "tool.pdfextractpages.title",
-    "descKey": "tool.pdfextractpages.desc",
-    "icon": "file-output",
-    "stepNames": [
-      "step.pdf.extractpages"
-    ],
-    "params": [
-      {
-        "key": "pages",
-        "label": "param.pdf.pages.label",
-        "type": "text",
-        "default": "",
-        "required": true,
-        "placeholder": "param.pdf.pages.placeholder",
-        "hint": "param.pdf.pages.hint"
-      }
-    ]
-  },
-  {
     "id": "pdf.extracttext",
     "category": "pdf",
     "titleKey": "tool.pdfextract.title",
@@ -788,6 +767,11 @@
         "type": "output",
         "default": "imagens.pdf",
         "hint": "param.pdffromimages.output.hint"
+      },
+      {
+        "key": "outputDir",
+        "label": "param.outputDir.label",
+        "type": "folder"
       }
     ]
   },

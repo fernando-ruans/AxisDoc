@@ -76,7 +76,6 @@ func NewRegistry() *tool.Registry {
 		pdftools.NewCompressPDF(),
 		pdftools.NewExtractTextPDF(),
 		pdftools2.NewExtractImages(),
-		pdftools2.NewExtractPages(),
 		pdftools2.NewRemovePages(),
 		pdftools2.NewExtractFonts(),
 		pdftools2.NewExtractAttachments(),
@@ -231,7 +230,6 @@ func runCLI() bool {
 		pdftools.NewCompressPDF(),
 		pdftools.NewExtractTextPDF(),
 		pdftools2.NewExtractImages(),
-		pdftools2.NewExtractPages(),
 		pdftools2.NewRemovePages(),
 		pdftools2.NewExtractFonts(),
 		pdftools2.NewExtractAttachments(),
@@ -306,9 +304,14 @@ func (e *wailsEmitter) Emit(event string, data any) {
 type wailsDialogs struct{ ctx context.Context }
 
 func (d *wailsDialogs) OpenFiles() ([]string, error) {
-	return wruntime.OpenMultipleFilesDialog(d.ctx, wruntime.OpenDialogOptions{
+	out, err := wruntime.OpenMultipleFilesDialog(d.ctx, wruntime.OpenDialogOptions{
 		Title: "Selecionar arquivos",
 	})
+	// cancelar devolve nil → serializa como null e quebra o frontend; garante []
+	if out == nil {
+		out = []string{}
+	}
+	return out, err
 }
 
 func (d *wailsDialogs) OpenFolder() (string, error) {

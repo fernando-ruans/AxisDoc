@@ -27,15 +27,16 @@ Juntar PDFs, converter imagens, gerar QR codes, extrair texto, renomear em lote 
 
 ## Recursos
 
-### PDF (24 ferramentas)
+### PDF (23 ferramentas)
 
 - **Juntar, dividir, extrair páginas, remover páginas, reordenar páginas** — manipulação completa de páginas
 - **Comprimir, N-up (2/4/8 por folha), girar, marca d'água (texto ou imagem posicionada), sobrepor PDF**
 - **Numerar páginas estilo livro** (número puro, sem marca d'água — define só o início e a posição)
 - **Proteger com senha (AES) e desbloquear**, permissões, metadados XMP
 - **Extrair**: texto, imagens, fontes, anexos, páginas — e **anexar arquivos** em PDFs
-- **Criar PDF** (título + texto), **imagens para PDF**, **PDF para imagens**, **comparar PDFs**
+- **Criar PDF** (título + texto), **comparar PDFs**, **PDF para imagens** e **Imagens para PDF visual** (thumbnails com drag & drop para ordenar)
 - **Editor visual de páginas**: thumbnails, remover, reordenar, girar 90° e inserir páginas em branco
+- **Extrair páginas visual**: thumbnails selecionáveis (todas ou sob medida) convertidas em imagens PNG/JPG
 - Visualizador embutido (PDF.js) com paginação e zoom
 
 ### Imagens (11 ferramentas)
@@ -156,7 +157,7 @@ axisdoc.exe img.convert --format jpg foto.png
 
 | Categoria | Ferramentas |
 |---|---|
-| PDF (24) | info, merge, split, rotate, watermark, compress, extracttext, extractimages, extractpages, removepages, extractfonts, extractattachments, extractmetadata, permissions, diff, addattachments, fromimages, create, nup, rearrange, protect, unlock, overlay, pagenumbers (+ editor visual e PDF→imagem) |
+| PDF (23) | info, merge, split, rotate, watermark, compress, extracttext, extractimages, removepages, extractfonts, extractattachments, extractmetadata, permissions, diff, addattachments, fromimages, create, nup, rearrange, protect, unlock, overlay, pagenumbers (+ editor visual, extrair páginas visual e PDF→imagem) |
 | Imagens (11) | convert, resize, watermark, watermarkpos, crop, transform, filters, icon, gifextract, gifbuild, palette |
 | Dados (8) | tabular, xlsxdiff, struct, jsonformat, tablejson, csv2sql, sql2csv, json2table |
 | Texto (12) | diff, rename, stats, qrcode, barcode, lorem, baseconvert, epoch, uuid, slug, columnize, escape |

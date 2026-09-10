@@ -70,13 +70,6 @@ func selectedPages(in tool.Input) []string {
 	return []string{s}
 }
 
-// extractOnePageFile extrai N páginas de um PDF via CollectFile (mesma engine
-// do SplitFile, que escreve direto no destino — evita digest com staged file).
-func extractPagesToDir(p string, pages []string, outDir string) error {
-	out := filepath.Join(outDir, fileStem(p)+"_paginas.pdf")
-	return api.CollectFile(p, out, pages, nil)
-}
-
 // extractImagesToDir extrai imagens via API com Reader.
 // Digest próprio: lê img.Reader (stream já decodificado pelo pdfcpu quando
 // possível), decodifica e grava PNG. Evita o WriteImageToDisk, cujo staged
@@ -271,55 +264,7 @@ func (t *ExtractImages) run(_ context.Context, in tool.Input, report func(pct fl
 	return tool.Output{Paths: outs, Message: fmt.Sprintf("%d imagem(ns) extraída(s)", len(outs))}, nil
 }
 
-// ---- 2. Extrair páginas ----
-
-type ExtractPages struct{ base }
-
-func NewExtractPages() *ExtractPages {
-	return &ExtractPages{base{"pdf.extractpages", "pdf", "tool.pdfextractpages.title", "tool.pdfextractpages.desc", "file-output"}}
-}
-
-func (t *ExtractPages) Params() []tool.Param {
-	return []tool.Param{
-		{Key: "pages", Label: "param.pdf.pages.label", Type: tool.ParamText, Required: true, Default: "",
-			Placeholder: "param.pdf.pages.placeholder", Hint: "param.pdf.pages.hint"},
-	}
-}
-
-func (t *ExtractPages) Steps() []tool.Step {
-	return []tool.Step{stepFunc{"step.pdf.extractpages", t.run}}
-}
-
-func (t *ExtractPages) run(_ context.Context, in tool.Input, report func(pct float64)) (tool.Output, error) {
-	if len(in.Paths) == 0 {
-		return tool.Output{}, fmt.Errorf("pdf.extractpages: nenhum arquivo")
-	}
-	pages := selectedPages(in)
-	if pages == nil {
-		return tool.Output{}, fmt.Errorf("pdf.extractpages: informe as páginas (ex.: 1-3,5)")
-	}
-	var outs []string
-	for _, p := range in.Paths {
-		work, err := output.TempDir()
-		if err != nil {
-			return tool.Output{}, err
-		}
-		dest := filepath.Join(work, fileStem(p)+"_paginas.pdf")
-		if err := api.CollectFile(p, dest, pages, nil); err != nil {
-			os.RemoveAll(work)
-			return tool.Output{}, fmt.Errorf("pdf.extractpages: %w", err)
-		}
-		moved, err := copyOut([]string{dest}, in)
-		os.RemoveAll(work)
-		if err != nil {
-			return tool.Output{}, err
-		}
-		outs = append(outs, moved...)
-	}
-	return tool.Output{Paths: outs, Message: fmt.Sprintf("%d página(s) extraída(s)", len(outs))}, nil
-}
-
-// ---- 3. Remover páginas ----
+// ---- 2. Remover páginas ----
 
 type RemovePages struct{ base }
 
@@ -357,7 +302,7 @@ func (t *RemovePages) run(_ context.Context, in tool.Input, _ func(pct float64))
 	return tool.Output{Paths: outs, Message: fmt.Sprintf("páginas removidas em %d arquivo(s)", len(outs))}, nil
 }
 
-// ---- 4. Extrair fontes ----
+// ---- 3. Extrair fontes ----
 
 type ExtractFonts struct{ base }
 
@@ -404,7 +349,7 @@ func (t *ExtractFonts) run(_ context.Context, in tool.Input, _ func(pct float64)
 	return tool.Output{Paths: outs, Message: fmt.Sprintf("%d fonte(s) extraída(s)", len(outs))}, nil
 }
 
-// ---- 5. Extrair anexos ----
+// ---- 4. Extrair anexos ----
 
 type ExtractAttachments struct{ base }
 
@@ -456,7 +401,7 @@ func (t *ExtractAttachments) run(_ context.Context, in tool.Input, _ func(pct fl
 	return tool.Output{Paths: outs, Message: fmt.Sprintf("%d anexo(s) extraído(s)", len(outs))}, nil
 }
 
-// ---- 6. Extrair metadados ----
+// ---- 5. Extrair metadados ----
 
 type ExtractMetadata struct{ base }
 
@@ -502,7 +447,7 @@ func (t *ExtractMetadata) run(_ context.Context, in tool.Input, _ func(pct float
 	return tool.Output{Message: strings.TrimRight(sb.String(), "\n")}, nil
 }
 
-// ---- 7. Permissões (somente leitura/listagem; alterar exige PDF criptografado) ----
+// ---- 6. Permissões (somente leitura/listagem; alterar exige PDF criptografado) ----
 
 type Permissions struct{ base }
 
@@ -542,7 +487,7 @@ func (t *Permissions) run(_ context.Context, in tool.Input, _ func(pct float64))
 	return tool.Output{Message: strings.TrimRight(sb.String(), "\n")}, nil
 }
 
-// ---- 8. Comparar PDFs ----
+// ---- 7. Comparar PDFs ----
 
 type ComparePDFs struct{ base }
 
@@ -606,7 +551,7 @@ func truncateLines(text string, max int) string {
 	return sb.String()
 }
 
-// ---- 9. Adicionar anexos ----
+// ---- 8. Adicionar anexos ----
 
 type AddAttachments struct{ base }
 
@@ -670,7 +615,7 @@ func (t *AddAttachments) run(_ context.Context, in tool.Input, _ func(pct float6
 	return tool.Output{Paths: outs, Message: fmt.Sprintf("%d anexo(s) em %d PDF(s)", len(files), len(outs))}, nil
 }
 
-// ---- 10. Imagens → PDF ----
+// ---- 9. Imagens → PDF ----
 
 type ImagesToPDF struct{ base }
 
@@ -682,6 +627,7 @@ func (t *ImagesToPDF) Params() []tool.Param {
 	return []tool.Param{
 		{Key: "outputPath", Label: "param.outputPath.label", Type: tool.ParamOutput, Default: "imagens.pdf",
 			Hint: "param.pdffromimages.output.hint"},
+		outputDirParam(),
 	}
 }
 
@@ -695,7 +641,11 @@ func (t *ImagesToPDF) run(_ context.Context, in tool.Input, _ func(pct float64))
 	}
 	dest := tool.ParamString(in, "outputPath", "")
 	if dest == "" {
-		dest = filepath.Join(tool.OutputDir(in), "imagens.pdf")
+		dest = "imagens.pdf"
+	}
+	// nome sem diretório: resolve contra a pasta de destino (ou a pasta das imagens)
+	if filepath.Dir(dest) == "." {
+		dest = filepath.Join(tool.OutputDir(in), dest)
 	}
 	dest = output.NextAvailablePath(dest)
 	if err := api.ImportImagesFile(in.Paths, dest, nil, nil); err != nil {
@@ -704,7 +654,7 @@ func (t *ImagesToPDF) run(_ context.Context, in tool.Input, _ func(pct float64))
 	return tool.Output{Paths: []string{dest}, Message: fmt.Sprintf("%d imagem(ns) em %s", len(in.Paths), filepath.Base(dest))}, nil
 }
 
-// ---- 11. Criar PDF ----
+// ---- 10. Criar PDF ----
 
 type CreatePDF struct{ base }
 
@@ -773,7 +723,7 @@ func (t *CreatePDF) run(_ context.Context, in tool.Input, _ func(pct float64)) (
 	return tool.Output{Paths: []string{dest}, Message: "PDF criado: " + filepath.Base(dest)}, nil
 }
 
-// ---- 12. N-up ----
+// ---- 11. N-up ----
 
 type NUp struct{ base }
 

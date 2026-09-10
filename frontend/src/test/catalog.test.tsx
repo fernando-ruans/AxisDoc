@@ -37,8 +37,8 @@ describe('catálogo canônico', () => {
 
   // Trava anti-drift: cada tool do snapshot do backend deve existir idêntica
   // no mirror TS (params, options, defaults, widgets, condicionais).
-  // Exceções documentadas: pdf.toimage/pdf.editor (frontend-driven, sem
-  // backend) e search.index/ocr.image (registradas no startup).
+  // Exceções documentadas: pdf.toimage/pdf.editor/pdf.extractpages
+  // (frontend-driven, sem backend) e search.index/ocr.image (registradas no startup).
   // Campos omitempty do Go ausentes no JSON viram null na comparação.
   it('mirror TS espelha o snapshot do backend param a param', () => {
     interface SnapParam {
@@ -302,7 +302,6 @@ describe('formulário de cada tool (golden por tool)', () => {
     ['pdf.compress', 'layout-transform-pdf.compress'],
     ['pdf.extracttext', 'layout-inspector-pdf.extracttext'],
     ['pdf.extractimages', 'layout-transform-pdf.extractimages'],
-    ['pdf.extractpages', 'layout-transform-pdf.extractpages'],
     ['pdf.removepages', 'layout-transform-pdf.removepages'],
     ['pdf.extractfonts', 'layout-transform-pdf.extractfonts'],
     ['pdf.extractattachments', 'layout-transform-pdf.extractattachments'],
@@ -310,7 +309,6 @@ describe('formulário de cada tool (golden por tool)', () => {
     ['pdf.permissions', 'layout-inspector-pdf.permissions'],
     ['pdf.diff', 'layout-inspector-pdf.diff'],
     ['pdf.addattachments', 'layout-transform-pdf.addattachments'],
-    ['pdf.fromimages', 'layout-transform-pdf.fromimages'],
     ['pdf.create', 'layout-generator-pdf.create'],
     ['pdf.nup', 'layout-transform-pdf.nup'],
     ['pdf.rearrange', 'layout-transform-pdf.rearrange'],
@@ -549,6 +547,50 @@ describe('formulário de cada tool (golden por tool)', () => {
     expect(await screen.findByTestId('pdf-preview-result', undefined, { timeout: 8000 })).toBeInTheDocument()
     const badge = await screen.findByTestId('pdf-preview-number', undefined, { timeout: 8000 })
     expect(badge).toHaveTextContent('1')
+  })
+
+  it('pdf.extractpages: runner visual de páginas monta com outputDir', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.extractpages')
+    if (!tool) throw new Error('pdf.extractpages ausente')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    render(<GenericToolForm tool={tool} />)
+    // runner sempre monta; sem PDF mostra a descrição
+    expect(screen.getByTestId('extractpages-runner')).toBeInTheDocument()
+    expect(screen.getByTestId('param-outputDir')).toBeInTheDocument()
+    // formato/qualidade vivem no runner (só com PDF selecionado)
+    expect(screen.queryByTestId('extractpages-format')).not.toBeInTheDocument()
+    // sem botão de job (frontend-driven) e sem FilePreview
+    expect(screen.queryByTestId('run-tool')).not.toBeInTheDocument()
+    // ao selecionar um PDF o runner assume (estado vazio some); grid depende
+    // do pdf.js worker (validado no wails dev, igual ao pdf.toimage/pdf.editor)
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('pick-files'))
+    expect(await screen.findByTestId('selected-files')).toBeInTheDocument()
+    expect(screen.queryByTestId('extractpages-empty')).not.toBeInTheDocument()
+    expect(screen.getByTestId('extractpages-format')).toBeInTheDocument()
+    // alternar formato revela o slider de qualidade
+    expect(screen.queryByTestId('extractpages-quality')).not.toBeInTheDocument()
+    await user.click(screen.getByTestId('extractpages-format-jpg'))
+    expect(screen.getByTestId('extractpages-quality')).toBeInTheDocument()
+  })
+
+  it('pdf.fromimages: runner visual com thumbnails e ordenação', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.fromimages')
+    if (!tool) throw new Error('pdf.fromimages ausente')
+    setBackend(backendWith(CANONICAL_CATALOG))
+    render(<GenericToolForm tool={tool} />)
+    // runner sempre monta; sem imagens mostra a descrição
+    expect(screen.getByTestId('fromimages-runner')).toBeInTheDocument()
+    expect(screen.getByTestId('fromimages-name')).toBeInTheDocument()
+    expect(screen.getByTestId('output-dir')).toBeInTheDocument()
+    // sem botão de job duplicado e sem lista de texto duplicada
+    expect(screen.queryByTestId('run-tool')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('param-outputPath')).not.toBeInTheDocument()
+    // ao selecionar imagens o runner monta o grid na ordem do mock
+    const user = userEvent.setup()
+    await user.click(screen.getByTestId('pick-files'))
+    expect(await screen.findByTestId('fromimages-grid', undefined, { timeout: 8000 })).toBeInTheDocument()
+    expect(screen.getAllByTestId(/^fromimages-item-/)).toHaveLength(2)
   })
 
   it('pdf.toimage resolve first/last/middle/all/custom', async () => {

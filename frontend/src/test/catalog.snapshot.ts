@@ -556,20 +556,6 @@ export const BACKEND_SNAPSHOT = [
   "params": []
  },
  {
-  "id": "pdf.extractpages",
-  "params": [
-   {
-    "key": "pages",
-    "label": "param.pdf.pages.label",
-    "type": "text",
-    "def": "",
-    "req": true,
-    "ph": "param.pdf.pages.placeholder",
-    "hint": "param.pdf.pages.hint"
-   }
-  ]
- },
- {
   "id": "pdf.extracttext",
   "params": []
  },
@@ -582,6 +568,11 @@ export const BACKEND_SNAPSHOT = [
     "type": "output",
     "def": "imagens.pdf",
     "hint": "param.pdffromimages.output.hint"
+   },
+   {
+    "key": "outputDir",
+    "label": "param.outputDir.label",
+    "type": "folder"
    }
   ]
  },

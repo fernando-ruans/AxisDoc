@@ -221,7 +221,7 @@ export function SelectField({
 export function FileField({ param, value, onChange }: FieldProps): React.JSX.Element {
   const id = `f-${param.key}`
   const pick = async (): Promise<void> => {
-    const files = await getBackend().pickFiles()
+    const files = (await getBackend().pickFiles()) ?? []
     if (files.length === 0) return
     const accept = (param.accept ?? []).map((a) => a.toLowerCase())
     const match = accept.length === 0

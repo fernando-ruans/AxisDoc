@@ -1,4 +1,5 @@
 import type { ToolInfo, ToolParam } from '../bindings/backend'
+import { FRONTEND_TOOLS } from '../tools/frontendTools'
 
 // Catálogo canônico das ferramentas — espelho exato do que o backend declara
 // (internal/tool/* + app.go). Esta é a FONTE ÚNICA para os testes de contrato;
@@ -31,6 +32,14 @@ function param(
 }
 
 const outputDir = (): ToolParam => param('outputDir', 'param.outputDir.label', 'folder')
+
+// tools frontend-driven vivem em src/tools/frontendTools.ts (fonte única,
+// mesclada ao catálogo no store) — aqui entram no espelho para os testes.
+const fe = (id: string): ToolInfo => {
+  const t = FRONTEND_TOOLS.find((x) => x.id === id)
+  if (!t) throw new Error(`frontend tool ausente: ${id}`)
+  return t
+}
 
 export const CANONICAL_CATALOG: ToolInfo[] = [
   {
@@ -96,13 +105,7 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
       param('pages', 'param.pdf.pages.label', 'text', { default: '', placeholder: 'param.pdf.pages.optional', hint: 'param.pdf.pages.hint' }),
     ],
   },
-  {
-    id: 'pdf.extractpages', category: 'pdf', titleKey: 'tool.pdfextractpages.title',
-    descKey: 'tool.pdfextractpages.desc', icon: 'file-output', stepNames: ['step.pdf.extractpages'],
-    params: [
-      param('pages', 'param.pdf.pages.label', 'text', { required: true, default: '', placeholder: 'param.pdf.pages.placeholder', hint: 'param.pdf.pages.hint' }),
-    ],
-  },
+  fe('pdf.extractpages'),
   {
     id: 'pdf.removepages', category: 'pdf', titleKey: 'tool.pdfremovepages.title',
     descKey: 'tool.pdfremovepages.desc', icon: 'file-x', stepNames: ['step.pdf.removepages'],
@@ -145,6 +148,7 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     descKey: 'tool.pdffromimages.desc', icon: 'images', stepNames: ['step.pdf.fromimages'],
     params: [
       param('outputPath', 'param.outputPath.label', 'output', { default: 'imagens.pdf', hint: 'param.pdffromimages.output.hint' }),
+      outputDir(),
     ],
   },
   {
@@ -204,16 +208,7 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
       param('fontSize', 'param.pdf.fontsize.label', 'number', { default: 10, min: 6, max: 48, widget: 'slider' }),
     ],
   },
-  {
-    id: 'pdf.toimage', category: 'pdf', titleKey: 'tool.pdf2img.title',
-    descKey: 'tool.pdf2img.desc', icon: 'file-image', stepNames: [], frontendDriven: true,
-    params: [
-      param('format', 'param.pdf2img.format.label', 'select', { options: ['png', 'jpg'], default: 'png', widget: 'segmented' }),
-      param('quality', 'param.pdf2img.quality.label', 'number', { default: 85, min: 1, max: 100, widget: 'slider' }),
-      param('pages', 'param.pdf2img.pages.label', 'select', { options: ['first', 'last', 'middle', 'all', 'custom'], default: 'all', widget: 'segmented' }),
-      param('customPages', 'param.pdf2img.customPages.label', 'text', { default: '', placeholder: 'param.pdf2img.customPages.placeholder', visibleIf: { key: 'pages', equals: 'custom' } }),
-    ],
-  },
+  fe('pdf.toimage'),
   {
     id: 'img.convert', category: 'image', titleKey: 'tool.imgconvert.title',
     descKey: 'tool.imgconvert.desc', icon: 'repeat', stepNames: ['step.img.convert'],
@@ -377,12 +372,7 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
       param('recursive', 'param.search.recursive.label', 'bool', { default: false, widget: 'switch', hint: 'param.search.recursive.hint' }),
     ],
   },
-  {
-    id: 'pdf.editor', category: 'pdf', titleKey: 'tool.pdfeditor.title',
-    descKey: 'tool.pdfeditor.desc', icon: 'pencil-ruler', stepNames: ['step.pdf.editor'],
-    params: [outputDir()],
-    frontendDriven: true,
-  },
+  fe('pdf.editor'),
   {
     id: 'data.csv2sql', category: 'data', titleKey: 'tool.csv2sql.title',
     descKey: 'tool.csv2sql.desc', icon: 'database-zap', stepNames: ['step.data.csv2sql'],

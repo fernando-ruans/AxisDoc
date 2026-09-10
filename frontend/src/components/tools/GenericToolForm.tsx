@@ -7,6 +7,8 @@ import { useJobs } from '../../stores/jobs'
 import type { ToolInfo, ToolParam } from '../../bindings/backend'
 import { FilePreview } from '../FilePreview'
 import { PdfToImageRunner } from './PdfToImageRunner'
+import { PdfExtractPagesRunner } from './PdfExtractPagesRunner'
+import { PdfFromImagesRunner } from './PdfFromImagesRunner'
 import { InlineJobResult } from './InlineJobResult'
 import { QrLivePreview } from './QrLivePreview'
 import { BarcodeLivePreview } from './BarcodeLivePreview'
@@ -49,7 +51,6 @@ const LAYOUTS: Record<string, 'transform' | 'generator' | 'inspector'> = {
   'pdf.compress': 'transform',
   'pdf.extracttext': 'inspector',
   'pdf.extractimages': 'transform',
-  'pdf.extractpages': 'transform',
   'pdf.removepages': 'transform',
   'pdf.extractfonts': 'transform',
   'pdf.extractattachments': 'transform',
@@ -57,7 +58,6 @@ const LAYOUTS: Record<string, 'transform' | 'generator' | 'inspector'> = {
   'pdf.permissions': 'inspector',
   'pdf.diff': 'inspector',
   'pdf.addattachments': 'transform',
-  'pdf.fromimages': 'transform',
   'pdf.create': 'generator',
   'pdf.nup': 'transform',
   'pdf.rearrange': 'transform',
@@ -156,13 +156,22 @@ function LegacyForm({ tool, initial }: { tool: ToolInfo; initial: Record<string,
     setParams((prev) => ({ ...prev, [key]: value }))
 
   const addFiles = async (): Promise<void> => {
-    const files = await getBackend().pickFiles()
+    const files = (await getBackend().pickFiles()) ?? []
     setPaths((prev) => [...prev, ...files.filter((f) => !prev.includes(f))])
   }
   const addFolder = async (): Promise<void> => {
     const folder = await getBackend().pickFolder()
     if (folder) setPaths((prev) => (prev.includes(folder) ? prev : [...prev, folder]))
   }
+
+  const reorderPaths = (from: number, to: number): void =>
+    setPaths((prev) => {
+      const next = [...prev]
+      const [moved] = next.splice(from, 1)
+      if (moved === undefined) return prev
+      next.splice(to, 0, moved)
+      return next
+    })
 
   const run = async (): Promise<void> => {
     setError(null)
@@ -189,16 +198,18 @@ function LegacyForm({ tool, initial }: { tool: ToolInfo; initial: Record<string,
             <FilePlus2 className="h-4 w-4" />
             {t('common.pickFiles')}
           </button>
-          <button
-            onClick={() => void addFolder()}
-            className="flex items-center gap-2 rounded-md border border-dashed border-border px-3 py-2 text-sm text-text hover:border-accent hover:text-accent"
-            data-testid="pick-folder"
-          >
-            <FolderOpen className="h-4 w-4" />
-            {t('common.pickFolder')}
-          </button>
+          {tool.id !== 'pdf.extractpages' && (
+            <button
+              onClick={() => void addFolder()}
+              className="flex items-center gap-2 rounded-md border border-dashed border-border px-3 py-2 text-sm text-text hover:border-accent hover:text-accent"
+              data-testid="pick-folder"
+            >
+              <FolderOpen className="h-4 w-4" />
+              {t('common.pickFolder')}
+            </button>
+          )}
         </div>
-        {paths.length > 0 && (
+        {paths.length > 0 && tool.id !== 'pdf.fromimages' && (
           <ul className="space-y-1 text-xs text-text-muted" data-testid="selected-files">
             {paths.map((p: string) => (
               <li key={p} className="flex items-center justify-between">
@@ -214,7 +225,7 @@ function LegacyForm({ tool, initial }: { tool: ToolInfo; initial: Record<string,
             ))}
           </ul>
         )}
-        {tool.id !== 'pdf.toimage' && tool.id !== 'pdf.editor' && (
+        {tool.id !== 'pdf.toimage' && tool.id !== 'pdf.editor' && tool.id !== 'pdf.extractpages' && tool.id !== 'pdf.fromimages' && (
           <FilePreview paths={paths} toolId={tool.id} params={params} />
         )}
         {tool.id === 'text.qrcode' && (
@@ -234,11 +245,25 @@ function LegacyForm({ tool, initial }: { tool: ToolInfo; initial: Record<string,
         <PdfToImageRunner paths={paths} params={params} />
       ) : null}
 
+      {tool.id === 'pdf.extractpages' ? (
+        <PdfExtractPagesRunner paths={paths} params={params} />
+      ) : null}
+
+      {tool.id === 'pdf.fromimages' ? (
+        <PdfFromImagesRunner
+          paths={paths}
+          params={params}
+          setParam={setParam}
+          onReorder={reorderPaths}
+          onRemove={(p) => setPaths((prev) => prev.filter((x) => x !== p))}
+        />
+      ) : null}
+
       {tool.id === 'pdf.editor' ? (
         <PdfEditorRunner paths={paths} params={params} />
       ) : null}
 
-      {(tool.params ?? []).map((p: ToolParam) => {
+      {tool.id !== 'pdf.fromimages' && (tool.params ?? []).map((p: ToolParam) => {
         const label = t(p.label, { defaultValue: p.key })
         if (p.type === 'select') {
           return (
@@ -327,7 +352,7 @@ function LegacyForm({ tool, initial }: { tool: ToolInfo; initial: Record<string,
         </p>
       )}
 
-      {tool.id !== 'pdf.toimage' && tool.id !== 'pdf.editor' && (
+      {tool.id !== 'pdf.toimage' && tool.id !== 'pdf.editor' && tool.id !== 'pdf.extractpages' && tool.id !== 'pdf.fromimages' && (
         <button
           onClick={() => void run()}
           disabled={!canRun}

@@ -163,7 +163,10 @@ export const en: Dict = {
     },
     pdfextractpages: {
       title: 'Extract PDF pages',
-      desc: 'Save selected pages to a new PDF',
+      desc: 'Saves the selected pages as PNG/JPG images',
+      selectAll: 'Select all',
+      clear: 'Clear',
+      selected: 'page(s) selected',
     },
     pdfremovepages: {
       title: 'Remove PDF pages',
@@ -195,7 +198,8 @@ export const en: Dict = {
     },
     pdffromimages: {
       title: 'Images to PDF',
-      desc: 'Join images into a single PDF',
+      desc: 'Builds a single PDF from images, in the order you choose',
+      images: 'image(s)',
     },
     pdfcreate: {
       title: 'Create PDF',

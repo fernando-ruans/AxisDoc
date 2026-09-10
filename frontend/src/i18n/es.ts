@@ -163,7 +163,10 @@ export const es: Dict = {
     },
     pdfextractpages: {
       title: 'Extraer páginas de PDF',
-      desc: 'Guarda páginas seleccionadas en un nuevo PDF',
+      desc: 'Guarda las páginas seleccionadas como imágenes PNG/JPG',
+      selectAll: 'Seleccionar todas',
+      clear: 'Limpiar',
+      selected: 'página(s) seleccionada(s)',
     },
     pdfremovepages: {
       title: 'Eliminar páginas de PDF',
@@ -195,7 +198,8 @@ export const es: Dict = {
     },
     pdffromimages: {
       title: 'Imágenes a PDF',
-      desc: 'Une imágenes en un solo PDF',
+      desc: 'Crea un único PDF a partir de imágenes, en el orden que elijas',
+      images: 'imagen(es)',
     },
     pdfcreate: {
       title: 'Crear PDF',

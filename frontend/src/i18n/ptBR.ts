@@ -161,7 +161,10 @@ export const ptBR = {
     },
     pdfextractpages: {
       title: 'Extrair páginas de PDF',
-      desc: 'Salva páginas selecionadas em um novo PDF',
+      desc: 'Salva as páginas selecionadas como imagens PNG/JPG',
+      selectAll: 'Selecionar todas',
+      clear: 'Limpar',
+      selected: 'página(s) selecionada(s)',
     },
     pdfremovepages: {
       title: 'Remover páginas de PDF',
@@ -193,7 +196,8 @@ export const ptBR = {
     },
     pdffromimages: {
       title: 'Imagens para PDF',
-      desc: 'Junta imagens em um único PDF',
+      desc: 'Monta um único PDF a partir de imagens, na ordem que você escolher',
+      images: 'imagem(ns)',
     },
     pdfcreate: {
       title: 'Criar PDF',

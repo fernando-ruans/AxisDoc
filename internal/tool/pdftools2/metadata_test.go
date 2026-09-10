@@ -11,7 +11,7 @@ import (
 // TestToolMetadata cobre getters de todas as tools do pacote.
 func TestToolMetadata(t *testing.T) {
 	tools := []tool.Tool{
-		NewExtractImages(), NewExtractPages(), NewRemovePages(), NewExtractFonts(),
+		NewExtractImages(), NewRemovePages(), NewExtractFonts(),
 		NewExtractAttachments(), NewExtractMetadata(), NewPermissions(), NewComparePDFs(),
 		NewAddAttachments(), NewImagesToPDF(), NewCreatePDF(), NewNUp(),
 	}

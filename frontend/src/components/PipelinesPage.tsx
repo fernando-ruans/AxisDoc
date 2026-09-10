@@ -56,7 +56,7 @@ export function PipelinesPage(): React.JSX.Element {
   }
 
   const pickPaths = async (): Promise<void> => {
-    const files = await getBackend().pickFiles()
+    const files = (await getBackend().pickFiles()) ?? []
     setPaths((prev) => [...prev, ...files.filter((f) => !prev.includes(f))])
   }
 

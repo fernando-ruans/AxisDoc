@@ -96,7 +96,8 @@ function useToolCtx(tool: ToolInfo, initial: Record<string, unknown>): CtxFull {
 function PickFiles({ ctx, multiple, accept }: { ctx: Ctx; multiple: boolean; accept?: string[] }): React.JSX.Element {
   const { t } = useTranslation()
   const pick = async (): Promise<void> => {
-    const files = await getBackend().pickFiles()
+    // cancelar no diálogo resolve com null (Wails) — normaliza antes de tocar no estado
+    const files = (await getBackend().pickFiles()) ?? []
     ctx.setPaths((prev) => {
       const next = multiple ? [...prev] : []
       const useAll = accept?.length ? files.filter((f) => accept.some((a) => f.toLowerCase().endsWith(a.toLowerCase()))) : files

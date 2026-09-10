@@ -100,25 +100,12 @@ func TestExtractImagesRoundTrip(t *testing.T) {
 	}
 }
 
-func TestExtractPagesAndRemove(t *testing.T) {
+func TestRemovePages(t *testing.T) {
 	dir := t.TempDir()
 	p := filepath.Join(dir, "doc.pdf")
 	makePDF(t, p, 4)
 
-	out, _ := runOneRaw(t, NewExtractPages(), tool.Input{
-		Paths:  []string{p},
-		Params: map[string]any{"pages": "1-2"},
-	})
-	if len(out.Paths) != 1 {
-		entries, _ := os.ReadDir(filepath.Dir(p))
-		var names []string
-		for _, e := range entries {
-			names = append(names, e.Name())
-		}
-		t.Fatalf("esperado 1 PDF extraído, obtido %d (%v); dir=%v", len(out.Paths), out.Paths, names)
-	}
-
-	out = runOne(t, NewRemovePages(), tool.Input{
+	out := runOne(t, NewRemovePages(), tool.Input{
 		Paths:  []string{p},
 		Params: map[string]any{"pages": "1"},
 	})
@@ -126,10 +113,7 @@ func TestExtractPagesAndRemove(t *testing.T) {
 		t.Fatalf("esperado 1 PDF, obtido %d", len(out.Paths))
 	}
 
-	// validação: range vazio falha
-	if _, err := NewExtractPages().Steps()[0].Run(context.Background(), tool.Input{Paths: []string{p}}, nil); err == nil {
-		t.Fatal("extract sem pages deveria falhar")
-	}
+	// validação: sem arquivos falha
 	if _, err := NewRemovePages().Steps()[0].Run(context.Background(), tool.Input{}, nil); err == nil {
 		t.Fatal("remove sem arquivos deveria falhar")
 	}

@@ -28,6 +28,7 @@ export interface ToolInfo {
 export interface PreviewRef {
   token: string
   name: string
+  path?: string
 }
 
 export interface StructuredSummary {
