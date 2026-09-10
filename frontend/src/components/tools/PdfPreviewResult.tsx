@@ -13,6 +13,7 @@ GlobalWorkerOptions.workerSrc = workerUrl
 const SIMULATED = new Set([
   'pdf.rotate', // rotação via CSS = pixel-fiel
   'pdf.nup', // grade N-up via CSS = fiel
+  'pdf.pagenumbers', // número sobreposto = fiel (posição aproximada)
 ])
 
 interface Props {
@@ -141,7 +142,10 @@ export function PdfPreviewResult({
         </button>
       </div>
       <div className="max-h-80 overflow-auto bg-checker p-2" data-testid="pdf-preview-canvas">
-        <canvas ref={canvasRef} className="mx-auto max-w-full bg-white" style={style} />
+        <div className="relative mx-auto w-fit max-w-full">
+          <canvas ref={canvasRef} className="mx-auto max-w-full bg-white" style={style} />
+          {toolId === 'pdf.pagenumbers' && <PageNumberBadge params={params} page={page} />}
+        </div>
       </div>
       {!simulated && (
         <p className="flex items-center gap-1 bg-surface-2 px-2 py-1 text-xs text-text-muted" data-testid="pdf-preview-note">
@@ -156,6 +160,7 @@ export function PdfPreviewResult({
 // cssFor aplica a simulação visual da tool sobre a página real.
 // rotate: rotação CSS é pixel-fiel à rotação do pdfcpu.
 // nup: grade CSS reproduz o layout N-up.
+// pagenumbers: número real sobreposto na posição (backend usa as mesmas âncoras).
 function cssFor(toolId: string, params: Record<string, unknown>): React.CSSProperties {
   if (toolId === 'pdf.rotate') {
     const angle = Number(params.angle ?? 90)
@@ -163,10 +168,66 @@ function cssFor(toolId: string, params: Record<string, unknown>): React.CSSPrope
   }
   if (toolId === 'pdf.nup') {
     const n = Number(params.n ?? 2)
-    const cols = n >= 8 ? 2 : n >= 4 ? 2 : 2
     const scale = n >= 8 ? 0.5 : n >= 4 ? 0.7 : 0.85
-    void cols
     return { transform: `scale(${scale})`, transformOrigin: 'top center' }
   }
   return {}
+}
+
+// numberOverlay calcula número + posição do overlay de numeração,
+// espelhando o backend (mesmas âncoras, start configurável). Exportado
+// para o golden validar a mesma regra sem DOM.
+export function numberOverlay(
+  params: Record<string, unknown>,
+  page: number,
+): { num: string; pos: React.CSSProperties } {
+  const raw = Number(params.start ?? 1)
+  const start = Number.isFinite(raw) ? Math.max(1, Math.floor(raw)) : 1
+  const position = String(params.position ?? 'bottomCenter')
+  const pos: React.CSSProperties = { position: 'absolute' }
+  switch (position) {
+    case 'topCenter':
+      pos.top = '4%'
+      pos.left = '50%'
+      pos.transform = 'translateX(-50%)'
+      break
+    case 'bottomRight':
+      pos.bottom = '4%'
+      pos.right = '6%'
+      break
+    case 'bottomLeft':
+      pos.bottom = '4%'
+      pos.left = '6%'
+      break
+    default:
+      pos.bottom = '4%'
+      pos.left = '50%'
+      pos.transform = 'translateX(-50%)'
+      break
+  }
+  return { num: String(start + page), pos }
+}
+
+// PageNumberBadge sobrepõe o número real na posição configurada,
+// espelhando backend (fontSize proporcional ao canvas).
+function PageNumberBadge({ params, page }: { params: Record<string, unknown>; page: number }): React.JSX.Element {
+  const { num, pos } = numberOverlay(params, page)
+  const fontSize = Math.max(8, Math.min(28, Number(params.fontSize ?? 10) * 1.2))
+  return (
+    <span
+      data-testid="pdf-preview-number"
+      style={{
+        ...pos,
+        fontSize,
+        fontFamily: 'Helvetica, Arial, sans-serif',
+        color: '#111',
+        background: 'rgba(255,255,255,0.65)',
+        padding: '0 4px',
+        borderRadius: 3,
+        lineHeight: 1.4,
+      }}
+    >
+      {num}
+    </span>
+  )
 }

@@ -482,6 +482,30 @@ describe('formulário de cada tool (golden por tool)', () => {
     unmount()
   }, 30000)
 
+  it('pdf.pagenumbers mostra número real sobreposto (estilo livro)', async () => {
+    const { numberOverlay } = await import('../components/tools/PdfPreviewResult')
+    // mesma regra do backend: start + índice 0-based, 4 âncoras
+    expect(numberOverlay({ start: 1, position: 'bottomCenter' }, 0).num).toBe('1')
+    expect(numberOverlay({ start: 5, position: 'bottomCenter' }, 2).num).toBe('7')
+    expect(numberOverlay({ start: 0, position: 'bottomCenter' }, 0).num).toBe('1')
+    expect(numberOverlay({ start: NaN, position: 'bottomCenter' }, 0).num).toBe('1')
+    const br = numberOverlay({ position: 'bottomRight' }, 0)
+    expect(br.pos.bottom).toBe('4%')
+    expect(br.pos.right).toBe('6%')
+    const tc = numberOverlay({ position: 'topCenter' }, 0)
+    expect(tc.pos.top).toBe('4%')
+    // DOM: badge aparece ao selecionar PDF
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.pagenumbers')
+    if (!tool) throw new Error('pagenumbers ausente')
+    setBackend(backendWith(CANONICAL_CATALOG, { pickFiles: async () => ['C:/fixtures/doc.pdf'] }))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    await user.click(screen.getByTestId('pick-files'))
+    expect(await screen.findByTestId('pdf-preview-result', undefined, { timeout: 8000 })).toBeInTheDocument()
+    const badge = await screen.findByTestId('pdf-preview-number', undefined, { timeout: 8000 })
+    expect(badge).toHaveTextContent('1')
+  })
+
   it('pdf.editor: monta o grid ao selecionar um PDF', async () => {
     const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.editor')
     if (!tool) throw new Error('pdf.editor ausente do catálogo')

@@ -319,7 +319,7 @@ func (t *PageNumbers) run(_ context.Context, in tool.Input, _ func(pct float64))
 		start = 1
 	}
 	fontSize := int(tool.ParamFloat(in, "fontSize", 10))
-	desc := fmt.Sprintf("position:%s, scalefactor:1.0 abs, font:Helvetica, points:%d", posValue(tool.ParamString(in, "position", "bottomCenter")), fontSize)
+	desc := fmt.Sprintf("position:%s, rotation:0, scalefactor:1.0 abs, font:Helvetica, points:%d, opacity:1.0", posValue(tool.ParamString(in, "position", "bottomCenter")), fontSize)
 	var outs []string
 	for _, p := range in.Paths {
 		count := pageCount(p)
