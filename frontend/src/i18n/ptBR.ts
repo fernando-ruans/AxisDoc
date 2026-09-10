@@ -384,7 +384,8 @@ export const ptBR = {
       password: { label: 'Senha' },
       overlay: { label: 'PDF de sobreposição', hint: 'param.pdf.overlay.hint' },
       ontop: { label: 'Sobre o conteúdo' },
-      numformat: { label: 'Formato (use %p e %P)', hint: 'Ex.: Página %p de %P' },
+      numformat: { label: 'Formato' },
+      numstart: { label: 'Começar do número', hint: 'Primeira página recebe este número' },
       compress: { label: 'Nível', hint: 'Máximo tenta arquivos menores' },
     },
     pdfmerge: {

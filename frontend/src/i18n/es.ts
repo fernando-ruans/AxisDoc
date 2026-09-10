@@ -386,7 +386,8 @@ export const es: Dict = {
       password: { label: 'Contraseña' },
       overlay: { label: 'PDF de superposición', hint: 'param.pdf.overlay.hint' },
       ontop: { label: 'Sobre el contenido' },
-      numformat: { label: 'Formato (use %p y %P)', hint: 'Ej.: Página %p de %P' },
+      numformat: { label: 'Formato' },
+      numstart: { label: 'Comenzar del número', hint: 'La primera página recibe este número' },
       compress: { label: 'Nivel', hint: 'Máximo intenta archivos más pequeños' },
     },
     pdfmerge: {

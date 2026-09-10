@@ -644,12 +644,13 @@ export const BACKEND_SNAPSHOT = [
   "id": "pdf.pagenumbers",
   "params": [
    {
-    "key": "format",
-    "label": "param.pdf.numformat.label",
-    "type": "text",
-    "def": "Página %p de %P",
-    "req": true,
-    "hint": "param.pdf.numformat.hint"
+    "key": "start",
+    "label": "param.pdf.numstart.label",
+    "type": "number",
+    "def": 1,
+    "min": 1,
+    "max": 100000,
+    "hint": "param.pdf.numstart.hint"
    },
    {
     "key": "position",
@@ -657,9 +658,9 @@ export const BACKEND_SNAPSHOT = [
     "type": "select",
     "options": [
      "bottomCenter",
-     "topCenter",
      "bottomRight",
-     "bottomLeft"
+     "bottomLeft",
+     "topCenter"
     ],
     "def": "bottomCenter",
     "w": "segmented"

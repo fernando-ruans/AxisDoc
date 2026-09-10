@@ -282,10 +282,10 @@ func NewPageNumbers() *PageNumbers {
 
 func (t *PageNumbers) Params() []tool.Param {
 	return []tool.Param{
-		{Key: "format", Label: "param.pdf.numformat.label", Type: tool.ParamText, Required: true, Default: "Página %p de %P",
-			Hint: "param.pdf.numformat.hint"},
+		{Key: "start", Label: "param.pdf.numstart.label", Type: tool.ParamNumber, Default: 1, Min: 1, Max: 100000,
+			Hint: "param.pdf.numstart.hint"},
 		{Key: "position", Label: "param.img.position.label", Type: tool.ParamSelect,
-			Options: []string{"bottomCenter", "topCenter", "bottomRight", "bottomLeft"}, Default: "bottomCenter",
+			Options: []string{"bottomCenter", "bottomRight", "bottomLeft", "topCenter"}, Default: "bottomCenter",
 			Widget: tool.WidgetSegmented},
 		{Key: "fontSize", Label: "param.pdf.fontsize.label", Type: tool.ParamNumber, Default: 10, Min: 6, Max: 48,
 			Widget: tool.WidgetSlider},
@@ -314,7 +314,10 @@ func (t *PageNumbers) run(_ context.Context, in tool.Input, _ func(pct float64))
 	if len(in.Paths) == 0 {
 		return tool.Output{}, fmt.Errorf("pdf.pagenumbers: nenhum arquivo")
 	}
-	format := tool.ParamString(in, "format", "Página %p de %P")
+	start := int(tool.ParamFloat(in, "start", 1))
+	if start < 1 {
+		start = 1
+	}
 	fontSize := int(tool.ParamFloat(in, "fontSize", 10))
 	desc := fmt.Sprintf("position:%s, scalefactor:1.0 abs, font:Helvetica, points:%d", posValue(tool.ParamString(in, "position", "bottomCenter")), fontSize)
 	var outs []string
@@ -323,7 +326,7 @@ func (t *PageNumbers) run(_ context.Context, in tool.Input, _ func(pct float64))
 		if count <= 0 {
 			return tool.Output{}, fmt.Errorf("pdf.pagenumbers: não foi possível ler %s", filepath.Base(p))
 		}
-		if err := applyPageNumbers(p, count, format, desc, fontSize, tool.OutputDir(in)); err != nil {
+		if err := applyPageNumbers(p, count, start, desc, fontSize, tool.OutputDir(in)); err != nil {
 			return tool.Output{}, err
 		}
 		outs = append(outs, lastApplied)
@@ -334,11 +337,13 @@ func (t *PageNumbers) run(_ context.Context, in tool.Input, _ func(pct float64))
 // lastApplied guarda o destino da última aplicação (fluxo single-thread por job).
 var lastApplied string
 
-func applyPageNumbers(p string, count int, format, desc string, fontSize int, outDir string) error {
+// applyPageNumbers carimba o número puro da página (estilo livro: "1", "2", ...),
+// começando em start. Sem rotação, sem opacidade — só o número, pequeno e discreto.
+func applyPageNumbers(p string, count, start int, desc string, fontSize int, outDir string) error {
 	current := p
 	var first string
 	for i := 1; i <= count; i++ {
-		text := strings.ReplaceAll(strings.ReplaceAll(format, "%p", fmt.Sprintf("%d", i)), "%P", fmt.Sprintf("%d", count))
+		text := fmt.Sprintf("%d", start+i-1)
 		wm, err := api.TextWatermark(text, desc, true, false, types.POINTS)
 		if err != nil {
 			return fmt.Errorf("pdf.pagenumbers: %w", err)

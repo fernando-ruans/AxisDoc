@@ -885,12 +885,13 @@
     ],
     "params": [
       {
-        "key": "format",
-        "label": "param.pdf.numformat.label",
-        "type": "text",
-        "default": "Página %p de %P",
-        "required": true,
-        "hint": "param.pdf.numformat.hint"
+        "key": "start",
+        "label": "param.pdf.numstart.label",
+        "type": "number",
+        "default": 1,
+        "min": 1,
+        "max": 100000,
+        "hint": "param.pdf.numstart.hint"
       },
       {
         "key": "position",
@@ -898,9 +899,9 @@
         "type": "select",
         "options": [
           "bottomCenter",
-          "topCenter",
           "bottomRight",
-          "bottomLeft"
+          "bottomLeft",
+          "topCenter"
         ],
         "default": "bottomCenter",
         "widget": "segmented"

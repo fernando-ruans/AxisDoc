@@ -155,15 +155,11 @@ func TestPageNumbers(t *testing.T) {
 	makePDF(t, p, 3)
 	out := runOne(t, NewPageNumbers(), tool.Input{
 		Paths:  []string{p},
-		Params: map[string]any{"format": "Page %p of %P", "position": "bottomCenter", "fontSize": 10.0},
+		Params: map[string]any{"start": 5.0, "position": "bottomCenter", "fontSize": 10.0},
 	})
 	if len(out.Paths) != 1 {
 		t.Fatalf("esperado 1 PDF, obtido %d", len(out.Paths))
 	}
-	if n := pageCountOf(t, out.Paths[0]); n != 3 {
-		t.Fatalf("esperado 3 páginas, obtido %d", n)
-	}
-	// numeração confere via contagem de páginas + sufixo de nome
 	if n := pageCountOf(t, out.Paths[0]); n != 3 {
 		t.Fatalf("esperado 3 páginas, obtido %d", n)
 	}
@@ -178,5 +174,13 @@ func TestPageNumbers(t *testing.T) {
 	}
 	if _, err := NewPageNumbers().Steps()[0].Run(context.Background(), tool.Input{}, nil); err == nil {
 		t.Fatal("sem arquivos deveria falhar")
+	}
+	// start < 1 normaliza para 1
+	out = runOne(t, NewPageNumbers(), tool.Input{
+		Paths:  []string{p},
+		Params: map[string]any{"start": 0.0},
+	})
+	if len(out.Paths) != 1 {
+		t.Fatalf("start 0 deveria normalizar: %v", out)
 	}
 }

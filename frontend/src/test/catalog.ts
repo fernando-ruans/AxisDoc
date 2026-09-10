@@ -199,8 +199,8 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'pdf.pagenumbers', category: 'pdf', titleKey: 'tool.pdfpagenumbers.title',
     descKey: 'tool.pdfpagenumbers.desc', icon: 'list-ordered', stepNames: ['step.pdf.pagenumbers'],
     params: [
-      param('format', 'param.pdf.numformat.label', 'text', { required: true, default: 'Página %p de %P', hint: 'param.pdf.numformat.hint' }),
-      param('position', 'param.img.position.label', 'select', { options: ['bottomCenter', 'topCenter', 'bottomRight', 'bottomLeft'], default: 'bottomCenter', widget: 'segmented' }),
+      param('start', 'param.pdf.numstart.label', 'number', { default: 1, min: 1, max: 100000, hint: 'param.pdf.numstart.hint' }),
+      param('position', 'param.img.position.label', 'select', { options: ['bottomCenter', 'bottomRight', 'bottomLeft', 'topCenter'], default: 'bottomCenter', widget: 'segmented' }),
       param('fontSize', 'param.pdf.fontsize.label', 'number', { default: 10, min: 6, max: 48, widget: 'slider' }),
     ],
   },

@@ -386,7 +386,8 @@ export const en: Dict = {
       password: { label: 'Password' },
       overlay: { label: 'Overlay PDF', hint: 'param.pdf.overlay.hint' },
       ontop: { label: 'Over content' },
-      numformat: { label: 'Format (use %p and %P)', hint: 'E.g. Page %p of %P' },
+      numformat: { label: 'Format' },
+      numstart: { label: 'Start from', hint: 'First page gets this number' },
       compress: { label: 'Level', hint: 'Max tries smaller files' },
     },
     pdfmerge: {
