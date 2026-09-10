@@ -208,10 +208,10 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     id: 'pdf.toimage', category: 'pdf', titleKey: 'tool.pdf2img.title',
     descKey: 'tool.pdf2img.desc', icon: 'file-image', stepNames: [], frontendDriven: true,
     params: [
-      param('format', 'param.pdf2img.format.label', 'select', { options: ['png', 'jpg'], default: 'png' }),
-      param('quality', 'param.pdf2img.quality.label', 'number', { default: 85, min: 1, max: 100 }),
-      param('pages', 'param.pdf2img.pages.label', 'text', { default: '' }),
-      outputDir(),
+      param('format', 'param.pdf2img.format.label', 'select', { options: ['png', 'jpg'], default: 'png', widget: 'segmented' }),
+      param('quality', 'param.pdf2img.quality.label', 'number', { default: 85, min: 1, max: 100, widget: 'slider' }),
+      param('pages', 'param.pdf2img.pages.label', 'select', { options: ['first', 'last', 'middle', 'all', 'custom'], default: 'all', widget: 'segmented' }),
+      param('customPages', 'param.pdf2img.customPages.label', 'text', { default: '', placeholder: 'param.pdf2img.customPages.placeholder', visibleIf: { key: 'pages', equals: 'custom' } }),
     ],
   },
   {

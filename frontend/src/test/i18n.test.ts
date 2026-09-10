@@ -75,6 +75,7 @@ describe('i18n completude', () => {
               format: 'fmtFormat',
               '-': 'dash', _: 'underscore',
               v4: 'ver4', v7: 'ver7',
+              first: 'pgFirst', last: 'pgLast', middle: 'pgMiddle', all: 'pgAll', custom: 'pgCustom',
             }
             const optKey = `param.opt.${alias[opt] ?? opt}`
             if (!getPath(d, optKey)) {

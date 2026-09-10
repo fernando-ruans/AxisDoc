@@ -551,6 +551,20 @@ describe('formulário de cada tool (golden por tool)', () => {
     expect(badge).toHaveTextContent('1')
   })
 
+  it('pdf.toimage resolve first/last/middle/all/custom', async () => {
+    const { resolvePages } = await import('../components/tools/PdfToImageRunner')
+    // documento de 10 páginas
+    expect(resolvePages('first', '', 10)).toEqual([1])
+    expect(resolvePages('last', '', 10)).toEqual([10])
+    expect(resolvePages('middle', '', 10)).toEqual([5])
+    expect(resolvePages('middle', '', 9)).toEqual([5])
+    expect(resolvePages('all', '', 10)).toBeNull()
+    expect(resolvePages('custom', '1-3,5', 10)).toEqual([1, 2, 3, 5])
+    expect(resolvePages('custom', 'abc', 10)).toEqual([])
+    expect(resolvePages('custom', '', 10)).toBeNull()
+    expect(resolvePages('first', '', 0)).toEqual([])
+  })
+
   it('pdf.editor: monta o grid ao selecionar um PDF', async () => {
     const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.editor')
     if (!tool) throw new Error('pdf.editor ausente do catálogo')

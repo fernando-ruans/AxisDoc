@@ -289,6 +289,8 @@ export const en: Dict = {
       'por+eng': 'PT+EN',
       dash: 'Hyphen (-)', underscore: 'Underscore (_)',
       ver4: 'v4', ver7: 'v7',
+      pgFirst: 'First page', pgLast: 'Last page', pgMiddle: 'Middle page',
+      pgAll: 'All', pgCustom: 'Choose…',
       pages: 'Single pages', everyN: 'N-sized chunks',
       balanced: 'Balanced', max: 'Maximum',
       print: 'Print', printHighRes: 'High-res print', modify: 'Modify',
@@ -464,7 +466,8 @@ export const en: Dict = {
     pdf2img: {
       format: { label: 'Format' },
       quality: { label: 'JPG quality' },
-      pages: { label: 'Pages (e.g. 1-3,5)' },
+      pages: { label: 'Which pages' },
+      customPages: { label: 'Pages (e.g. 1-3,5)', placeholder: 'E.g. 1-3,5' },
     },
     gif: {
       delay: { label: 'Delay (ms)' },

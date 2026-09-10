@@ -289,6 +289,8 @@ export const es: Dict = {
       'por+eng': 'PT+EN',
       dash: 'Guion (-)', underscore: 'Guion bajo (_)',
       ver4: 'v4', ver7: 'v7',
+      pgFirst: 'Primera página', pgLast: 'Última página', pgMiddle: 'Página del medio',
+      pgAll: 'Todas', pgCustom: 'Elegir…',
       pages: 'Páginas sueltas', everyN: 'Bloques de N',
       balanced: 'Equilibrado', max: 'Máximo',
       print: 'Impresión', printHighRes: 'Impresión alta', modify: 'Modificar',
@@ -464,7 +466,8 @@ export const es: Dict = {
     pdf2img: {
       format: { label: 'Formato' },
       quality: { label: 'Calidad JPG' },
-      pages: { label: 'Páginas (ej.: 1-3,5)' },
+      pages: { label: 'Qué páginas' },
+      customPages: { label: 'Páginas (ej.: 1-3,5)', placeholder: 'Ej.: 1-3,5' },
     },
     gif: {
       delay: { label: 'Intervalo (ms)' },

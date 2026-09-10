@@ -8,10 +8,31 @@ import { getBackend } from '../../bindings/backend'
 
 GlobalWorkerOptions.workerSrc = workerUrl
 
-// parsePages "todas" ou "1-3,5" → índices 1-based ou null (todas).
+// resolvePages traduz a seleção amigável (first/last/middle/all/custom)
+// para índices 1-based, dado o total de páginas.
+export function resolvePages(
+  mode: string,
+  customSpec: string,
+  total: number,
+): number[] | null {
+  switch (mode) {
+    case 'first':
+      return total >= 1 ? [1] : []
+    case 'last':
+      return total >= 1 ? [total] : []
+    case 'middle':
+      return total >= 1 ? [Math.floor((total + 1) / 2)] : []
+    case 'custom':
+      return parsePages(customSpec, total)
+    default:
+      return null // all
+  }
+}
+
+// parsePages "1-3,5" → índices 1-based ou null (todas/vazio).
 function parsePages(spec: string, total: number): number[] | null {
   const s = spec.trim().toLowerCase()
-  if (!s || s === 'todas' || s === 'all') return null
+  if (!s) return null
   const out = new Set<number>()
   for (const part of s.split(',')) {
     const m = part.trim().match(/^(\d+)(?:-(\d+))?$/)
@@ -40,7 +61,8 @@ export function PdfToImageRunner({ paths, params }: Props): React.JSX.Element {
 
   const format = String(params.format ?? 'png')
   const quality = Number(params.quality ?? 85)
-  const pagesSpec = String(params.pages ?? '')
+  const pagesMode = String(params.pages ?? 'all')
+  const customSpec = String(params.customPages ?? '')
   const outputDir = String(params.outputDir ?? '')
 
   const pdfPath = paths.find((p) => p.toLowerCase().endsWith('.pdf'))
@@ -79,7 +101,7 @@ export function PdfToImageRunner({ paths, params }: Props): React.JSX.Element {
       const refs = await getBackend().registerPreviewFiles([pdfPath])
       if (refs.length === 0) throw new Error('preview indisponível')
       const doc = await getDocument({ url: `/preview/${refs[0].token}` }).promise
-      const selected = parsePages(pagesSpec, doc.numPages) ?? Array.from({ length: doc.numPages }, (_, i) => i + 1)
+      const selected = resolvePages(pagesMode, customSpec, doc.numPages) ?? Array.from({ length: doc.numPages }, (_, i) => i + 1)
       if (selected.length === 0) throw new Error('nenhuma página válida')
       const out: string[] = []
       for (let i = 0; i < selected.length; i++) {
@@ -117,6 +139,9 @@ export function PdfToImageRunner({ paths, params }: Props): React.JSX.Element {
           {totalPages > 0 ? `${totalPages} ${t('common.pages')}` : ''} — {baseName}
         </p>
       )}
+      {pdfPath && totalPages > 0 && (
+        <PagePicker total={totalPages} mode={pagesMode} customSpec={customSpec} />
+      )}
       {error && (
         <p className="text-sm text-danger" data-testid="pdf2img-error">
           {t('common.error')}: {error}
@@ -151,6 +176,34 @@ export function PdfToImageRunner({ paths, params }: Props): React.JSX.Element {
         {t('common.run')}
       </button>
       {!pdfPath && <p className="text-xs text-text-muted">{t('tool.pdf2img.desc')}</p>}
+    </div>
+  )
+}
+
+// PagePicker mostra quais páginas serão convertidas (chips), resolvendo
+// first/last/middle/all/custom contra o total real do documento.
+function PagePicker({ total, mode, customSpec }: { total: number; mode: string; customSpec: string }): React.JSX.Element {
+  const { t } = useTranslation()
+  const selected = resolvePages(mode, customSpec, total) ?? Array.from({ length: total }, (_, i) => i + 1)
+  const shown = selected.slice(0, 12)
+  return (
+    <div className="rounded-md border border-border bg-surface p-2" data-testid="pdf2img-pages">
+      <p className="mb-1 text-xs text-text-muted">
+        {t('preview.resultTitle')}: {selected.length} {t('common.pages').toLowerCase()}
+      </p>
+      <div className="flex flex-wrap gap-1">
+        {shown.map((n) => (
+          <span key={n} className="rounded bg-accent/10 px-2 py-0.5 text-xs tabular-nums text-accent" data-testid={`pdf2img-page-${n}`}>
+            p{n}
+          </span>
+        ))}
+        {selected.length > shown.length && (
+          <span className="px-1 text-xs text-text-muted">+{selected.length - shown.length}</span>
+        )}
+        {selected.length === 0 && (
+          <span className="text-xs text-danger">{t('common.error')}: 0</span>
+        )}
+      </div>
     </div>
   )
 }

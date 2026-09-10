@@ -287,6 +287,8 @@ export const ptBR = {
       'por+eng': 'PT+EN',
       dash: 'Hífen (-)', underscore: 'Sublinhado (_)',
       ver4: 'v4', ver7: 'v7',
+      pgFirst: 'Primeira página', pgLast: 'Última página', pgMiddle: 'Página do meio',
+      pgAll: 'Todas', pgCustom: 'Escolher…',
       pages: 'Páginas avulsas', everyN: 'Blocos de N',
       balanced: 'Equilibrado', max: 'Máximo',
       print: 'Impressão', printHighRes: 'Impressão alta', modify: 'Modificar',
@@ -462,7 +464,8 @@ export const ptBR = {
     pdf2img: {
       format: { label: 'Formato' },
       quality: { label: 'Qualidade JPG' },
-      pages: { label: 'Páginas (ex.: 1-3,5)' },
+      pages: { label: 'Quais páginas' },
+      customPages: { label: 'Páginas (ex.: 1-3,5)', placeholder: 'Ex.: 1-3,5' },
     },
     gif: {
       delay: { label: 'Intervalo (ms)' },

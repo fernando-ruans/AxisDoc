@@ -85,6 +85,7 @@ function useToolCtx(tool: ToolInfo, initial: Record<string, unknown>): CtxFull {
     format: 'fmtFormat',
     '-': 'dash', _: 'underscore',
     v4: 'ver4', v7: 'ver7',
+    first: 'pgFirst', last: 'pgLast', middle: 'pgMiddle', all: 'pgAll', custom: 'pgCustom',
   }
   const optionLabel = (paramKey: string, opt: string): string =>
     t(`param.opt.${OPT_ALIAS[opt] ?? opt}`, { defaultValue: opt })
