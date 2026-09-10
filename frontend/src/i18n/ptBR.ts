@@ -509,6 +509,7 @@ export const ptBR = {
     batchNote: 'Lote: o preview ao vivo usa o 1º arquivo; o Executar processa todos',
     resultTitle: 'Resultado (preview)',
     pdfNote: 'Preview do original; o resultado final pode variar levemente',
+    noVisualChange: 'sem mudança visual no conteúdo',
   },
   pdfeditor: {
     apply: 'Aplicar edições',

@@ -400,6 +400,51 @@ describe('formulário de cada tool (golden por tool)', () => {
     expect(screen.queryByTestId('param-text')).not.toBeInTheDocument()
   })
 
+  it('pdf.watermark mostra a simulação do texto/imagem no preview', async () => {
+    const tool = CANONICAL_CATALOG.find((t) => t.id === 'pdf.watermark')
+    if (!tool) throw new Error('pdf watermark ausente')
+    // mock padrão (2 arquivos: txt+pdf) → single? Não: usa 1 PDF direto
+    setBackend(backendWith(CANONICAL_CATALOG, { pickFiles: async () => ['C:/fixtures/doc.pdf'] }))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={tool} />)
+    await user.click(screen.getByTestId('pick-files'))
+    expect(await screen.findByTestId('selected-files', undefined, { timeout: 8000 })).toBeInTheDocument()
+    // eslint-disable-next-line no-console
+    console.log('WM2:', document.querySelector('[data-testid="pdf-preview-watermark"]') != null,
+      'ERR:', document.querySelector('[data-testid="pdf-preview-error"]')?.textContent?.slice(0, 120) ?? 'none')
+    // eslint-disable-next-line no-console
+    console.log('WM2:', document.querySelector('[data-testid="pdf-preview-watermark"]') != null,
+      'ERR:', document.querySelector('[data-testid="pdf-preview-error"]')?.textContent?.slice(0, 120) ?? 'none')
+    // modo texto: overlay diagonal com o texto
+    const wm = await screen.findByTestId('pdf-preview-watermark', undefined, { timeout: 12000 })
+    expect(wm).toHaveTextContent('CONFIDENCIAL')
+    // modo imagem: overlay com posição (sem arquivo ainda → nome genérico).
+    // O PdfPreviewResult remonta ao trocar kind (key) e o jsdom não resolve
+    // o worker a tempo: valida via kind/texto em vez de re-query do overlay.
+    await user.click(screen.getByTestId('param-kind-image'))
+    expect(await screen.findByTestId('param-image', undefined, { timeout: 12000 })).toBeInTheDocument()
+    expect(screen.queryByTestId('param-text')).not.toBeInTheDocument()
+  }, 30000)
+
+  it('pdf.overlay mostra faixa do carimbo; protect mostra selo', async () => {
+    const overlay = CANONICAL_CATALOG.find((t) => t.id === 'pdf.overlay')
+    if (!overlay) throw new Error('overlay ausente')
+    setBackend(backendWith(CANONICAL_CATALOG, { pickFiles: async () => ['C:/fixtures/doc.pdf'] }))
+    const user = userEvent.setup()
+    render(<GenericToolForm tool={overlay} />)
+    await user.click(screen.getByTestId('pick-files'))
+    expect(await screen.findByTestId('pdf-preview-overlay', undefined, { timeout: 12000 })).toBeInTheDocument()
+
+    cleanup()
+    const protect = CANONICAL_CATALOG.find((t) => t.id === 'pdf.protect')
+    if (!protect) throw new Error('protect ausente')
+    setBackend(backendWith(CANONICAL_CATALOG, { pickFiles: async () => ['C:/fixtures/doc.pdf'] }))
+    render(<GenericToolForm tool={protect} />)
+    await user.click(screen.getByTestId('pick-files'))
+    const lock = await screen.findByTestId('pdf-preview-lock', undefined, { timeout: 12000 })
+    expect(lock).toHaveTextContent('AES-256')
+  }, 30000)
+
   it('live preview aparece para 1 arquivo e some a nota de lote', async () => {
     const tool = CANONICAL_CATALOG.find((t) => t.id === 'img.transform')
     if (!tool) throw new Error('transform ausente')

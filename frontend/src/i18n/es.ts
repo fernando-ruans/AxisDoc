@@ -511,6 +511,7 @@ export const es: Dict = {
     batchNote: 'Lote: la vista previa usa el 1º archivo; Ejecutar procesa todos',
     resultTitle: 'Resultado (vista previa)',
     pdfNote: 'Vista del original; el resultado final puede variar levemente',
+    noVisualChange: 'sin cambio visual en el contenido',
   },
   pdfeditor: {
     apply: 'Aplicar ediciones',

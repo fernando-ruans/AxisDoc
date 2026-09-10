@@ -511,6 +511,7 @@ export const en: Dict = {
     batchNote: 'Batch: live preview uses the 1st file; Run processes all',
     resultTitle: 'Result (preview)',
     pdfNote: 'Original preview; final result may vary slightly',
+    noVisualChange: 'no visual change in content',
   },
   pdfeditor: {
     apply: 'Apply edits',

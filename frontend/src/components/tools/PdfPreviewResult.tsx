@@ -9,11 +9,18 @@ import { getBackend } from '../../bindings/backend'
 GlobalWorkerOptions.workerSrc = workerUrl
 
 // Quais tools PDF têm simulação visual fiel no frontend (sem pdfium).
-// As demais mostram o PDF original + aviso honesto.
+// Regra: o overlay precisa ser computável só com params + página.
+// rotate/nup/pagenumbers: CSS puro. watermark-texto/imagem, overlay,
+// protect/permissions: selo informativo (não dá para rasterizar o stamp
+// exato sem pdfium — mostra onde/aparece o quê, honesto).
 const SIMULATED = new Set([
   'pdf.rotate', // rotação via CSS = pixel-fiel
   'pdf.nup', // grade N-up via CSS = fiel
   'pdf.pagenumbers', // número sobreposto = fiel (posição aproximada)
+  'pdf.watermark', // texto/imagem simulados (posição/escala fiéis)
+  'pdf.overlay', // faixa "overlay aplicado" posicionada em cima
+  'pdf.protect', // selo cadeado (efeito é invisível no conteúdo)
+  'pdf.permissions', // selo informativo (só leitura de flags)
 ])
 
 interface Props {
@@ -145,6 +152,9 @@ export function PdfPreviewResult({
         <div className="relative mx-auto w-fit max-w-full">
           <canvas ref={canvasRef} className="mx-auto max-w-full bg-white" style={style} />
           {toolId === 'pdf.pagenumbers' && <PageNumberBadge params={params} page={page} />}
+          {toolId === 'pdf.watermark' && <WatermarkOverlay params={params} />}
+          {toolId === 'pdf.overlay' && <StampOverlay params={params} />}
+          {(toolId === 'pdf.protect' || toolId === 'pdf.permissions') && <LockOverlay toolId={toolId} params={params} />}
         </div>
       </div>
       {!simulated && (
@@ -206,6 +216,138 @@ export function numberOverlay(
       break
   }
   return { num: String(start + page), pos }
+}
+
+// WatermarkOverlay simula a marca d'água do backend (mesmos params):
+// texto diagonal centralizado OU imagem posicionada com escala.
+function WatermarkOverlay({ params }: { params: Record<string, unknown> }): React.JSX.Element | null {
+  const kind = String(params.kind ?? 'text')
+  if (kind === 'image') {
+    const position = String(params.position ?? 'bottomRight')
+    const scale = Math.max(5, Math.min(90, Number(params.scale ?? 20)))
+    const pos: React.CSSProperties = { position: 'absolute', opacity: 0.85 }
+    const size = `${scale}%`
+    switch (position) {
+      case 'topLeft':
+        pos.top = '6%'
+        pos.left = '6%'
+        pos.width = size
+        break
+      case 'topRight':
+        pos.top = '6%'
+        pos.right = '6%'
+        pos.width = size
+        break
+      case 'center':
+        pos.top = '50%'
+        pos.left = '50%'
+        pos.transform = 'translate(-50%,-50%)'
+        pos.width = size
+        break
+      case 'bottomLeft':
+        pos.bottom = '6%'
+        pos.left = '6%'
+        pos.width = size
+        break
+      default:
+        pos.bottom = '6%'
+        pos.right = '6%'
+        pos.width = size
+        break
+    }
+    return (
+      <span
+        data-testid="pdf-preview-watermark"
+        style={{
+          ...pos,
+          background: 'rgba(37,99,235,0.18)',
+          border: '1px dashed rgba(37,99,235,0.6)',
+          color: '#1d4ed8',
+          fontSize: 10,
+          padding: '2px 6px',
+          borderRadius: 3,
+        }}
+      >
+        {String(params.image ?? '').split(/[\\/]/).pop() || 'imagem'}
+      </span>
+    )
+  }
+  const text = String(params.text ?? 'CONFIDENCIAL')
+  const fontSize = Math.max(8, Math.min(40, Number(params.fontSize ?? 48) * 0.35))
+  return (
+    <span
+      data-testid="pdf-preview-watermark"
+      style={{
+        position: 'absolute',
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%,-50%) rotate(-45deg)',
+        fontSize,
+        fontFamily: 'Helvetica, Arial, sans-serif',
+        fontWeight: 700,
+        color: 'rgba(100,100,100,0.45)',
+        whiteSpace: 'nowrap',
+        pointerEvents: 'none',
+      }}
+    >
+      {text}
+    </span>
+  )
+}
+
+// StampOverlay simula o overlay de PDF: faixa no topo indicando o carimbo.
+function StampOverlay({ params }: { params: Record<string, unknown> }): React.JSX.Element {
+  const name = String(params.overlay ?? '').split(/[\\/]/).pop() || 'overlay.pdf'
+  const onTop = params.onTop !== false
+  return (
+    <span
+      data-testid="pdf-preview-overlay"
+      style={{
+        position: 'absolute',
+        top: onTop ? '3%' : undefined,
+        bottom: onTop ? undefined : '3%',
+        left: '50%',
+        transform: 'translateX(-50%)',
+        background: onTop ? 'rgba(37,99,235,0.85)' : 'rgba(100,100,100,0.7)',
+        color: '#fff',
+        fontSize: 10,
+        padding: '2px 8px',
+        borderRadius: 3,
+        maxWidth: '90%',
+        overflow: 'hidden',
+        textOverflow: 'ellipsis',
+        whiteSpace: 'nowrap',
+      }}
+    >
+      {name}
+    </span>
+  )
+}
+
+// LockOverlay informa o efeito invisível (protect/permissions não mudam pixels).
+function LockOverlay({ toolId, params }: { toolId: string; params: Record<string, unknown> }): React.JSX.Element {
+  const { t } = useTranslation()
+  const detail =
+    toolId === 'pdf.protect'
+      ? `AES-${String(params.keyLength ?? '256')}`
+      : t('preview.noVisualChange')
+  return (
+    <span
+      data-testid="pdf-preview-lock"
+      style={{
+        position: 'absolute',
+        top: '3%',
+        right: '4%',
+        background: 'rgba(20,83,45,0.85)',
+        color: '#fff',
+        fontSize: 10,
+        padding: '2px 8px',
+        borderRadius: 3,
+      }}
+    >
+      🔒 {detail}
+    </span>
+  )
 }
 
 // PageNumberBadge sobrepõe o número real na posição configurada,
