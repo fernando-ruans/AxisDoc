@@ -30,7 +30,8 @@ Juntar PDFs, converter imagens, gerar QR codes, extrair texto, renomear em lote 
 ### PDF (24 ferramentas)
 
 - **Juntar, dividir, extrair páginas, remover páginas, reordenar páginas** — manipulação completa de páginas
-- **Comprimir, N-up (2/4/8 por folha), girar, marca d'água, numerar páginas, sobrepor PDF**
+- **Comprimir, N-up (2/4/8 por folha), girar, marca d'água (texto ou imagem posicionada), sobrepor PDF**
+- **Numerar páginas estilo livro** (número puro, sem marca d'água — define só o início e a posição)
 - **Proteger com senha (AES) e desbloquear**, permissões, metadados XMP
 - **Extrair**: texto, imagens, fontes, anexos, páginas — e **anexar arquivos** em PDFs
 - **Criar PDF** (título + texto), **imagens para PDF**, **PDF para imagens**, **comparar PDFs**
@@ -42,7 +43,7 @@ Juntar PDFs, converter imagens, gerar QR codes, extrair texto, renomear em lote 
 - **Converter** entre JPG/PNG/GIF/BMP/TIFF, **redimensionar** com presets, **girar/inverter**
 - **Filtros** (P&B, inverter, blur, nitidez, sépia, contraste, brilho) com **live preview**
 - **Recortar visual** (arrastar o retângulo sobre a imagem, presets 1:1/4:3/16:9)
-- **Marca d'água** de texto ou imagem (5 posições), **favicon .ico** multi-resolução
+- **Marca d'água** de texto (diagonal) ou imagem (5 posições + escala), **favicon .ico** multi-resolução
 - **GIF**: extrair frames e montar animação a partir de PNGs, **paleta de cores**
 
 ### Dados (8 ferramentas)
@@ -60,12 +61,16 @@ Juntar PDFs, converter imagens, gerar QR codes, extrair texto, renomear em lote 
 
 ### Plataforma
 
-- **Busca global** com índice FTS5 (texto de arquivos + PDFs), insensível a acentos
+- **Busca global** com índice FTS5 (texto de arquivos + PDFs), insensível a acentos, com prefixos
 - **Macros**: encadeie ferramentas e execute em lote; **pastas vigiadas** disparam macros sozinhas
 - **CLI embutida**: `axisdoc <tool-id> [arquivos]` — as mesmas ferramentas no terminal
 - **OCR** de imagens via Tesseract (quando instalado)
 - Fila de **jobs** com progresso, cancelamento e histórico persistente
-- **Live preview** antes de executar nas ferramentas visuais + comparador antes/depois
+- **Preview do resultado antes de executar** em todas as ferramentas visuais:
+  - Imagens (girar, filtros, resize, convert, marcas d'água, crop visual): efeito aplicado na hora
+  - PDF: página real + simulação (rotação, N-up, número, marca d'água, overlay, selo de proteção)
+  - Comparador **antes × depois** com slider no resultado
+- **Editor visual de PDF** (remover, reordenar, girar, inserir brancas) e **crop visual de imagem** (drag)
 - **Temas** Dark/Light, **3 idiomas** (PT-BR, EN, ES), **modo portable** (`--portable`)
 - Verificação de atualização via GitHub Releases (silenciosa offline)
 
@@ -133,7 +138,9 @@ Saídas: `frontend/public/logo.png` (cabeçalho), `build/appicon.png` (512px) e 
 
 ## Ferramentas
 
-São **60 ferramentas** organizadas por categoria na sidebar, todas com formulário próprio por intenção (transformar, gerar ou inspecionar), preview antes de executar e resultado inline com botões Abrir / Abrir pasta / Copiar caminho.
+São **60 ferramentas** organizadas por categoria na sidebar, todas com formulário próprio por intenção (transformar, gerar ou inspecionar), **preview do resultado antes de executar** e resultado inline com botões Abrir / Abrir pasta / Copiar caminho.
+
+> **Filosofia de preview:** nada é gravado antes de confirmar. Ferramentas visuais mostram o efeito na hora (trocar a opção atualiza o preview); o botão Executar só então grava no destino escolhido.
 
 Paleta de comandos com `Ctrl+K`, dashboard inicial com mais usadas e recentes, e CLI com os mesmos IDs:
 
@@ -252,7 +259,7 @@ Banco SQLite com histórico de jobs, índice de busca (FTS5), macros e configura
 ```bash
 go test ./...            # Go: 25 pacotes (unit + integração + golden)
 go run ./scripts/coverage-gate <coverage.out> 70
-cd frontend && npm test  # Vitest + Testing Library (golden por tool, 99 testes)
+cd frontend && npm test  # Vitest + Testing Library (golden por tool, 105 testes)
 npm run e2e              # Playwright (mock) + smoke contra wails dev real
 ```
 
@@ -267,6 +274,7 @@ Pirâmide completa: testes de contrato do catálogo (fail-fast no `Register`), s
 - ✅ Fundação — registry de tools, jobs, SQLite, UI, CI, CLI
 - ✅ 60 ferramentas (PDF, imagens, dados, texto, segurança) + editor visual de PDF
 - ✅ Busca global FTS5, macros, pastas vigiadas, OCR, live preview, PDF→imagem
+- ✅ Preview do resultado antes de executar (imagem + PDF com simulação visual)
 - ✅ i18n PT-BR/EN/ES, temas, instalador NSIS, modo portable
 
 **Futuro:**
