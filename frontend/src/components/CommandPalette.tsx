@@ -19,9 +19,6 @@ export function CommandPalette({ open, onClose, onSelect }: Props): React.JSX.El
 
   const actions = useMemo(
     () => [
-      { id: '__view:search', label: t('search.title') },
-      { id: '__view:pipelines', label: t('pipelines.title') },
-      { id: '__view:watch', label: t('watch.title') },
       { id: '__view:jobs', label: t('job.title') },
     ],
     [t],
@@ -93,7 +90,7 @@ export function CommandPalette({ open, onClose, onSelect }: Props): React.JSX.El
             className="w-full bg-transparent text-sm text-text outline-none"
             data-testid="palette-input"
           />
-          <button onClick={onClose} aria-label={String('Fechar')} className="text-text-muted hover:text-text">
+          <button onClick={onClose} aria-label={t('common.close')} className="text-text-muted hover:text-text">
             <X className="h-4 w-4" />
           </button>
         </div>

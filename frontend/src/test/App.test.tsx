@@ -64,31 +64,23 @@ describe('AppShell', () => {
     expect(screen.getByTestId('tool-page')).toHaveTextContent('Hash de arquivos')
   })
 
-  it('navega para as páginas Busca, Macros e Watch', async () => {
-    const user = userEvent.setup()
+  it('menu inferior tem só Início e Jobs (Busca/Macros/Watch removidos)', async () => {
     render(<App />)
-    await waitFor(() => expect(screen.getByTestId('nav-search')).toBeInTheDocument())
-
-    await user.click(screen.getByTestId('nav-search'))
-    expect(await screen.findByTestId('search-page')).toBeInTheDocument()
-    // destaque sincronizado: item ativo + seção da tool some
-    expect(screen.getByTestId('nav-search')).toHaveClass('text-accent')
-    await user.click(screen.getByTestId('nav-pipelines'))
-    expect(await screen.findByTestId('pipelines-page')).toBeInTheDocument()
-    expect(screen.getByTestId('nav-pipelines')).toHaveClass('text-accent')
-    expect(await screen.findByText('Nenhuma macro salva')).toBeInTheDocument()
-    await user.click(screen.getByTestId('nav-watch'))
-    expect(await screen.findByTestId('watch-page')).toBeInTheDocument()
-    expect(await screen.findByText('Nenhuma regra ativa')).toBeInTheDocument()
+    await waitFor(() => expect(screen.getByTestId('nav-home')).toBeInTheDocument())
+    expect(screen.getByTestId('nav-jobs')).toBeInTheDocument()
+    expect(screen.queryByTestId('nav-search')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('nav-pipelines')).not.toBeInTheDocument()
+    expect(screen.queryByTestId('nav-watch')).not.toBeInTheDocument()
+    expect(screen.getByTestId('nav-home')).toHaveClass('text-accent')
   })
 
-  it('selecionar tool depois de view inferior volta para a tool', async () => {
+  it('selecionar tool depois de clicar em Jobs volta para a tool', async () => {
     const user = userEvent.setup()
     render(<App />)
     await waitFor(() => expect(screen.getByTestId('tool-security.hashfile')).toBeInTheDocument())
-    // vai para Busca e depois clica numa tool: a tool aparece (bug anterior: ficava na view)
-    await user.click(screen.getByTestId('nav-search'))
-    expect(await screen.findByTestId('search-page')).toBeInTheDocument()
+    // vai para Jobs e depois clica numa tool: a tool aparece
+    await user.click(screen.getByTestId('nav-jobs'))
+    expect(await screen.findByTestId('jobs-empty')).toBeInTheDocument()
     await user.click(screen.getByTestId('tool-security.hashfile'))
     expect(await screen.findByTestId('tool-page')).toBeInTheDocument()
     expect(screen.getByTestId('tool-security.hashfile')).toHaveClass('text-accent')
@@ -119,9 +111,9 @@ describe('AppShell', () => {
     render(<App />)
     expect(await screen.findByTestId('jobs-badge')).toHaveTextContent('1')
     const user = userEvent.setup()
-    await user.click(screen.getByTestId('toggle-jobs'))
+    await user.click(screen.getByTestId('nav-jobs'))
     expect(await screen.findByTestId('job-list')).toBeInTheDocument()
-    expect(screen.getByTestId('toggle-jobs')).toHaveClass('text-accent')
+    expect(screen.getByTestId('nav-jobs')).toHaveClass('text-accent')
   })
 
   it('mostra "nenhuma ferramenta" quando a busca não encontra nada', async () => {
@@ -162,15 +154,14 @@ describe('AppShell', () => {
     expect(screen.getAllByTestId('app-logo')).toHaveLength(1)
   })
 
-  it('busca mostra erro do backend em vez de falhar calada', async () => {
-    setBackend(makeBackend({ searchQuery: async () => { throw new Error('fts quebrou') } }))
+  it('command palette abre Jobs pelo Enter', async () => {
     const user = userEvent.setup()
     render(<App />)
-    await waitFor(() => expect(screen.getByTestId('nav-search')).toBeInTheDocument())
-    await user.click(screen.getByTestId('nav-search'))
-    await user.type(screen.getByTestId('search-input'), 'json')
-    await user.click(screen.getByTestId('search-run'))
-    expect(await screen.findByTestId('search-error', undefined, { timeout: 3000 })).toHaveTextContent('fts quebrou')
+    await waitFor(() => expect(screen.getByTestId('tool-security.hashfile')).toBeInTheDocument())
+    await user.click(screen.getByTestId('open-palette'))
+    const input = screen.getByTestId('palette-input')
+    await user.type(input, 'jobs{Enter}')
+    await waitFor(() => expect(screen.getByTestId('jobs-empty')).toBeInTheDocument())
   })
 })
 
@@ -242,7 +233,7 @@ describe('GenericToolForm (hashfile)', () => {
     setBackend(makeBackend({ listJobs: async () => fakeJobs }))
     const user = userEvent.setup()
     render(<App />)
-    await user.click(await screen.findByTestId('toggle-jobs'))
+    await user.click(await screen.findByTestId('nav-jobs'))
     expect(await screen.findByTestId('job-paths-j1')).toBeInTheDocument()
     expect(screen.getAllByTestId('job-open')).toHaveLength(2)
     expect(screen.getAllByTestId('job-open-folder')).toHaveLength(2)

@@ -20,7 +20,7 @@ test('fluxo completo: escolher ferramenta, calcular hash, ver resultado', async 
   await expect(page.getByTestId('file-preview')).toBeVisible()
 
   await page.getByTestId('run-tool').click()
-  await page.getByTestId('toggle-jobs').click()
+  await page.getByTestId('nav-jobs').click()
 
   const result = page.locator('[data-testid^="job-result-"]')
   await expect(result).toBeVisible({ timeout: 10_000 })
@@ -28,16 +28,12 @@ test('fluxo completo: escolher ferramenta, calcular hash, ver resultado', async 
   await expect(result).toContainText('sha256')
 })
 
-test('navega para as páginas de Busca, Macros e Watch', async ({ page }) => {
-  await page.getByTestId('nav-search').click()
-  await expect(page.getByTestId('search-page')).toBeVisible()
-  await expect(page.getByTestId('search-count')).toContainText('documentos indexados')
-
-  await page.getByTestId('nav-pipelines').click()
-  await expect(page.getByTestId('pipelines-page')).toBeVisible()
-
-  await page.getByTestId('nav-watch').click()
-  await expect(page.getByTestId('watch-page')).toBeVisible()
+test('menu inferior tem só Início e Jobs', async ({ page }) => {
+  await expect(page.getByTestId('nav-home')).toBeVisible()
+  await expect(page.getByTestId('nav-jobs')).toBeVisible()
+  await expect(page.getByTestId('nav-search')).toHaveCount(0)
+  await expect(page.getByTestId('nav-pipelines')).toHaveCount(0)
+  await expect(page.getByTestId('nav-watch')).toHaveCount(0)
 })
 
 test('command palette abre e navega para ferramenta', async ({ page }) => {

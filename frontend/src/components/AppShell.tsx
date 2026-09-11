@@ -3,7 +3,6 @@ import { useEffect, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import {
   Moon, Sun, History, FileSearch, Download, ChevronDown, PanelLeftClose, PanelLeftOpen, House,
-  Search as SearchIcon, Workflow, FolderClock,
 } from 'lucide-react'
 import { useCatalog } from '../stores/catalog'
 import { useTheme } from '../stores/theme'
@@ -12,9 +11,6 @@ import { GenericToolForm } from './tools/GenericToolForm'
 import { ToolHeader } from './ToolHeader'
 import { HomeDashboard } from './HomeDashboard'
 import { JobList } from './JobList'
-import { SearchPage } from './SearchPage'
-import { PipelinesPage } from './PipelinesPage'
-import { WatchPage } from './WatchPage'
 import { getBackend } from '../bindings/backend'
 import { iconFor } from './icons'
 import { useJobs } from '../stores/jobs'
@@ -30,9 +26,9 @@ export function AppShell(): React.JSX.Element {
   const toggleTheme = useTheme((s) => s.toggle)
   const [paletteOpen, setPaletteOpen] = useState(false)
   const [selected, setSelected] = useState<string | null>(null)
-  // view única: 'tool' | 'search' | 'pipelines' | 'watch' | 'jobs' — Jobs virou
-  // view como as demais (antes era toggle sobreposto, que escondia a seleção).
-  const [view, setView] = useState<'tool' | 'search' | 'pipelines' | 'watch' | 'jobs' | 'home'>('home')
+  // view única: 'tool' | 'jobs' | 'home' — menu inferior reduzido a
+  // Início + Jobs (+ tema e barra lateral).
+  const [view, setView] = useState<'tool' | 'jobs' | 'home'>('home')
   const [updateTag, setUpdateTag] = useState<string | null>(null)
   const [sidebarOpen, setSidebarOpen] = useState<boolean>(() => {
     try {
@@ -118,13 +114,10 @@ export function AppShell(): React.JSX.Element {
 
   const selectedTool = tools.find((x) => x.id === selected)
 
-  // tools visíveis no menu de navegação rápida (rodapé)
+  // ferramentas visíveis no menu inferior: só Início e Jobs
   const navItems = [
     { view: 'home' as const, icon: House, label: t('home.title'), testid: 'nav-home' },
-    { view: 'search' as const, icon: SearchIcon, label: t('search.title'), testid: 'nav-search' },
-    { view: 'pipelines' as const, icon: Workflow, label: t('pipelines.title'), testid: 'nav-pipelines' },
-    { view: 'watch' as const, icon: FolderClock, label: t('watch.title'), testid: 'nav-watch' },
-    { view: 'jobs' as const, icon: History, label: t('job.title'), testid: 'toggle-jobs', badge: runningJobs > 0 ? runningJobs : null },
+    { view: 'jobs' as const, icon: History, label: t('job.title'), testid: 'nav-jobs', badge: runningJobs > 0 ? runningJobs : null },
   ]
 
   return (
@@ -286,12 +279,6 @@ export function AppShell(): React.JSX.Element {
             <h2 className="mb-4 text-xl font-semibold">{t('job.title')}</h2>
             <JobList />
           </div>
-        ) : view === 'search' ? (
-          <SearchPage />
-        ) : view === 'pipelines' ? (
-          <PipelinesPage />
-        ) : view === 'watch' ? (
-          <WatchPage />
         ) : view === 'home' || selectedTool == null ? (
           <HomeDashboard
             tools={tools}
@@ -312,8 +299,8 @@ export function AppShell(): React.JSX.Element {
         open={paletteOpen}
         onClose={() => setPaletteOpen(false)}
         onSelect={(id) => {
-          if (id === '__view:search' || id === '__view:pipelines' || id === '__view:watch' || id === '__view:jobs') {
-            goView(id.replace('__view:', '') as typeof view)
+          if (id === '__view:jobs') {
+            goView('jobs')
             return
           }
           goTool(id)
