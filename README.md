@@ -44,7 +44,7 @@ Juntar PDFs, converter imagens, gerar QR codes, extrair texto, renomear em lote 
 - **Converter** entre JPG/PNG/GIF/BMP/TIFF, **redimensionar** com presets, **girar/inverter**
 - **Filtros** (P&B, inverter, blur, nitidez, sépia, contraste, brilho) com **live preview**
 - **Recortar visual** (desenhe/mova/redimensione o recorte sobre a imagem, com **preview do resultado antes de executar**, presets 1:1/4:3/16:9 e lote com o mesmo recorte)
-- **Marca d'água** de texto (diagonal) ou imagem (5 posições + escala), **favicon .ico** multi-resolução
+- **Marca d'água** de texto (diagonal) ou imagem (5 posições + escala), **favicon .ico** com seleção de resoluções (todas/presets/única) e simulação real antes de gerar
 - **GIF**: extrair frames e montar animação a partir de PNGs, **paleta de cores**
 
 ### Dados (8 ferramentas)
@@ -62,8 +62,6 @@ Juntar PDFs, converter imagens, gerar QR codes, extrair texto, renomear em lote 
 
 ### Plataforma
 
-- **Busca global** com índice FTS5 (texto de arquivos + PDFs), insensível a acentos, com prefixos
-- **Macros**: encadeie ferramentas e execute em lote; **pastas vigiadas** disparam macros sozinhas
 - **CLI embutida**: `axisdoc <tool-id> [arquivos]` — as mesmas ferramentas no terminal
 - **OCR** de imagens via Tesseract (quando instalado)
 - Fila de **jobs** com progresso, cancelamento e histórico persistente
@@ -162,8 +160,7 @@ axisdoc.exe img.convert --format jpg foto.png
 | Dados (8) | tabular, xlsxdiff, struct, jsonformat, tablejson, csv2sql, sql2csv, json2table |
 | Texto (12) | diff, rename, stats, qrcode, barcode, lorem, baseconvert, epoch, uuid, slug, columnize, escape |
 | Segurança (1) | hashfile |
-| Busca/OCR (2) | indexação FTS5, OCR via Tesseract |
-| Macros/Watch | pipelines salvas + pastas vigiadas via UI e CLI (`axisdoc run <macro>`) |
+| OCR (1) | OCR via Tesseract (quando instalado) |
 
 ---
 
@@ -175,13 +172,12 @@ axisdoc.exe img.convert --format jpg foto.png
 │  ┌────────────────────┐   ┌───────────────────┐  │
 │  │  React + TS UI     │◄──┤    Go Backend     │  │
 │  │  (Tailwind,        │   │ (bindings: Tool/  │  │
-│  │   Zustand, PDF.js) │   │ Job/System/Search/│  │
-│  └────────────────────┘   │ Pipeline/Watch)   │  │
-│                           └────────┬──────────┘  │
+│  │   Zustand, PDF.js) │   │ Job/System/PdfEdit│  │
+│  └────────────────────┘   └───────────────────┘  │
 │                    ┌───────────────┼───────────┐ │
 │               ┌────▼─────┐  ┌──────▼──┐  ┌─────▼─┐│
 │               │  Tools   │  │  Jobs   │  │ Store ││
-│               │ (60 pkgs)│  │ (fila)  │  │(SQLite││
+│               │ (59 tools) │  │ (fila)  │  │(SQLite││
 │               └──────────┘  └─────────┘  └───────┘│
 └─────────────────────────────────────────────────┘
 ```
@@ -204,7 +200,7 @@ Cada ferramenta implementa a interface `tool.Tool` (`ID/Category/Title/Descripti
 
 ## Onde os dados ficam
 
-Banco SQLite com histórico de jobs, macros e configurações:
+Banco SQLite com histórico de jobs e configurações:
 
 - **Windows**: `%APPDATA%\axisdoc\axisdoc.sqlite3`
 - **Linux**: `~/.config/axisdoc/axisdoc.sqlite3`
@@ -274,7 +270,7 @@ Pirâmide completa: testes de contrato do catálogo (fail-fast no `Register`), s
 
 - ✅ Fundação — registry de tools, jobs, SQLite, UI, CI, CLI
 - ✅ 59 ferramentas (PDF, imagens, dados, texto, segurança) + editor visual de PDF
-- ✅ Busca global FTS5, macros, pastas vigiadas, OCR, live preview, PDF→imagem
+- ✅ Live preview, PDF→imagem, OCR, seleção visual de páginas
 - ✅ Preview do resultado antes de executar (imagem + PDF com simulação visual)
 - ✅ i18n PT-BR/EN/ES, temas, instalador NSIS, modo portable
 
