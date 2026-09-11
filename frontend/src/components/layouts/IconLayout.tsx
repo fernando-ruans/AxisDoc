@@ -19,16 +19,42 @@ interface Ctx {
   error: string | null
 }
 
-// tamanhos reais gravados no .ico pelo backend (writeICO)
-const ICO_SIZES = [16, 24, 32, 48, 64, 128, 256]
+// seleção de resoluções: mesmas chaves do backend (icoAllowedSizes)
+const ICO_PRESETS: Array<{ key: string; sizes: number[] }> = [
+  { key: 'all', sizes: [16, 24, 32, 48, 64, 128, 256] },
+  { key: '16,32,48', sizes: [16, 32, 48] },
+  { key: '16,24,32,48,64', sizes: [16, 24, 32, 48, 64] },
+  { key: 'ico16', sizes: [16] },
+  { key: 'ico24', sizes: [24] },
+  { key: 'ico32', sizes: [32] },
+  { key: 'ico48', sizes: [48] },
+  { key: 'ico64', sizes: [64] },
+  { key: 'ico128', sizes: [128] },
+  { key: 'ico256', sizes: [256] },
+]
+
+function presetSizes(sel: string): number[] {
+  return ICO_PRESETS.find((p) => p.key === sel)?.sizes ?? ICO_PRESETS[0]?.sizes ?? []
+}
+
+// rótulos das opções de resolução (mesmo mapeamento do i18n.test alias)
+function presetLabel(t: (k: string) => string, key: string): string {
+  const alias: Record<string, string> = {
+    all: 'imgiconAll',
+    '16,32,48': 'size1648', '16,24,32,48,64': 'size1664',
+    ico16: 'size16', ico24: 'size24', ico32: 'size32', ico48: 'size48',
+    ico64: 'size64', ico128: 'size128', ico256: 'size256',
+  }
+  return t(`param.opt.${alias[key] ?? key}`)
+}
 
 // IconLayout: layout dedicado ao img.icon. Sem imagem selecionada mostra
-// SÓ o seletor + dica (nada de formulário). Com imagem: simulação
-// multi-resolução do futuro .ico (os 7 tamanhos reais, renderizados localmente)
-// + destino + Executar.
+// SÓ o seletor + dica (nada de formulário). Com imagem: seletor de
+// resoluções + simulação das resoluções que vão no .ico + destino + Executar.
 export function IconLayout({ ctx }: { ctx: Ctx }): React.JSX.Element {
   const { t } = useTranslation()
   const single = ctx.paths.length === 1 ? ctx.paths[0] ?? null : null
+  const sizes = String(ctx.params.sizes ?? 'all')
 
   return (
     <div className="space-y-4" data-testid={`layout-icon-${ctx.toolId}`}>
@@ -38,7 +64,24 @@ export function IconLayout({ ctx }: { ctx: Ctx }): React.JSX.Element {
         </p>
       ) : (
         <>
-          <IconSim path={single} />
+          <div>
+            <span className="mb-1 block text-sm font-medium text-text">{t('param.img.sizes.label')}</span>
+            <div className="flex flex-wrap gap-1" data-testid="icon-sizes">
+              {ICO_PRESETS.map((p) => (
+                <button
+                  type="button"
+                  key={p.key}
+                  onClick={() => ctx.setParam('sizes', p.key)}
+                  className={`rounded px-3 py-1 text-xs font-medium ${sizes === p.key ? 'bg-accent text-white' : 'border border-border text-text hover:border-accent'}`}
+                  data-testid={`icon-size-${p.key}`}
+                >
+                  {presetLabel(t, p.key)}
+                </button>
+              ))}
+            </div>
+            <p className="mt-1 text-xs text-text-muted">{t('param.img.sizes.hint')}</p>
+          </div>
+          <IconSim path={single} sizes={presetSizes(sizes)} />
           {ctx.paths.length > 1 && (
             <p className="text-xs text-text-muted" data-testid="live-batch-note">{t('preview.batchNote')}</p>
           )}
@@ -87,9 +130,9 @@ function IconDest({ ctx }: { ctx: Ctx }): React.JSX.Element {
   )
 }
 
-// IconSim: simulação multi-resolução — mostra a imagem de origem e as 6
-// resoluções do .ico lado a lado (como ficarão no arquivo final).
-function IconSim({ path }: { path: string }): React.JSX.Element | null {
+// IconSim: simulação — mostra lado a lado só as resoluções que vão no .ico
+// (como ficarão no arquivo final).
+function IconSim({ path, sizes }: { path: string; sizes: number[] }): React.JSX.Element | null {
   const { t } = useTranslation()
   const [token, setToken] = useState<string | null>(null)
   const name = path.split(/[\\/]/).pop() ?? path
@@ -127,13 +170,13 @@ function IconSim({ path }: { path: string }): React.JSX.Element | null {
         {t('tool.imgicon.simTitle')} — {name}
       </p>
       <div className="flex flex-wrap items-end gap-4 bg-checker p-4" data-testid="icon-sim-sizes">
-        {ICO_SIZES.map((s) => (
+        {sizes.map((s) => (
           <div key={s} className="flex flex-col items-center gap-1">
             <img
               src={src}
               alt={`${s}px`}
-              style={{ width: s, height: s }}
-              className={s > 96 ? 'max-h-28 w-auto' : 'bg-white object-contain'}
+              style={{ width: s > 128 ? 128 : s, height: s > 128 ? 128 : s }}
+              className="bg-white object-contain"
               data-testid={`icon-sim-${s}`}
             />
             <span className="text-[11px] tabular-nums text-text-muted">{s}×{s}</span>

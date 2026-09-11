@@ -296,6 +296,10 @@ export const ptBR = {
       print: 'Impressão', printHighRes: 'Impressão alta', modify: 'Modificar',
       extract: 'Extrair', assemble: 'Montar', form: 'Formulários', annotate: 'Anotar',
       all: 'Tudo', none: 'Nada',
+      imgiconAll: 'Todas (7)',
+      size1648: '16, 32, 48', size1664: '16–64',
+      size16: '16', size24: '24', size32: '32', size48: '48',
+      size64: '64', size128: '128', size256: '256',
       png: 'PNG', jpg: 'JPG', gif: 'GIF', bmp: 'BMP', tiff: 'TIFF',
       xlsx: 'XLSX', csv: 'CSV', json: 'JSON', yaml: 'YAML', toml: 'TOML',
       sqlite: 'SQLite', postgres: 'PostgreSQL', mysql: 'MySQL',
@@ -402,6 +406,7 @@ export const ptBR = {
       placeholder: 'Ex.: CONFIDENCIAL',
     },
     img: {
+      sizes: { label: 'Resoluções', hint: 'Só as resoluções marcadas vão dentro do .ico' },
       format: { label: 'Formato' },
       quality: { label: 'Qualidade', hint: 'Só vale para JPG' },
       width: { label: 'Largura' },

@@ -76,6 +76,9 @@ describe('i18n completude', () => {
               '-': 'dash', _: 'underscore',
               v4: 'ver4', v7: 'ver7',
               first: 'pgFirst', last: 'pgLast', middle: 'pgMiddle', all: 'pgAll', custom: 'pgCustom',
+              '16,32,48': 'size1648', '16,24,32,48,64': 'size1664',
+              ico16: 'size16', ico24: 'size24', ico32: 'size32', ico48: 'size48',
+              ico64: 'size64', ico128: 'size128', ico256: 'size256',
             }
             const optKey = `param.opt.${alias[opt] ?? opt}`
             if (!getPath(d, optKey)) {

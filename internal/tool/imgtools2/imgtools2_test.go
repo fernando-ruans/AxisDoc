@@ -161,6 +161,39 @@ func TestIconGen(t *testing.T) {
 	}
 }
 
+func TestIconGenSizes(t *testing.T) {
+	dir := t.TempDir()
+	p := filepath.Join(dir, "img.png")
+	writePNG(t, p, 256, 256)
+	// só 32px: header declara 1 imagem (bytes 4-5)
+	out := runOne(t, NewIconGen(), tool.Input{
+		Paths:  []string{p},
+		Params: map[string]any{"outputPath": filepath.Join(dir, "s.ico"), "sizes": "ico32"},
+	})
+	raw, err := os.ReadFile(out.Paths[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if raw[4] != 1 || raw[5] != 0 {
+		t.Fatalf("esperado 1 imagem no ICO, count=%d", int(raw[4])+int(raw[5])<<8)
+	}
+	if raw[6] != 32 {
+		t.Fatalf("esperado tamanho 32, obtido %d", raw[6])
+	}
+	// seleção desconhecida cai para o conjunto completo
+	out = runOne(t, NewIconGen(), tool.Input{
+		Paths:  []string{p},
+		Params: map[string]any{"outputPath": filepath.Join(dir, "f.ico"), "sizes": "nope"},
+	})
+	raw, err = os.ReadFile(out.Paths[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if int(raw[4])+int(raw[5])<<8 != 7 {
+		t.Fatalf("esperado 7 imagens no fallback, count=%d", int(raw[4])+int(raw[5])<<8)
+	}
+}
+
 func TestGIFExtractAndBuild(t *testing.T) {
 	dir := t.TempDir()
 	a := filepath.Join(dir, "a.png")

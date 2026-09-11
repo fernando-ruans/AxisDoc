@@ -298,6 +298,10 @@ export const es: Dict = {
       print: 'Impresión', printHighRes: 'Impresión alta', modify: 'Modificar',
       extract: 'Extraer', assemble: 'Montar', form: 'Formularios', annotate: 'Anotar',
       all: 'Todo', none: 'Nada',
+      imgiconAll: 'Todas (7)',
+      size1648: '16, 32, 48', size1664: '16–64',
+      size16: '16', size24: '24', size32: '32', size48: '48',
+      size64: '64', size128: '128', size256: '256',
       png: 'PNG', jpg: 'JPG', gif: 'GIF', bmp: 'BMP', tiff: 'TIFF',
       xlsx: 'XLSX', csv: 'CSV', json: 'JSON', yaml: 'YAML', toml: 'TOML',
       sqlite: 'SQLite', postgres: 'PostgreSQL', mysql: 'MySQL',
@@ -404,6 +408,7 @@ export const es: Dict = {
       placeholder: 'Ej.: CONFIDENCIAL',
     },
     img: {
+      sizes: { label: 'Resoluciones', hint: 'Solo las resoluciones marcadas van dentro del .ico' },
       format: { label: 'Formato' },
       quality: { label: 'Calidad', hint: 'Solo vale para JPG' },
       width: { label: 'Ancho' },

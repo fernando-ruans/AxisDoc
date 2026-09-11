@@ -251,26 +251,6 @@ export namespace store {
 		    return a;
 		}
 	}
-	export class SearchHit {
-	    docId: string;
-	    path: string;
-	    title: string;
-	    snippet: string;
-	    rank: number;
-	
-	    static createFrom(source: any = {}) {
-	        return new SearchHit(source);
-	    }
-	
-	    constructor(source: any = {}) {
-	        if ('string' === typeof source) source = JSON.parse(source);
-	        this.docId = source["docId"];
-	        this.path = source["path"];
-	        this.title = source["title"];
-	        this.snippet = source["snippet"];
-	        this.rank = source["rank"];
-	    }
-	}
 
 }
 

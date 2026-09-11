@@ -271,6 +271,10 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
     descKey: 'tool.imgicon.desc', icon: 'shapes', stepNames: ['step.img2.icon'],
     params: [
       param('outputPath', 'param.outputPath.label', 'output', { default: 'icon.ico' }),
+      param('sizes', 'param.img.sizes.label', 'select', {
+        options: ['all', '16,32,48', '16,24,32,48,64', 'ico16', 'ico24', 'ico32', 'ico48', 'ico64', 'ico128', 'ico256'],
+        default: 'all', widget: 'segmented', hint: 'param.img.sizes.hint',
+      }),
     ],
   },
   {

@@ -339,6 +339,34 @@ func NewIconGen() *IconGen {
 func (t *IconGen) Params() []tool.Param {
 	return []tool.Param{
 		{Key: "outputPath", Label: "param.outputPath.label", Type: tool.ParamOutput, Default: "icon.ico"},
+		{Key: "sizes", Label: "param.img.sizes.label", Type: tool.ParamSelect, Default: "all",
+			Options: []string{"all", "16,32,48", "16,24,32,48,64", "ico16", "ico24", "ico32", "ico48", "ico64", "ico128", "ico256"},
+			Widget: tool.WidgetSegmented, Hint: "param.img.sizes.hint"},
+	}
+}
+
+// icoAllowedSizes traduz a seleção de resoluções em lista concreta.
+func icoAllowedSizes(sel string) []int {
+	full := []int{16, 24, 32, 48, 64, 128, 256}
+	switch sel {
+	case "", "all":
+		return full
+	case "16,32,48":
+		return []int{16, 32, 48}
+	case "16,24,32,48,64":
+		return []int{16, 24, 32, 48, 64}
+	default:
+		if strings.HasPrefix(sel, "ico") {
+			var n int
+			if _, err := fmt.Sscanf(sel, "ico%d", &n); err == nil {
+				for _, s := range full {
+					if s == n {
+						return []int{n}
+					}
+				}
+			}
+		}
+		return full
 	}
 }
 
@@ -362,7 +390,8 @@ func (t *IconGen) run(_ context.Context, in tool.Input, _ func(pct float64)) (to
 		dest = filepath.Join(tool.OutputDir(in), dest)
 	}
 	dest = output.NextAvailablePath(dest)
-	if err := writeICO(dest, src); err != nil {
+	sizes := icoAllowedSizes(tool.ParamString(in, "sizes", "all"))
+	if err := writeICO(dest, src, sizes); err != nil {
 		return tool.Output{}, fmt.Errorf("img.icon: %w", err)
 	}
 	return tool.Output{Paths: []string{dest}, Message: "ICO gerado: " + filepath.Base(dest)}, nil
@@ -379,8 +408,10 @@ type icoDirEntry struct {
 	Offset uint32
 }
 
-func writeICO(path string, src image.Image) error {
-	sizes := []int{16, 24, 32, 48, 64, 128, 256}
+func writeICO(path string, src image.Image, sizes []int) error {
+	if len(sizes) == 0 {
+		sizes = []int{16, 24, 32, 48, 64, 128, 256}
+	}
 	blobs := make([][]byte, 0, len(sizes))
 	for _, s := range sizes {
 		r := imaging.Resize(src, s, s, imaging.Lanczos)

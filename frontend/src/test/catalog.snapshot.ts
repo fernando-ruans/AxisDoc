@@ -259,6 +259,26 @@ export const BACKEND_SNAPSHOT = [
     "label": "param.outputPath.label",
     "type": "output",
     "def": "icon.ico"
+   },
+   {
+    "key": "sizes",
+    "label": "param.img.sizes.label",
+    "type": "select",
+    "options": [
+     "all",
+     "16,32,48",
+     "16,24,32,48,64",
+     "ico16",
+     "ico24",
+     "ico32",
+     "ico48",
+     "ico64",
+     "ico128",
+     "ico256"
+    ],
+    "def": "all",
+    "hint": "param.img.sizes.hint",
+    "w": "segmented"
    }
   ]
  },
