@@ -19,7 +19,6 @@ export const ptBR = {
     image: 'Imagens',
     data: 'Dados',
     text: 'Texto',
-    search: 'Busca',
     ocr: 'OCR',
   },
   tool: {
@@ -143,10 +142,6 @@ export const ptBR = {
     barcode: {
       title: 'Código de barras',
       desc: 'Gera CODE-128 ou EAN-13',
-    },
-    searchindex: {
-      title: 'Indexar para busca',
-      desc: 'Indexa arquivos de texto e PDF na busca global',
     },
     ocr: {
       title: 'OCR de imagem',
@@ -452,9 +447,6 @@ export const ptBR = {
       delimiter: { label: 'Delimitador' },
       padding: { label: 'Espaçamento' },
       escapekind: { label: 'Operação' },
-    },
-    search: {
-      recursive: { label: 'Incluir subpastas', hint: 'Percorre a pasta inteira' },
     },
     rename: {
       pattern: { hint: 'Ex.: (.*) casa tudo; use grupos (a|b)' },

@@ -22,7 +22,6 @@ var expectedIDs = []string{
 	"img.convert", "img.resize", "img.watermark",
 	"data.tabular", "data.xlsxdiff", "data.struct", "data.jsonformat", "data.tablejson",
 	"text.diff", "text.rename", "text.stats", "text.qrcode", "text.barcode",
-	"search.index",
 	// ocr.image é condicional (tesseract); não entra aqui
 }
 

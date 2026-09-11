@@ -22,7 +22,6 @@ import (
 
 	"github.com/ferna/axisdoc/internal/output"
 	"github.com/ferna/axisdoc/internal/pipeline"
-	"github.com/ferna/axisdoc/internal/search"
 	"github.com/ferna/axisdoc/internal/store"
 	"github.com/ferna/axisdoc/internal/tool"
 	"github.com/ferna/axisdoc/internal/tool/datafiles"
@@ -31,17 +30,7 @@ import (
 	"github.com/ferna/axisdoc/internal/watcher"
 )
 
-// Fallbacks pré-startup: o Wails faz Bind dos serviços no NewApp, antes do
-// startup() abrir o SQLite. Esses fallbacks em memória evitam nil pointer e
-// são substituídos pelos reais no startup().
-func newSearchServiceFallback() *SearchService {
-	st, err := store.Open(":memory:")
-	if err != nil {
-		return &SearchService{}
-	}
-	return &SearchService{repo: st.Search(), svc: search.NewService(st.Search())}
-}
-
+// PipelineService expõe macros ao frontend.
 func newPipelineRepoFallback() *pipeline.Repo {
 	st, err := store.Open(":memory:")
 	if err != nil {
@@ -52,47 +41,6 @@ func newPipelineRepoFallback() *pipeline.Repo {
 
 func newPipelineRunnerFallback(reg *tool.Registry) *pipeline.Runner {
 	return pipeline.NewRunner(reg)
-}
-
-func newWatchServiceFallback() *WatchService {
-	return &WatchService{}
-}
-
-// SearchService expõe a busca global ao frontend.
-type SearchService struct {
-	repo *store.SearchRepo
-	svc  *search.Service
-}
-
-// Query busca no índice global. Nunca retorna null.
-func (s *SearchService) Query(q string, limit int) ([]store.SearchHit, error) {
-	if s.repo == nil {
-		return []store.SearchHit{}, nil
-	}
-	hits, err := s.repo.Query(context.Background(), q, limit)
-	if err != nil {
-		return nil, err
-	}
-	if hits == nil {
-		return []store.SearchHit{}, nil
-	}
-	return hits, nil
-}
-
-// Count documentos indexados.
-func (s *SearchService) Count() (int, error) {
-	if s.repo == nil {
-		return 0, nil
-	}
-	return s.repo.Count(context.Background())
-}
-
-// IndexFiles indexa arquivos diretamente (fora da fila de jobs).
-func (s *SearchService) IndexFiles(paths []string) (int, error) {
-	if s.svc == nil {
-		return 0, fmt.Errorf("busca indisponível")
-	}
-	return s.svc.IndexFiles(context.Background(), paths, nil)
 }
 
 // PipelineService expõe macros ao frontend.

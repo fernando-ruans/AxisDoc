@@ -139,7 +139,7 @@ Saídas: `frontend/public/logo.png` (cabeçalho), `build/appicon.png` (512px) e 
 
 ## Ferramentas
 
-São **60 ferramentas** organizadas por categoria na sidebar, todas com formulário próprio por intenção (transformar, gerar ou inspecionar), **preview do resultado antes de executar** e resultado inline com botões Abrir / Abrir pasta / Copiar caminho.
+São **59 ferramentas** organizadas por categoria na sidebar, todas com formulário próprio por intenção (transformar, gerar ou inspecionar), **preview do resultado antes de executar** e resultado inline com botões Abrir / Abrir pasta / Copiar caminho.
 
 > **Filosofia de preview:** nada é gravado antes de confirmar. Ferramentas visuais mostram o efeito na hora (trocar a opção atualiza o preview); o botão Executar só então grava no destino escolhido.
 
@@ -204,7 +204,7 @@ Cada ferramenta implementa a interface `tool.Tool` (`ID/Category/Title/Descripti
 
 ## Onde os dados ficam
 
-Banco SQLite com histórico de jobs, índice de busca (FTS5), macros e configurações:
+Banco SQLite com histórico de jobs, macros e configurações:
 
 - **Windows**: `%APPDATA%\axisdoc\axisdoc.sqlite3`
 - **Linux**: `~/.config/axisdoc/axisdoc.sqlite3`
@@ -235,8 +235,8 @@ Banco SQLite com histórico de jobs, índice de busca (FTS5), macros e configura
 │   ├── tool/datafiles*  # 8 ferramentas de dados (2 pacotes)
 │   ├── tool/texttools*  # 12 ferramentas de texto (2 pacotes)
 │   ├── jobs/            # fila de execução, progresso, cancelamento
-│   ├── store/           # SQLite: jobs, settings, backups, busca FTS5
-│   ├── search/          # indexação e busca global
+│   ├── store/           # SQLite: jobs, settings, backups
+│   ├── watcher/         # pastas vigiadas (backend)
 │   ├── pipeline/        # macros persistidas
 │   ├── watcher/         # pastas vigiadas (fsnotify)
 │   ├── cli/             # modo linha de comando
@@ -273,7 +273,7 @@ Pirâmide completa: testes de contrato do catálogo (fail-fast no `Register`), s
 **Concluído:**
 
 - ✅ Fundação — registry de tools, jobs, SQLite, UI, CI, CLI
-- ✅ 60 ferramentas (PDF, imagens, dados, texto, segurança) + editor visual de PDF
+- ✅ 59 ferramentas (PDF, imagens, dados, texto, segurança) + editor visual de PDF
 - ✅ Busca global FTS5, macros, pastas vigiadas, OCR, live preview, PDF→imagem
 - ✅ Preview do resultado antes de executar (imagem + PDF com simulação visual)
 - ✅ i18n PT-BR/EN/ES, temas, instalador NSIS, modo portable

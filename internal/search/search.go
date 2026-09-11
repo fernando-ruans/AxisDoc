@@ -5,14 +5,12 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
-	"fmt"
 	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/ferna/axisdoc/internal/store"
-	"github.com/ferna/axisdoc/internal/tool"
 	"github.com/ferna/axisdoc/internal/tool/pdftools"
 )
 
@@ -127,57 +125,4 @@ func (s *Service) Query(ctx context.Context, q string, limit int) ([]store.Searc
 // Count documentos indexados.
 func (s *Service) Count(ctx context.Context) (int, error) {
 	return s.repo.Count(ctx)
-}
-
-// --- Ferramenta "indexar para busca" (aparece na UI) ---
-
-// IndexTool indexa arquivos no índice de busca.
-type IndexTool struct {
-	Svc *Service
-}
-
-func NewIndexTool(svc *Service) *IndexTool { return &IndexTool{Svc: svc} }
-
-func (t *IndexTool) ID() string          { return "search.index" }
-func (t *IndexTool) Category() string    { return "search" }
-func (t *IndexTool) Title() string       { return "tool.searchindex.title" }
-func (t *IndexTool) Description() string { return "tool.searchindex.desc" }
-func (t *IndexTool) Icon() string        { return "database" }
-func (t *IndexTool) Params() []tool.Param {
-	return []tool.Param{
-		{Key: "recursive", Label: "param.search.recursive.label", Type: tool.ParamBool, Default: false,
-			Widget: tool.WidgetSwitch, Hint: "param.search.recursive.hint"},
-	}
-}
-
-func (t *IndexTool) Steps() []tool.Step { return []tool.Step{indexStep{t}} }
-
-type indexStep struct{ t *IndexTool }
-
-func (s indexStep) Name() string { return "step.search.index" }
-
-func (s indexStep) Run(ctx context.Context, in tool.Input, report func(pct float64)) (tool.Output, error) {
-	paths := in.Paths
-	if tool.ParamBoolValue(in, "recursive", false) {
-		// expande diretórios
-		var expanded []string
-		for _, p := range in.Paths {
-			if st, err := os.Stat(p); err == nil && st.IsDir() {
-				_ = filepath.WalkDir(p, func(path string, d os.DirEntry, err error) error {
-					if err == nil && !d.IsDir() {
-						expanded = append(expanded, path)
-					}
-					return nil
-				})
-			} else {
-				expanded = append(expanded, p)
-			}
-		}
-		paths = expanded
-	}
-	n, err := s.t.Svc.IndexFiles(ctx, paths, report)
-	if err != nil {
-		return tool.Output{}, err
-	}
-	return tool.Output{Message: fmt.Sprintf("%d documento(s) indexado(s)", n)}, nil
 }

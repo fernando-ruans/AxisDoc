@@ -21,7 +21,6 @@ export const en: Dict = {
     image: 'Images',
     data: 'Data',
     text: 'Text',
-    search: 'Search',
     ocr: 'OCR',
   },
   tool: {
@@ -145,10 +144,6 @@ export const en: Dict = {
     barcode: {
       title: 'Barcode',
       desc: 'Generate CODE-128 or EAN-13',
-    },
-    searchindex: {
-      title: 'Index for search',
-      desc: 'Index text and PDF files into global search',
     },
     ocr: {
       title: 'Image OCR',
@@ -454,9 +449,6 @@ export const en: Dict = {
       delimiter: { label: 'Delimiter' },
       padding: { label: 'Spacing' },
       escapekind: { label: 'Operation' },
-    },
-    search: {
-      recursive: { label: 'Include subfolders', hint: 'Walks the whole folder' },
     },
     rename: {
       pattern: { hint: 'E.g. (.*) matches all; use groups (a|b)' },

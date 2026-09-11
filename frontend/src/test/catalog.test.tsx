@@ -29,16 +29,16 @@ beforeEach(() => {
 })
 
 describe('catálogo canônico', () => {
-  it('tem 60 tools com IDs únicos', () => {
+  it('tem 59 tools com IDs únicos', () => {
     const ids = CANONICAL_CATALOG.map((t) => t.id)
-    expect(ids).toHaveLength(60)
-    expect(new Set(ids).size).toBe(60)
+    expect(ids).toHaveLength(59)
+    expect(new Set(ids).size).toBe(59)
   })
 
   // Trava anti-drift: cada tool do snapshot do backend deve existir idêntica
   // no mirror TS (params, options, defaults, widgets, condicionais).
   // Exceções documentadas: pdf.toimage/pdf.editor/pdf.extractpages
-  // (frontend-driven, sem backend) e search.index/ocr.image (registradas no startup).
+  // (frontend-driven, sem backend) e ocr.image (registrada no startup).
   // Campos omitempty do Go ausentes no JSON viram null na comparação.
   it('mirror TS espelha o snapshot do backend param a param', () => {
     interface SnapParam {
@@ -139,7 +139,7 @@ describe('formulário de cada tool (golden por tool)', () => {
       'security.hashfile',
       'data.tabular', 'data.xlsxdiff', 'data.struct', 'data.jsonformat', 'data.tablejson',
       'data.csv2sql', 'data.sql2csv', 'data.json2table',
-      'text.rename', 'search.index', 'ocr.image'].includes(tool.id)) continue
+      'text.rename', 'ocr.image'].includes(tool.id)) continue
     it(`${tool.id}: renderiza label + controle para cada param`, async () => {
       if (tool.id === 'ocr.image') {
         // sem backend real de OCR no teste de UI; pula
@@ -324,7 +324,6 @@ describe('formulário de cada tool (golden por tool)', () => {
     ['data.sql2csv', 'layout-transform-data.sql2csv'],
     ['data.json2table', 'layout-transform-data.json2table'],
     ['text.rename', 'layout-transform-text.rename'],
-    ['search.index', 'layout-transform-search.index'],
     ['ocr.image', 'layout-transform-ocr.image'],
   ])('%s usa o layout %s', async (id, layoutId) => {
     const tool = CANONICAL_CATALOG.find((t) => t.id === id)

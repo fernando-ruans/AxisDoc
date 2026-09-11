@@ -12,7 +12,6 @@ import (
 	"github.com/ferna/axisdoc/internal/ocr"
 	"github.com/ferna/axisdoc/internal/pipeline"
 	"github.com/ferna/axisdoc/internal/runtimei"
-	"github.com/ferna/axisdoc/internal/search"
 	"github.com/ferna/axisdoc/internal/store"
 	"github.com/ferna/axisdoc/internal/tool"
 	"github.com/ferna/axisdoc/internal/tool/datafiles"
@@ -38,7 +37,6 @@ type App struct {
 	toolSvc     *ToolService
 	jobSvc      *JobService
 	sysSvc      *SystemService
-	searchSvc   *SearchService
 	pipelineSvc *PipelineService
 	watchSvc    *WatchService
 	pdfEditSvc  *PdfEditService
@@ -48,15 +46,13 @@ type App struct {
 func NewApp() *App {
 	reg := NewRegistry()
 
-	searchSvc := newSearchServiceFallback()
 	return &App{
 		registry:    reg,
 		toolSvc:     &ToolService{reg: reg},
 		jobSvc:      &JobService{},
 		sysSvc:      &SystemService{},
-		searchSvc:   searchSvc,
 		pipelineSvc: &PipelineService{},
-		watchSvc:    newWatchServiceFallback(),
+		watchSvc:    &WatchService{},
 		pdfEditSvc:  &PdfEditService{},
 	}
 }
@@ -167,13 +163,6 @@ func (a *App) startup(ctx context.Context) {
 	a.sysSvc.ctx = ctx
 	a.sysSvc.dialogs = wailsDialogs
 	a.sysSvc.emitter = wailsEmitter
-
-	searchSvc := search.NewService(st.Search())
-	// registra a tool de indexação que usa o serviço
-	if err := a.registry.Register(search.NewIndexTool(searchSvc)); err != nil {
-		slog.Error("registrar search.index", "err", err)
-	}
-	a.searchSvc = &SearchService{repo: st.Search(), svc: searchSvc}
 
 	pipelineRepo := pipeline.NewRepo(st.Settings())
 	pipelineRunner := pipeline.NewRunner(a.registry)

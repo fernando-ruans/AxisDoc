@@ -365,13 +365,6 @@ export const CANONICAL_CATALOG: ToolInfo[] = [
       param('height', 'param.img.height.label', 'number', { default: 100, min: 20, max: 1000, widget: 'slider' }),
     ],
   },
-  {
-    id: 'search.index', category: 'search', titleKey: 'tool.searchindex.title',
-    descKey: 'tool.searchindex.desc', icon: 'database', stepNames: ['step.search.index'],
-    params: [
-      param('recursive', 'param.search.recursive.label', 'bool', { default: false, widget: 'switch', hint: 'param.search.recursive.hint' }),
-    ],
-  },
   fe('pdf.editor'),
   {
     id: 'data.csv2sql', category: 'data', titleKey: 'tool.csv2sql.title',

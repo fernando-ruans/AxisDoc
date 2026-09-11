@@ -58,8 +58,8 @@ func TestCatalogContract(t *testing.T) {
 	}
 
 	// 4. snapshot: o JSON canônico do catálogo deve ser idêntico ao gravado.
-	// NOTA: o snapshot cobre o registry estático (NewRegistry). Tools registradas
-	// no startup (search.index, ocr.image condicional) e tools frontend-driven
+	// NOTA: o snapshot cobre o registry estático (NewRegistry). A tool
+	// ocr.image (condicional no startup) e as tools frontend-driven
 	// (pdf.toimage, pdf.editor — sem backend) vivem só no mirror TS
 	// (frontend/src/test/catalog.ts), que é validado pelo golden por tool.
 	// Se este teste falhar, rode com UPDATE_SNAPSHOT=1 e atualize o mirror TS

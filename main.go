@@ -39,7 +39,6 @@ func main() {
 			app.toolSvc,
 			app.jobSvc,
 			app.sysSvc,
-			app.searchSvc,
 			app.pipelineSvc,
 			app.watchSvc,
 			app.pdfEditSvc,

@@ -21,7 +21,6 @@ export const es: Dict = {
     image: 'Imágenes',
     data: 'Datos',
     text: 'Texto',
-    search: 'Búsqueda',
     ocr: 'OCR',
   },
   tool: {
@@ -145,10 +144,6 @@ export const es: Dict = {
     barcode: {
       title: 'Código de barras',
       desc: 'Genera CODE-128 o EAN-13',
-    },
-    searchindex: {
-      title: 'Indexar para búsqueda',
-      desc: 'Indexa archivos de texto y PDF en la búsqueda global',
     },
     ocr: {
       title: 'OCR de imagen',
@@ -454,9 +449,6 @@ export const es: Dict = {
       delimiter: { label: 'Delimitador' },
       padding: { label: 'Espaciado' },
       escapekind: { label: 'Operación' },
-    },
-    search: {
-      recursive: { label: 'Incluir subcarpetas', hint: 'Recorre toda la carpeta' },
     },
     rename: {
       pattern: { hint: 'Ej.: (.*) casa todo; use grupos (a|b)' },
