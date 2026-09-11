@@ -159,7 +159,7 @@ function LegacyForm({ tool, initial }: { tool: ToolInfo; initial: Record<string,
     const files = (await getBackend().pickFiles()) ?? []
     setPaths((prev) => [...prev, ...files.filter((f) => !prev.includes(f))])
   }
-  const addFolder = async (): Promise<void> => {
+  const pickFolderPath = async (): Promise<void> => {
     const folder = await getBackend().pickFolder()
     if (folder) setPaths((prev) => (prev.includes(folder) ? prev : [...prev, folder]))
   }
@@ -200,7 +200,7 @@ function LegacyForm({ tool, initial }: { tool: ToolInfo; initial: Record<string,
           </button>
           {tool.id !== 'pdf.extractpages' && (
             <button
-              onClick={() => void addFolder()}
+              onClick={() => void pickFolderPath()}
               className="flex items-center gap-2 rounded-md border border-dashed border-border px-3 py-2 text-sm text-text hover:border-accent hover:text-accent"
               data-testid="pick-folder"
             >
@@ -318,7 +318,9 @@ function LegacyForm({ tool, initial }: { tool: ToolInfo; initial: Record<string,
                     if (folder) setParam(p.key, folder)
                     return
                   }
-                  setParam(p.key, await getBackend().savePath(def))
+                  // cancelar o diálogo resolve com '' (string vazia) — não grava
+                  const chosen = await getBackend().savePath(def)
+                  if (chosen) setParam(p.key, chosen)
                 }}
                 className="flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm text-text hover:border-accent"
                 data-testid={`param-${p.key}`}

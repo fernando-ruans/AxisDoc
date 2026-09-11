@@ -97,16 +97,18 @@ export function PdfToImageRunner({ paths, params }: Props): React.JSX.Element {
     setError(null)
     setResults([])
     setProgress(0)
+    let doc: { cleanup: () => Promise<void> } | null = null
     try {
       const refs = await getBackend().registerPreviewFiles([pdfPath])
       if (refs.length === 0) throw new Error('preview indisponível')
-      const doc = await getDocument({ url: `/preview/${refs[0].token}` }).promise
-      const selected = resolvePages(pagesMode, customSpec, doc.numPages) ?? Array.from({ length: doc.numPages }, (_, i) => i + 1)
+      const loaded = await getDocument({ url: `/preview/${refs[0]?.token ?? ''}` }).promise
+      doc = loaded
+      const selected = resolvePages(pagesMode, customSpec, loaded.numPages) ?? Array.from({ length: loaded.numPages }, (_, i) => i + 1)
       if (selected.length === 0) throw new Error('nenhuma página válida')
       const out: string[] = []
       for (let i = 0; i < selected.length; i++) {
         const pageNum = selected[i]
-        const pg = await doc.getPage(pageNum)
+        const pg = await loaded.getPage(pageNum ?? 0)
         const viewport = pg.getViewport({ scale: 2 })
         const canvas = document.createElement('canvas')
         canvas.width = Math.floor(viewport.width)
@@ -117,15 +119,19 @@ export function PdfToImageRunner({ paths, params }: Props): React.JSX.Element {
         const mime = format === 'jpg' ? 'image/jpeg' : 'image/png'
         const dataUrl = canvas.toDataURL(mime, quality / 100)
         const base64 = dataUrl.slice(dataUrl.indexOf(',') + 1)
-        const saved = await getBackend().saveRenderedPage(outputDir, baseName, pageNum, format, base64)
+        const saved = await getBackend().saveRenderedPage(outputDir, baseName, pageNum ?? 0, format, base64)
         out.push(saved)
         setProgress(Math.round(((i + 1) / selected.length) * 100))
       }
-      await doc.cleanup()
       setResults(out)
     } catch (e) {
       setError(String(e))
     } finally {
+      try {
+        await doc?.cleanup()
+      } catch {
+        // worker já descartado
+      }
       setBusy(false)
     }
   }

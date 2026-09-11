@@ -58,7 +58,7 @@ export function PdfViewer({ src }: Props): React.JSX.Element {
           disabled={page <= 1}
           className="rounded p-1 hover:bg-surface-2 disabled:opacity-30"
           data-testid="pdf-prev"
-          aria-label="prev"
+          aria-label={t('common.previous')}
         >
           <ChevronLeft className="h-4 w-4" />
         </button>
@@ -70,14 +70,14 @@ export function PdfViewer({ src }: Props): React.JSX.Element {
           disabled={total > 0 && page >= total}
           className="rounded p-1 hover:bg-surface-2 disabled:opacity-30"
           data-testid="pdf-next"
-          aria-label="next"
+          aria-label={t('common.next')}
         >
           <ChevronRight className="h-4 w-4" />
         </button>
-        <button onClick={() => setZoom((z) => Math.max(0.4, z - 0.2))} className="rounded p-1 hover:bg-surface-2" aria-label="zoom-out">
+        <button onClick={() => setZoom((z) => Math.max(0.4, z - 0.2))} className="rounded p-1 hover:bg-surface-2" aria-label={t('common.zoomOut')}>
           <ZoomOut className="h-4 w-4" />
         </button>
-        <button onClick={() => setZoom((z) => Math.min(3, z + 0.2))} className="rounded p-1 hover:bg-surface-2" aria-label="zoom-in">
+        <button onClick={() => setZoom((z) => Math.min(3, z + 0.2))} className="rounded p-1 hover:bg-surface-2" aria-label={t('common.zoomIn')}>
           <ZoomIn className="h-4 w-4" />
         </button>
       </div>

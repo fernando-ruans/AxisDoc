@@ -29,7 +29,7 @@ test('executa hash na tool real', async ({ page }) => {
   })
   expect(executed).toBeTruthy()
 
-  await page.getByTestId('toggle-jobs').click()
+  await page.getByTestId('nav-jobs').click()
   const result = page.getByTestId(`job-result-${executed}`)
   await expect(result).toBeVisible({ timeout: 15_000 })
   await expect(result).toContainText('win.ini', { ignoreCase: true })

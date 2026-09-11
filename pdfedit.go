@@ -102,40 +102,53 @@ func removePages(pdfPath, pages, dest string) ([]string, error) {
 
 func rotatePages(pdfPath string, rots []PageRotation, dest string) ([]string, error) {
 	current := pdfPath
+	// temps de todas as rotações intermediárias (limpos no fim)
+	var temps []string
+	defer func() {
+		for _, t := range temps {
+			os.RemoveAll(t)
+		}
+	}()
+	mkTemp := func() (string, error) {
+		tmp, err := output.TempDir()
+		if err != nil {
+			return "", err
+		}
+		temps = append(temps, tmp)
+		return filepath.Join(tmp, "rot.pdf"), nil
+	}
 	for _, r := range rots {
 		if r.Angle%90 != 0 {
 			return nil, fmt.Errorf("ângulo deve ser múltiplo de 90")
 		}
-		tmp, err := output.TempDir()
+		inter, err := mkTemp()
 		if err != nil {
 			return nil, err
 		}
-		inter := filepath.Join(tmp, "rot.pdf")
 		sel := []string{fmt.Sprintf("%d", r.Page)}
 		if err := api.RotateFile(current, inter, r.Angle%360, sel, nil); err != nil {
-			os.RemoveAll(tmp)
 			return nil, fmt.Errorf("girar página %d: %w", r.Page, err)
 		}
-		// move para o destino progressivo
-		final := dest
-		if r != rots[len(rots)-1] {
-			tmp2, err := output.TempDir()
-			if err != nil {
-				os.RemoveAll(tmp)
-				return nil, err
-			}
-			final = filepath.Join(tmp2, "rot.pdf")
-			defer os.RemoveAll(tmp2)
-		}
 		data, err := os.ReadFile(inter)
-		os.RemoveAll(tmp)
 		if err != nil {
 			return nil, err
 		}
-		if err := output.WriteFile(final, data); err != nil {
+		// move para o destino progressivo
+		if r == rots[len(rots)-1] {
+			if err := output.WriteFile(dest, data); err != nil {
+				return nil, err
+			}
+			current = dest
+			continue
+		}
+		next, err := mkTemp()
+		if err != nil {
 			return nil, err
 		}
-		current = final
+		if err := output.WriteFile(next, data); err != nil {
+			return nil, err
+		}
+		current = next
 	}
 	return []string{current}, nil
 }

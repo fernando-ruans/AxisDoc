@@ -687,7 +687,10 @@ func (t *CreatePDF) run(_ context.Context, in tool.Input, _ func(pct float64)) (
 	}
 	dest := tool.ParamString(in, "outputPath", "")
 	if dest == "" {
-		dest = filepath.Join(tool.OutputDir(in), "novo.pdf")
+		dest = "novo.pdf"
+	}
+	if filepath.Dir(dest) == "." {
+		dest = filepath.Join(tool.OutputDir(in), dest)
 	}
 	dest = output.NextAvailablePath(dest)
 

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getBackend } from '../../bindings/backend'
@@ -8,25 +8,25 @@ import { getBackend } from '../../bindings/backend'
 export function QrLivePreview({ text, size }: { text: string; size: number }): React.JSX.Element | null {
   const { t } = useTranslation()
   const [img, setImg] = useState<string | null>(null)
+  const seqRef = useRef(0)
 
   useEffect(() => {
     if (text.trim() === '') {
       setImg(null)
       return
     }
+    // seq descarta respostas de digitações antigas (last-write-wins)
+    seqRef.current += 1
+    const seq = seqRef.current
     const id = setTimeout(() => {
-      let cancelled = false
       void getBackend()
         .previewFor('text.qrcode', { text, size })
         .then((b64) => {
-          if (!cancelled) setImg(`data:image/png;base64,${b64}`)
+          if (seqRef.current === seq) setImg(`data:image/png;base64,${b64}`)
         })
         .catch(() => {
-          if (!cancelled) setImg(null)
+          if (seqRef.current === seq) setImg(null)
         })
-      return () => {
-        cancelled = true
-      }
     }, 300)
     return () => clearTimeout(id)
   }, [text, size])

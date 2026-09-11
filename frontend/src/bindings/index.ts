@@ -1,4 +1,4 @@
-import type { Backend } from './backend'
+import type { Backend, PreviewRef } from './backend'
 import { MockBackend } from './mockBackend'
 
 // Detecta modo E2E: sem bindings Wails ou com flag ?mock na URL.
@@ -36,7 +36,7 @@ function createWailsBackend(): Backend {
     enqueue: (toolId, input) => call('JobService', 'Enqueue', toolId, input),
     cancel: (id) => call('JobService', 'Cancel', id),
     listJobs: (limit) => call('JobService', 'ListJobs', limit),
-    pickFiles: () => call('SystemService', 'PickFiles'),
+    pickFiles: () => call<string[]>('SystemService', 'PickFiles').then((r) => r ?? []),
     pickFolder: () => call('SystemService', 'PickFolder'),
     savePath: (name) => call('SystemService', 'SavePath', name),
     version: () => call('SystemService', 'Version'),
@@ -46,7 +46,7 @@ function createWailsBackend(): Backend {
     clearHistory: () => call('JobService', 'ClearHistory'),
     openPath: (path) => call('SystemService', 'OpenPath', path),
     revealInFolder: (path) => call('SystemService', 'RevealInFolder', path),
-    registerPreviewFiles: (paths) => call('SystemService', 'RegisterPreviewFiles', paths),
+    registerPreviewFiles: (paths) => call<PreviewRef[]>('SystemService', 'RegisterPreviewFiles', paths).then((r) => r ?? []),
     previewText: (token, maxLines) => call('SystemService', 'PreviewText', token, maxLines),
     previewSummary: (token) => call('SystemService', 'PreviewSummary', token),
     previewFor: (toolId, params) => call('SystemService', 'PreviewFor', toolId, params),
@@ -54,15 +54,6 @@ function createWailsBackend(): Backend {
     previewRender: (toolId, path, params, page) => call('SystemService', 'PreviewRender', toolId, path, params, page),
     saveRenderedPage: (outputDir, baseName, page, ext, base64) =>
       call('SystemService', 'SaveRenderedPage', outputDir, baseName, page, ext, base64),
-    searchQuery: (q, limit) => call('SearchService', 'Query', q, limit),
-    searchCount: () => call('SearchService', 'Count'),
-    pipelineList: () => call('PipelineService', 'List'),
-    pipelineSave: (p) => call('PipelineService', 'Save', p),
-    pipelineDelete: (id) => call('PipelineService', 'Delete', id),
-    pipelineRun: (p, paths) => call('PipelineService', 'Run', p, paths),
-    watchList: () => call('WatchService', 'ListRules'),
-    watchAdd: (folder, pattern, p) => call('WatchService', 'AddRule', folder, pattern, p),
-    watchRemove: (id) => call('WatchService', 'RemoveRule', id),
     pdfEditRemove: (pdfPath, range, outputDir) => call('PdfEditService', 'Remove', pdfPath, range, outputDir),
     pdfEditReorder: (pdfPath, order, outputDir) => call('PdfEditService', 'Reorder', pdfPath, order, outputDir),
     pdfEditRotate: (pdfPath, rots, outputDir) => call('PdfEditService', 'Rotate', pdfPath, rots, outputDir),

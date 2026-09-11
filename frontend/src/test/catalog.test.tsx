@@ -219,7 +219,7 @@ describe('formulário de cada tool (golden por tool)', () => {
     setBackend(backendWith(CANONICAL_CATALOG, { listJobs: async () => fakeJobs }))
     const user = userEvent.setup()
     render(<App />)
-    await user.click(await screen.findByTestId('toggle-jobs'))
+    await user.click(await screen.findByTestId('nav-jobs'))
     expect(await screen.findByTestId('job-paths-j2')).toBeInTheDocument()
   })
 })

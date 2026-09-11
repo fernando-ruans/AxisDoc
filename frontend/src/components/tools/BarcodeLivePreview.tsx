@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type React from 'react'
 import { useTranslation } from 'react-i18next'
 import { getBackend } from '../../bindings/backend'
@@ -19,6 +19,7 @@ export function BarcodeLivePreview({
   const { t } = useTranslation()
   const [img, setImg] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const seqRef = useRef(0)
 
   useEffect(() => {
     if (text.trim() === '') {
@@ -26,23 +27,22 @@ export function BarcodeLivePreview({
       setError(null)
       return
     }
+    // seq descarta respostas de digitações antigas (last-write-wins)
+    seqRef.current += 1
+    const seq = seqRef.current
     const id = setTimeout(() => {
-      let cancelled = false
       void getBackend()
         .previewFor('text.barcode', { text, kind, width, height })
         .then((b64) => {
-          if (cancelled) return
+          if (seqRef.current !== seq) return
           setImg(`data:image/png;base64,${b64}`)
           setError(null)
         })
         .catch((e: unknown) => {
-          if (cancelled) return
+          if (seqRef.current !== seq) return
           setImg(null)
           setError(String(e))
         })
-      return () => {
-        cancelled = true
-      }
     }, 300)
     return () => clearTimeout(id)
   }, [text, kind, width, height])

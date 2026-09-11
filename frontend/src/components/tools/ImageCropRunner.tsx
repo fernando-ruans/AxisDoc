@@ -65,12 +65,22 @@ export function ImageCropRunner({ paths, params, setParam }: Props): React.JSX.E
   // pré-carrega a imagem original para desenhar o preview do recorte
   useEffect(() => {
     if (!token) return
+    let cancelled = false
     const img = new Image()
     img.onload = () => {
+      if (cancelled) return
       imgRef.current = img
       redraw(rectRef.current)
     }
+    img.onerror = () => {
+      if (!cancelled) imgRef.current = null
+    }
     img.src = `/preview/${token}`
+    return () => {
+      cancelled = true
+      img.onload = null
+      img.onerror = null
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [token])
 
@@ -122,7 +132,7 @@ export function ImageCropRunner({ paths, params, setParam }: Props): React.JSX.E
       )}
       {path && (
         <div className="flex flex-wrap items-start gap-6">
-          <VisualCropper path={path} ratio={ratio} onCrop={onCrop} />
+          <VisualCropper path={path} ratio={ratio} onCrop={onCrop} silentInit />
           <div className="min-w-40 space-y-1">
             <p className="text-xs font-medium text-text">{t('preview.resultTitle')}</p>
             {preview != null ? (

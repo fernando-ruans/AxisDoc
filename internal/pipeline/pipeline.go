@@ -45,7 +45,23 @@ func (r *Repo) Save(ctx context.Context, p Pipeline) error {
 }
 
 func (r *Repo) Delete(ctx context.Context, id string) error {
-	return r.repo.Set(ctx, "pipeline:"+id, "")
+	if err := r.repo.Set(ctx, "pipeline:"+id, ""); err != nil {
+		return err
+	}
+	// remove o ID da lista (evita fantasmas no List)
+	raw, _ := r.repo.Get(ctx, "pipelines")
+	var ids []string
+	if raw != "" {
+		_ = json.Unmarshal([]byte(raw), &ids)
+	}
+	kept := ids[:0]
+	for _, x := range ids {
+		if x != id {
+			kept = append(kept, x)
+		}
+	}
+	data, _ := json.Marshal(kept)
+	return r.repo.Set(ctx, "pipelines", string(data))
 }
 
 func (r *Repo) List(ctx context.Context) ([]Pipeline, error) {
@@ -109,7 +125,7 @@ func NewRunner(reg *tool.Registry) *Runner {
 func (r *Runner) Run(ctx context.Context, p Pipeline, paths []string) (*RunResult, error) {
 	current := paths
 	var msgs []string
-	var allPaths []string
+	allPaths := []string{}
 	for i, step := range p.Steps {
 		if err := ctx.Err(); err != nil {
 			return nil, err

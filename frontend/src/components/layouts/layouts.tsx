@@ -120,6 +120,7 @@ function PickFiles({ ctx, multiple, accept }: { ctx: Ctx; multiple: boolean; acc
 }
 
 function SortableList({ ctx }: { ctx: Ctx }): React.JSX.Element {
+  const { t } = useTranslation()
   const move = (i: number, dir: -1 | 1): void => {
     ctx.setPaths((prev) => {
       const next = [...prev]
@@ -135,10 +136,10 @@ function SortableList({ ctx }: { ctx: Ctx }): React.JSX.Element {
       {ctx.paths.map((p, i) => (
         <li key={p} className="flex items-center gap-1 rounded border border-border bg-surface px-2 py-1 text-xs">
           <span className="min-w-0 flex-1 truncate text-text" title={p}>{p}</span>
-          <button type="button" aria-label="up" onClick={() => move(i, -1)} disabled={i === 0} className="p-0.5 text-text-muted hover:text-accent disabled:opacity-30">
+            <button type="button" aria-label={t('common.moveUp')} title={t('common.moveUp')} onClick={() => move(i, -1)} disabled={i === 0} className="p-0.5 text-text-muted hover:text-accent disabled:opacity-30">
             <ArrowUp className="h-3.5 w-3.5" />
           </button>
-          <button type="button" aria-label="down" onClick={() => move(i, 1)} disabled={i === ctx.paths.length - 1} className="p-0.5 text-text-muted hover:text-accent disabled:opacity-30">
+              <button type="button" aria-label={t('common.moveDown')} title={t('common.moveDown')} onClick={() => move(i, 1)} disabled={i === ctx.paths.length - 1} className="p-0.5 text-text-muted hover:text-accent disabled:opacity-30">
             <ArrowDown className="h-3.5 w-3.5" />
           </button>
           <button type="button" aria-label="remove" onClick={() => ctx.setPaths((prev) => prev.filter((x) => x !== p))} className="p-0.5 text-text-muted hover:text-danger">

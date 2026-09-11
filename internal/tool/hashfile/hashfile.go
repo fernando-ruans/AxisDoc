@@ -14,8 +14,10 @@ import (
 	"hash/crc32"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 
+	"github.com/ferna/axisdoc/internal/output"
 	"github.com/ferna/axisdoc/internal/tool"
 )
 
@@ -110,6 +112,11 @@ func (h *HashFile) Run(ctx context.Context, in tool.Input, report func(pct float
 	out := tool.Output{Message: strings.TrimRight(sb.String(), "\n")}
 	// Se um arquivo de saída foi pedido, escreve os resultados.
 	if dest, ok := in.Params["outputPath"].(string); ok && dest != "" {
+		// nome sem diretório: resolve contra a pasta de destino (ou dos arquivos)
+		if filepath.Dir(dest) == "." {
+			dest = filepath.Join(tool.OutputDir(in), dest)
+		}
+		dest = output.NextAvailablePath(dest)
 		if err := writeResults(dest, sb.String()); err != nil {
 			return tool.Output{}, fmt.Errorf("hashfile: gravar saída: %w", err)
 		}

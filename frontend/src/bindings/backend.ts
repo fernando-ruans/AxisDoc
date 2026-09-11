@@ -40,32 +40,6 @@ export interface StructuredSummary {
   title: string
 }
 
-export interface SearchHit {
-  docId: string
-  path: string
-  title: string
-  snippet: string
-  rank: number
-}
-
-export interface PipelineStep {
-  toolId: string
-  params: Record<string, unknown>
-}
-
-export interface Pipeline {
-  id: string
-  name: string
-  steps: PipelineStep[]
-}
-
-export interface WatchRuleOut {
-  id: string
-  folder: string
-  pattern: string
-  pipeline: Pipeline
-}
-
 export interface Job {
   id: string
   toolId: string
@@ -109,15 +83,6 @@ export interface Backend {
   previewTransform(toolId: string, path: string, params: Record<string, unknown>): Promise<string>
   previewRender(toolId: string, path: string, params: Record<string, unknown>, page: number): Promise<string>
   saveRenderedPage(outputDir: string, baseName: string, page: number, ext: string, base64: string): Promise<string>
-  searchQuery(q: string, limit: number): Promise<SearchHit[]>
-  searchCount(): Promise<number>
-  pipelineList(): Promise<Pipeline[]>
-  pipelineSave(p: Pipeline): Promise<void>
-  pipelineDelete(id: string): Promise<void>
-  pipelineRun(p: Pipeline, paths: string[]): Promise<{ paths: string[]; message: string }>
-  watchList(): Promise<WatchRuleOut[]>
-  watchAdd(folder: string, pattern: string, p: Pipeline): Promise<void>
-  watchRemove(id: string): Promise<void>
   pdfEditRemove(pdfPath: string, range: string, outputDir: string): Promise<string[]>
   pdfEditReorder(pdfPath: string, order: string, outputDir: string): Promise<string[]>
   pdfEditRotate(pdfPath: string, rots: Array<{ page: number; angle: number }>, outputDir: string): Promise<string[]>

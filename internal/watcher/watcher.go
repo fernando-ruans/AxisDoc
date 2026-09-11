@@ -48,8 +48,20 @@ func (w *Watcher) AddRule(r Rule) error {
 		return err
 	}
 	w.mu.Lock()
+	defer w.mu.Unlock()
+	// dedup: substitui regra com mesmo ID em vez de duplicar watches
+	for i, cur := range w.rules {
+		if cur.ID == r.ID {
+			prev := w.rules[i].Folder
+			w.rules[i] = r
+			if prev != r.Folder {
+				_ = w.fs.Remove(prev)
+				return w.fs.Add(r.Folder)
+			}
+			return nil
+		}
+	}
 	w.rules = append(w.rules, r)
-	w.mu.Unlock()
 	return w.fs.Add(r.Folder)
 }
 
@@ -67,14 +79,21 @@ func (w *Watcher) ListRules() []Rule {
 	return append([]Rule(nil), w.rules...)
 }
 
-// RemoveRule remove uma regra por ID.
+// RemoveRule remove uma regra por ID (e o watch da pasta se ninguém mais usa).
 func (w *Watcher) RemoveRule(id string) error {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	for i, r := range w.rules {
 		if r.ID == id {
+			folder := r.Folder
 			w.rules = append(w.rules[:i], w.rules[i+1:]...)
-			return nil
+			// só para de observar a pasta se nenhuma outra regra a usa
+			for _, rest := range w.rules {
+				if rest.Folder == folder {
+					return nil
+				}
+			}
+			return w.fs.Remove(folder)
 		}
 	}
 	return errRuleNotFound(id)

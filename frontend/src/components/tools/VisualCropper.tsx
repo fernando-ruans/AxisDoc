@@ -47,10 +47,14 @@ export function VisualCropper({
   path,
   ratio,
   onCrop,
+  silentInit,
 }: {
   path: string
   ratio: string
   onCrop: (r: Rect) => void
+  // quando true, o retângulo inicial NÃO emite onCrop (o pai já preencheu
+  // x/y/w/h — evita gravar coordenadas fake 100x100 vindas do timeout jsdom)
+  silentInit?: boolean
 }): React.JSX.Element | null {
   const { t } = useTranslation()
   const [token, setToken] = useState<string | null>(null)
@@ -61,6 +65,8 @@ export function VisualCropper({
   const dragRef = useRef<{ mode: Mode; dx: number; dy: number } | null>(null)
   const onCropRef = useRef(onCrop)
   onCropRef.current = onCrop
+  const silentInitRef = useRef(silentInit ?? false)
+  silentInitRef.current = silentInit ?? false
 
   useEffect(() => {
     let cancelled = false
@@ -94,12 +100,19 @@ export function VisualCropper({
     if (!silent) emit(r, nw, nh)
   }
 
-  // jsdom não dispara onLoad de <img>: garante o retângulo inicial por timeout
+  // jsdom não dispara onLoad de <img>: garante o retângulo inicial por timeout.
+  // Com silentInit o retângulo aparece mas nunca emite onCrop fake.
   useEffect(() => {
     if (!token || rect) return
     const id = setTimeout(() => {
       if (rectRef.current) return
-      applyRect(applyRatio({ x: 0.2, y: 0.2, w: 0.6, h: 0.6 }, ratio), nat.w || 100, nat.h || 100)
+      const init = applyRatio({ x: 0.2, y: 0.2, w: 0.6, h: 0.6 }, ratio)
+      if (silentInitRef.current) {
+        rectRef.current = init
+        setRect(init)
+      } else {
+        applyRect(init, nat.w || 100, nat.h || 100)
+      }
     }, 50)
     return () => clearTimeout(id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -111,7 +124,13 @@ export function VisualCropper({
     const nh = el.naturalHeight || 100
     setNat({ w: nw, h: nh })
     if (!rectRef.current) {
-      applyRect(applyRatio({ x: 0.2, y: 0.2, w: 0.6, h: 0.6 }, ratio), nw, nh)
+      if (silentInitRef.current) {
+        const init = applyRatio({ x: 0.2, y: 0.2, w: 0.6, h: 0.6 }, ratio)
+        rectRef.current = init
+        setRect(init)
+      } else {
+        applyRect(applyRatio({ x: 0.2, y: 0.2, w: 0.6, h: 0.6 }, ratio), nw, nh)
+      }
     }
   }
 

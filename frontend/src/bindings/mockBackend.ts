@@ -1,4 +1,4 @@
-import type { Backend, Job, JobInput, Pipeline, PreviewRef, SearchHit, StructuredSummary, ToolInfo, WatchRuleOut } from './backend'
+import type { Backend, Job, JobInput, PreviewRef, StructuredSummary, ToolInfo } from './backend'
 
 // Mock do backend para E2E (Playwright) e desenvolvimento sem Wails.
 // Roda em memória, simula progresso com timers.
@@ -166,44 +166,6 @@ export class MockBackend implements Backend {
 
   async saveRenderedPage(outputDir: string, baseName: string, page: number, ext: string, _base64: string): Promise<string> {
     return `${outputDir}/${baseName}_p${String(page).padStart(2, '0')}.${ext}`
-  }
-
-  async searchQuery(_q: string, _limit: number): Promise<SearchHit[]> {
-    return [
-      { docId: 'd1', path: 'C:/fixtures/doc.txt', title: 'doc.txt', snippet: 'trecho ▶exemplo◀ …', rank: 0.1 },
-    ]
-  }
-
-  async searchCount(): Promise<number> {
-    return 1
-  }
-
-  async pipelineList(): Promise<Pipeline[]> {
-    return []
-  }
-
-  async pipelineSave(_p: Pipeline): Promise<void> {
-    // noop
-  }
-
-  async pipelineDelete(_id: string): Promise<void> {
-    // noop
-  }
-
-  async pipelineRun(_p: Pipeline, _paths: string[]): Promise<{ paths: string[]; message: string }> {
-    return { paths: [], message: 'macro executada (mock)' }
-  }
-
-  async watchList(): Promise<WatchRuleOut[]> {
-    return []
-  }
-
-  async watchAdd(_folder: string, _pattern: string, _p: Pipeline): Promise<void> {
-    // noop
-  }
-
-  async watchRemove(_id: string): Promise<void> {
-    // noop
   }
 
   async pdfEditRemove(_pdfPath: string, _range: string, _outputDir: string): Promise<string[]> {

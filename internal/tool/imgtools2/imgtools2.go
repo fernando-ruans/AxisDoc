@@ -356,7 +356,10 @@ func (t *IconGen) run(_ context.Context, in tool.Input, _ func(pct float64)) (to
 	}
 	dest := tool.ParamString(in, "outputPath", "")
 	if dest == "" {
-		dest = filepath.Join(tool.OutputDir(in), fileStem(in.Paths[0])+".ico")
+		dest = fileStem(in.Paths[0]) + ".ico"
+	}
+	if filepath.Dir(dest) == "." {
+		dest = filepath.Join(tool.OutputDir(in), dest)
 	}
 	dest = output.NextAvailablePath(dest)
 	if err := writeICO(dest, src); err != nil {
@@ -510,7 +513,10 @@ func (t *GIFBuild) run(_ context.Context, in tool.Input, _ func(pct float64)) (t
 	delay := int(tool.ParamFloat(in, "delay", 100))
 	dest := tool.ParamString(in, "outputPath", "")
 	if dest == "" {
-		dest = filepath.Join(tool.OutputDir(in), "animacao.gif")
+		dest = "animacao.gif"
+	}
+	if filepath.Dir(dest) == "." {
+		dest = filepath.Join(tool.OutputDir(in), dest)
 	}
 	dest = output.NextAvailablePath(dest)
 

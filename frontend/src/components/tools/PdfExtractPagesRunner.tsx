@@ -99,15 +99,17 @@ export function PdfExtractPagesRunner({ paths, params }: Props): React.JSX.Eleme
     setError(null)
     setResults([])
     setProgress(0)
+    let doc: { cleanup: () => Promise<void> } | null = null
     try {
       const refsPreview = await getBackend().registerPreviewFiles([pdfPath])
       if (refsPreview.length === 0) throw new Error('preview indisponível')
-      const doc = await getDocument({ url: `/preview/${refsPreview[0].token}` }).promise
+      const loaded = await getDocument({ url: `/preview/${refsPreview[0]?.token ?? ''}` }).promise
+      doc = loaded
       const pages = [...selected].sort((a, b) => a - b)
       const out: string[] = []
       for (let i = 0; i < pages.length; i++) {
         const pageNum = pages[i] ?? 0
-        const pg = await doc.getPage(pageNum)
+        const pg = await loaded.getPage(pageNum)
         const viewport = pg.getViewport({ scale: 2 })
         const canvas = document.createElement('canvas')
         canvas.width = Math.floor(viewport.width)
@@ -122,11 +124,16 @@ export function PdfExtractPagesRunner({ paths, params }: Props): React.JSX.Eleme
         out.push(saved)
         setProgress(Math.round(((i + 1) / pages.length) * 100))
       }
-      await doc.cleanup()
       setResults(out)
     } catch (e) {
       setError(String(e))
     } finally {
+      // cleanup mesmo em erro; setBusy pós-unmount é no-op seguro
+      try {
+        await doc?.cleanup()
+      } catch {
+        // worker já descartado
+      }
       setBusy(false)
     }
   }

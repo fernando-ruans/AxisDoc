@@ -117,7 +117,11 @@ func (t *MergePDF) run(_ context.Context, in tool.Input, _ func(pct float64)) (t
 	}
 	dest := tool.ParamString(in, "outputPath", "")
 	if dest == "" {
-		dest = filepath.Join(tool.OutputDir(in), "merged.pdf")
+		dest = "merged.pdf"
+	}
+	// nome sem diretório: resolve contra a pasta de destino (ou dos arquivos)
+	if filepath.Dir(dest) == "." {
+		dest = filepath.Join(tool.OutputDir(in), dest)
 	}
 	dest = output.NextAvailablePath(dest)
 	if err := api.MergeCreateFile(in.Paths, dest, false, nil); err != nil {
