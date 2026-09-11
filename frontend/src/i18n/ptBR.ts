@@ -86,6 +86,8 @@ export const ptBR = {
     imgicon: {
       title: 'Ícone favicon',
       desc: 'Gera .ico multi-resolução a partir de imagem',
+      empty: 'Selecione uma imagem para gerar o .ico multi-resolução (16 a 256 px embutidos)',
+      simTitle: 'Como ficam as resoluções no .ico',
     },
     gifextract: {
       title: 'Extrair frames de GIF',

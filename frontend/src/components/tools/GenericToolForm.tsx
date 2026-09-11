@@ -37,7 +37,7 @@ const LAYOUTS: Record<string, 'transform' | 'generator' | 'inspector'> = {
   'img.resize': 'transform',
   'img.transform': 'transform',
   'img.filters': 'transform',
-  'img.icon': 'generator',
+  'img.icon': 'transform',
   'img.gifextract': 'transform',
   'img.gifbuild': 'generator',
   'img.watermark': 'transform',

@@ -11,6 +11,7 @@ import { InlineJobResult } from '../tools/InlineJobResult'
 import { LiveTransformPreview } from '../tools/LiveTransformPreview'
 import { PdfPreviewResult } from '../tools/PdfPreviewResult'
 import { BeforeAfter } from '../BeforeAfter'
+import { IconLayout, IconLastResult } from './IconLayout'
 
 // Tools cujo Transform mostra live preview do 1º arquivo (clicar = ver na hora).
 // Saída em IMAGEM → LiveTransformPreview (<img>). Saída em PDF → PdfLivePreview
@@ -104,7 +105,8 @@ function PickFiles({ ctx, multiple, accept }: { ctx: Ctx; multiple: boolean; acc
       for (const f of useAll.length > 0 ? useAll : files) {
         if (!next.includes(f)) next.push(f)
       }
-      return next
+      // seleção única: mantém só o último escolhido
+      return multiple ? next : next.slice(-1)
     })
   }
   return (
@@ -217,6 +219,17 @@ export function TransformLayout({ tool, initial }: { tool: ToolInfo; initial: Re
   const needFiles = ctx.paths.length === 0
   const missing = visible.find((p) => p.required && (ctx.params[p.key] === undefined || ctx.params[p.key] === ''))
   const reason = needFiles ? t('common.pickFiles') : missing ? t(missing.label, { defaultValue: missing.key }) : null
+  // img.icon tem layout próprio (IconLayout) — aqui só o shell de seleção.
+  if (tool.id === 'img.icon') {
+    return (
+      <div className="space-y-4">
+        <PickFiles ctx={ctx} multiple={false} accept={toolAccept(tool)} />
+        <SortableList ctx={ctx} />
+        <IconLayout ctx={{ ...ctx, toolId: tool.id }} />
+        <IconLastResult lastJobId={ctx.lastJobId} />
+      </div>
+    )
+  }
   // Live preview só com 1 arquivo (multi vira lote): imagem via backend,
   // PDF via render real + simulação (sem pdfium, sem erro).
   const single = ctx.paths.length === 1 ? ctx.paths[0] ?? null : null

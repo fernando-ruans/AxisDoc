@@ -288,7 +288,7 @@ describe('formulário de cada tool (golden por tool)', () => {
     ['img.resize', 'layout-transform-img.resize'],
     ['img.transform', 'layout-transform-img.transform'],
     ['img.filters', 'layout-transform-img.filters'],
-    ['img.icon', 'layout-generator-img.icon'],
+    ['img.icon', 'layout-icon-img.icon'],
     ['img.gifextract', 'layout-transform-img.gifextract'],
     ['img.gifbuild', 'layout-generator-img.gifbuild'],
     ['img.watermark', 'layout-transform-img.watermark'],
@@ -329,7 +329,15 @@ describe('formulário de cada tool (golden por tool)', () => {
     const tool = CANONICAL_CATALOG.find((t) => t.id === id)
     if (!tool) throw new Error(`${id} ausente`)
     setBackend(backendWith(CANONICAL_CATALOG))
+    const user = userEvent.setup()
     render(<GenericToolForm tool={tool} />)
+    // img.icon: layout dedicado que exige seleção antes de montar o IconLayout
+    if (id === 'img.icon') {
+      expect(screen.getByTestId('pick-files')).toBeInTheDocument()
+      await user.click(screen.getByTestId('pick-files'))
+      expect(await screen.findByTestId(layoutId, undefined, { timeout: 3000 })).toBeInTheDocument()
+      return
+    }
     expect(screen.getByTestId(layoutId)).toBeInTheDocument()
   })
 

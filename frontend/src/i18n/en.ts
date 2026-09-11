@@ -88,6 +88,8 @@ export const en: Dict = {
     imgicon: {
       title: 'Favicon icon',
       desc: 'Generate multi-resolution .ico from image',
+      empty: 'Pick an image to generate the multi-resolution .ico (16 to 256 px embedded)',
+      simTitle: 'How the resolutions look in the .ico',
     },
     gifextract: {
       title: 'Extract GIF frames',

@@ -88,6 +88,8 @@ export const es: Dict = {
     imgicon: {
       title: 'Icono favicon',
       desc: 'Genera .ico multi-resolución desde imagen',
+      empty: 'Elige una imagen para generar el .ico multi-resolución (16 a 256 px incluidos)',
+      simTitle: 'Cómo quedan las resoluciones en el .ico',
     },
     gifextract: {
       title: 'Extraer cuadros de GIF',
