@@ -1,6 +1,7 @@
 package imgtools2
 
 import (
+	"bytes"
 	"context"
 	"image"
 	"image/png"
@@ -158,6 +159,44 @@ func TestIconGen(t *testing.T) {
 	}
 	if _, err := NewIconGen().Steps()[0].Run(context.Background(), tool.Input{}, nil); err == nil {
 		t.Fatal("sem arquivos deveria falhar")
+	}
+}
+
+func TestIconGenDecodesBack(t *testing.T) {
+	// gera via a própria tool e relê cada entrada como PNG (o que o
+	// Windows faz ao escolher uma resolução do .ico); o arquivo também
+	// é salvo para inspeção manual.
+	dir := t.TempDir()
+	p := filepath.Join(dir, "img.png")
+	writePNG(t, p, 256, 256)
+	out := runOne(t, NewIconGen(), tool.Input{
+		Paths:  []string{p},
+		Params: map[string]any{"outputPath": filepath.Join(dir, "favicon.ico")},
+	})
+	raw, err := os.ReadFile(out.Paths[0])
+	if err != nil {
+		t.Fatal(err)
+	}
+	if v := os.Getenv("ICO_DEBUG_DIR"); v != "" {
+		_ = os.WriteFile(filepath.Join(v, "favicon-debug.ico"), raw, 0o644)
+	}
+	count := int(raw[4]) + int(raw[5])<<8
+	off := 6
+	for i := 0; i < count; i++ {
+		w := int(raw[off])
+		if w == 0 {
+			w = 256
+		}
+		size := int(raw[off+8]) | int(raw[off+9])<<8 | int(raw[off+10])<<16 | int(raw[off+11])<<24
+		start := int(raw[off+12]) | int(raw[off+13])<<8 | int(raw[off+14])<<16 | int(raw[off+15])<<24
+		img, err := png.Decode(bytes.NewReader(raw[start : start+size]))
+		if err != nil {
+			t.Fatalf("entrada %d (%dpx): PNG inválido: %v", i, w, err)
+		}
+		if img.Bounds().Dx() != w || img.Bounds().Dy() != w {
+			t.Fatalf("entrada %d: dims %v != %dx%d", i, img.Bounds(), w, w)
+		}
+		off += 16
 	}
 }
 

@@ -398,14 +398,14 @@ func (t *IconGen) run(_ context.Context, in tool.Input, _ func(pct float64)) (to
 }
 
 type icoDirEntry struct {
-	Width  uint8
-	Height uint8
-	_      uint8
-	_      uint16
-	Planes uint16
-	BitCnt uint16
-	Size   uint32
-	Offset uint32
+	Width      uint8
+	Height     uint8
+	ColorCount uint8
+	Reserved   uint8
+	Planes     uint16
+	BitCount   uint16
+	BytesInRes uint32
+	ImageOffset uint32
 }
 
 func writeICO(path string, src image.Image, sizes []int) error {
@@ -442,7 +442,10 @@ func writeICO(path string, src image.Image, sizes []int) error {
 		if s >= 256 {
 			w = 0
 		}
-		e := icoDirEntry{Width: w, Height: w, Planes: 1, BitCnt: 32, Size: uint32(len(b)), Offset: offset}
+		e := icoDirEntry{
+			Width: w, Height: w, ColorCount: 0, Reserved: 0,
+			Planes: 1, BitCount: 32, BytesInRes: uint32(len(b)), ImageOffset: offset,
+		}
 		if err := binary.Write(f, binary.LittleEndian, e); err != nil {
 			return err
 		}
